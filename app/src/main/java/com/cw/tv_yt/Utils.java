@@ -28,6 +28,8 @@ import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A collection of utility methods, all static.
@@ -95,5 +97,23 @@ public class Utils {
             mmr.setDataSource(videoUrl);
         }
         return Long.parseLong(mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+    }
+
+    public static String getYoutubeId(String url) {
+
+        String videoId = "";
+
+        if (url != null && url.trim().length() > 0 && url.startsWith("http")) {
+            String expression = "^.*((youtu.be\\/)|(v\\/)|(\\/u\\/w\\/)|(embed\\/)|(watch\\?))\\??(v=)?([^#\\&\\?]*).*";
+            CharSequence input = url;
+            Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);//??? some Urls are NG
+            Matcher matcher = pattern.matcher(input);
+            if (matcher.matches()) {
+                String groupIndex1 = matcher.group(8);
+                if (groupIndex1 != null && groupIndex1.length() == 11)
+                    videoId = groupIndex1;
+            }
+        }
+        return videoId;
     }
 }

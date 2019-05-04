@@ -21,6 +21,7 @@ import android.media.Rating;
 import android.util.Log;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -123,7 +124,8 @@ public class VideoDbBuilder_yt {
 //                String bgImageUrl = video.optString(TAG_BACKGROUND);
                 String bgImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/Google%2B/Google%2B_%20Instant%20Upload/bg.jpg";
 //                String cardImageUrl = video.optString(TAG_CARD_THUMB);
-                String cardImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Explore%20Treasure%20Mode%20with%20Google%20Maps/card.jpg";
+//                String cardImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Explore%20Treasure%20Mode%20with%20Google%20Maps/card.jpg";
+                String cardImageUrl = "http://img.youtube.com/vi/"+ Utils.getYoutubeId(videoUrl)+"/0.jpg";
 //                String studio = video.optString(TAG_STUDIO);
                 String studio = "STUDIO";
 
