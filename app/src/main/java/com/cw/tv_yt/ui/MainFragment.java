@@ -56,8 +56,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
-import com.cw.tv_yt.data.FetchVideoService;
-import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.data_yt.FetchVideoService_yt;
+import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -151,7 +151,8 @@ public class MainFragment extends BrowseSupportFragment
 
         mCategoryRowAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(mCategoryRowAdapter);
-        updateRecommendations();
+        //todo temporary mark
+//        updateRecommendations();
 
     }
 
@@ -249,13 +250,13 @@ public class MainFragment extends BrowseSupportFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         if (id == CATEGORY_LOADER) {
-            System.out.println("MainFragment / _onCreateLoade / id == CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
-                    VideoContract.VideoEntry.CONTENT_URI);
-            System.out.println("MainFragment / _onCreateLoade / DISTINCT VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract.VideoEntry.COLUMN_CATEGORY);
+            System.out.println("MainFragment / _onCreateLoader / id == CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
+                    VideoContract_yt.VideoEntry.CONTENT_URI);
+            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
             return new CursorLoader(
                     getContext(),
-                    VideoContract.VideoEntry.CONTENT_URI, // Table to query
-                    new String[]{"DISTINCT " + VideoContract.VideoEntry.COLUMN_CATEGORY},
+                    VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
+                    new String[]{"DISTINCT " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
@@ -263,17 +264,17 @@ public class MainFragment extends BrowseSupportFragment
             );
         } else {
             System.out.println("MainFragment / _onCreateLoader / id != CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI = " +
-                    VideoContract.VideoEntry.CONTENT_URI );
-            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract.VideoEntry.COLUMN_CATEGORY);
+                    VideoContract_yt.VideoEntry.CONTENT_URI );
+            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
             // Assume it is for a video.
-            String category = args.getString(VideoContract.VideoEntry.COLUMN_CATEGORY);
+            String category = args.getString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
 
             // This just creates a CursorLoader that gets all videos.
             return new CursorLoader(
                     getContext(),
-                    VideoContract.VideoEntry.CONTENT_URI, // Table to query
+                    VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
                     null, // Projection to return - null means return all fields
-                    VideoContract.VideoEntry.COLUMN_CATEGORY + " = ?", // Selection clause
+                    VideoContract_yt.VideoEntry.COLUMN_CATEGORY + " = ?", // Selection clause
                     new String[]{category},  // Select based on the category id.
                     null // Default sort order
             );
@@ -297,7 +298,7 @@ public class MainFragment extends BrowseSupportFragment
                 while (!data.isAfterLast()) {
 
                     int categoryIndex =
-                            data.getColumnIndex(VideoContract.VideoEntry.COLUMN_CATEGORY);
+                            data.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
                     String category = data.getString(categoryIndex);
 
                     // Create header for this category.
@@ -318,7 +319,7 @@ public class MainFragment extends BrowseSupportFragment
 
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
-                        args.putString(VideoContract.VideoEntry.COLUMN_CATEGORY, category);
+                        args.putString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, category);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
                     } else {
                         ListRow row = new ListRow(header, existingAdapter);
@@ -349,7 +350,7 @@ public class MainFragment extends BrowseSupportFragment
         } else {
             System.out.println("MainFragment / _onLoadFinished / data == null or !data.moveToFirst()");
             // Start an Intent to fetch the videos.
-            Intent serviceIntent = new Intent(getActivity(), FetchVideoService.class);
+            Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
             getActivity().startService(serviceIntent);
         }
     }
@@ -382,25 +383,28 @@ public class MainFragment extends BrowseSupportFragment
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-            if (item instanceof Video) {
-                Video video = (Video) item;
-                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                intent.putExtra(VideoDetailsActivity.VIDEO, video);
-
-                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
-                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                getActivity().startActivity(intent, bundle);
+//            if (item instanceof Video) {
+//                Video video = (Video) item;
+//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+//
+//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                        getActivity(),
+//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+//                getActivity().startActivity(intent, bundle);
 
             //todo
             ///
 //            if (item instanceof Movie) {
 //                Movie movie = (Movie) item;
-//                String idStr = getYoutubeId(movie.getVideoUrl() );
-//
-//                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-//                startActivity(intent);
+//            String idStr = getYoutubeId(movie.getVideoUrl() );
+
+            // case: no details
+            if (item instanceof Video) {
+                String idStr = getYoutubeId(((Video) item).videoUrl );
+                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                startActivity(intent);
             ///
             } else if (item instanceof String) {
                 if (((String) item).contains(getString(R.string.grid_view))) {

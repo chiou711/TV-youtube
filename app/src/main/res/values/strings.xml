@@ -16,8 +16,8 @@
 -->
 
 <resources>
-    <string name="app_name"><![CDATA[Videos by Google]]></string>
-    <string name="browse_title"><![CDATA[Videos by Google]]></string>
+    <string name="app_name"><![CDATA[TV YouTube]]></string>
+    <string name="browse_title"><![CDATA[TV YouTube]]></string>
     <string name="related_movies">Related Videos</string>
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
 
@@ -36,7 +36,11 @@
 
     <string name="search_results">Search results for \'%1$s\'</string>
     <string name="no_search_results">No search results found for \'%1$s\'</string>
-    <string name="catalog_url">https://storage.googleapis.com/android-tv/android_tv_videos_new.json</string>
+    <!--<string name="catalog_url">https://storage.googleapis.com/android-tv/android_tv_videos_new.json</string>-->
+
+    <string name="catalog_url">
+    https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json
+    </string>
 
     <!-- Error messages -->
 

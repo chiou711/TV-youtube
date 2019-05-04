@@ -115,7 +115,7 @@
 
         <!-- Provides search suggestions for keywords against video metadata. -->
         <provider
-            android:name="com.cw.tv_yt.data.VideoProvider"
+            android:name="com.cw.tv_yt.data_yt.VideoProvider_yt"
             android:authorities="${packageName}"
             android:permission="${applicationId}.ACCESS_VIDEO_DATA"
             android:exported="true">
@@ -134,7 +134,7 @@
         </receiver>
 
         <service
-            android:name="com.cw.tv_yt.data.FetchVideoService"
+            android:name="com.cw.tv_yt.data_yt.FetchVideoService_yt"
             android:exported="false" />
         <service
             android:name="com.cw.tv_yt.recommendation.UpdateRecommendationsService"
