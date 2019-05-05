@@ -383,29 +383,23 @@ public class MainFragment extends BrowseSupportFragment
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-//            if (item instanceof Video) {
-//                Video video = (Video) item;
-//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
-//
-//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                        getActivity(),
-//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-//                getActivity().startActivity(intent, bundle);
+            if (item instanceof Video) {
+                Video video = (Video) item;
+                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+
+                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        getActivity(),
+                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                getActivity().startActivity(intent, bundle);
 
             //todo
-            ///
-//            if (item instanceof Movie) {
-//                Movie movie = (Movie) item;
-//            String idStr = getYoutubeId(movie.getVideoUrl() );
-
             // case: no details
-            if (item instanceof Video) {
-                String idStr = getYoutubeId(((Video) item).videoUrl );
-                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                startActivity(intent);
-            ///
+//            if (item instanceof Video) {
+//                String idStr = getYoutubeId(((Video) item).videoUrl );
+//                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+//                startActivity(intent);
             } else if (item instanceof String) {
                 if (((String) item).contains(getString(R.string.grid_view))) {
                     Intent intent = new Intent(getActivity(), VerticalGridActivity.class);

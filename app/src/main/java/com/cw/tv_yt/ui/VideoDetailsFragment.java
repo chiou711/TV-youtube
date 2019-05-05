@@ -67,6 +67,9 @@ import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.presenter.DetailsDescriptionPresenter;
+import com.google.android.youtube.player.YouTubeIntents;
+
+import static com.cw.tv_yt.Utils.getYoutubeId;
 
 /*
  * VideoDetailsFragment extends DetailsFragment, a Wrapper fragment for leanback details screens.
@@ -203,8 +206,13 @@ public class VideoDetailsFragment extends DetailsSupportFragment
             @Override
             public void onActionClicked(Action action) {
                 if (action.getId() == ACTION_WATCH_TRAILER) {
-                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
-                    intent.putExtra(VideoDetailsActivity.VIDEO, mSelectedVideo);
+//                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
+//                    intent.putExtra(VideoDetailsActivity.VIDEO, mSelectedVideo);
+//                    startActivity(intent);
+
+                    //todo run YouTube
+                    String idStr = getYoutubeId(mSelectedVideo.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
                     startActivity(intent);
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
@@ -376,15 +384,20 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-                Video video = (Video) item;
-                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+//                Video video = (Video) item;
+//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+//
+//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                        getActivity(),
+//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+//                getActivity().startActivity(intent, bundle);
 
-                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
-                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                getActivity().startActivity(intent, bundle);
+                //todo run YouTube
+                String idStr = getYoutubeId(((Video) item).videoUrl );
+                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                startActivity(intent);
             }
         }
     }
