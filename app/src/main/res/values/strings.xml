@@ -39,7 +39,8 @@
     <!--<string name="catalog_url">https://storage.googleapis.com/android-tv/android_tv_videos_new.json</string>-->
 
     <string name="catalog_url">
-    https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json
+    <!--https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json-->
+    https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_2.json
     </string>
 
     <!-- Error messages -->

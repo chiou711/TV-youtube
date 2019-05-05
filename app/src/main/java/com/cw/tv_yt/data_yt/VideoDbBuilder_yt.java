@@ -44,7 +44,7 @@ import androidx.annotation.NonNull;
 public class VideoDbBuilder_yt {
 //    public static final String TAG_MEDIA = "videos";
     public static final String TAG_MEDIA = "links";
-    public static final String TAG_GOOGLE_VIDEOS = "googlevideos";
+    public static final String TAG_GOOGLE_VIDEOS = "link_page";//"googlevideos";
     public static final String TAG_CATEGORY = "category";
     public static final String TAG_STUDIO = "studio";
     public static final String TAG_SOURCES = "sources";
@@ -88,21 +88,21 @@ public class VideoDbBuilder_yt {
         System.out.println("VideoDbBuilder / _buildMedia / jsonObj.toString = " + jsonObj.toString());
 
         //todo mark for simple check
-//        JSONArray categoryArray = jsonObj.getJSONArray(TAG_GOOGLE_VIDEOS);
+        JSONArray categoryArray = jsonObj.getJSONArray(TAG_GOOGLE_VIDEOS);
         List<ContentValues> videosToInsert = new ArrayList<>();
 
-//        for (int i = 0; i < categoryArray.length(); i++)
+        for (int i = 0; i < categoryArray.length(); i++)
         {
             JSONArray videoArray;
 
-//            JSONObject category = categoryArray.getJSONObject(i);
-//            String categoryName = category.getString(TAG_CATEGORY);
-            String categoryName = "category";
-//            videoArray = category.getJSONArray(TAG_MEDIA);
+            JSONObject category = categoryArray.getJSONObject(i);
+            String categoryName = category.getString(TAG_CATEGORY);
+            //String categoryName = "category";
+            videoArray = category.getJSONArray(TAG_MEDIA);
 
             ///
             // links
-            videoArray = jsonObj.getJSONArray(TAG_MEDIA);
+            //videoArray = jsonObj.getJSONArray(TAG_MEDIA);
 
             for (int j = 0; j < videoArray.length(); j++) {
                 JSONObject video = videoArray.getJSONObject(j);
