@@ -103,6 +103,10 @@ public class MainFragment extends BrowseSupportFragment
 
     int rowsCount;
 
+    // workaround for keeping cursor position
+    private boolean isDataLoaded;
+    private int rowsLoadedCount;
+
 
     @Override
     public void onAttach(Context context) {
@@ -154,6 +158,9 @@ public class MainFragment extends BrowseSupportFragment
         //todo temporary mark
 //        updateRecommendations();
 
+        // workaround for keeping cursor position
+        isDataLoaded = false;
+        rowsLoadedCount = 0;
     }
 
     @Override
@@ -183,7 +190,7 @@ public class MainFragment extends BrowseSupportFragment
                 getActivity().getResources().getDrawable(R.drawable.videos_by_google_banner, null));
         setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
         setHeadersState(HEADERS_ENABLED);
-        setHeadersTransitionOnBackEnabled(true);
+	    setHeadersTransitionOnBackEnabled(true); //true: focus will return to header, false: will close App
 
         // Set fastLane (or headers) background color
         setBrandColor(ContextCompat.getColor(getActivity(), R.color.fastlane_background));
@@ -248,7 +255,7 @@ public class MainFragment extends BrowseSupportFragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
+        System.out.println("MainFragment / _onCreateLoader");
         if (id == CATEGORY_LOADER) {
             System.out.println("MainFragment / _onCreateLoader / id == CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
                     VideoContract_yt.VideoEntry.CONTENT_URI);
@@ -284,6 +291,10 @@ public class MainFragment extends BrowseSupportFragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        // workaround for keeping cursor position
+        if(isDataLoaded)
+            return;
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
@@ -321,14 +332,16 @@ public class MainFragment extends BrowseSupportFragment
                         Bundle args = new Bundle();
                         args.putString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, category);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
+                        System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / 1 ");
                     } else {
                         ListRow row = new ListRow(header, existingAdapter);
                         mCategoryRowAdapter.add(row);
+                        System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / 2 ");
                     }
 
                     data.moveToNext();
                 }
-
+                System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                 // Create a row for this special case with more samples.
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
@@ -342,10 +355,18 @@ public class MainFragment extends BrowseSupportFragment
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
+
             } else {
                 System.out.println("MainFragment / _onLoadFinished / loaderId != CATEGORY_LOADER");
+                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
+                System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
+
+                // workaround for keeping cursor position
+                rowsLoadedCount++;
+                if(mVideoCursorAdapters.size() == rowsLoadedCount)
+                    isDataLoaded = true;
             }
         } else {
             System.out.println("MainFragment / _onLoadFinished / data == null or !data.moveToFirst()");
