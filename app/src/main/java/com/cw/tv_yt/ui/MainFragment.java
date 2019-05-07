@@ -19,10 +19,10 @@ package com.cw.tv_yt.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -58,6 +58,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
+import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -346,7 +347,8 @@ public class MainFragment extends BrowseSupportFragment
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
-                gridRowAdapter.add(getString(R.string.grid_view));
+	            gridRowAdapter.add(getString(R.string.refresh_links));
+	            gridRowAdapter.add(getString(R.string.grid_view));
                 gridRowAdapter.add(getString(R.string.guidedstep_first_title));
                 gridRowAdapter.add(getString(R.string.error_fragment));
                 gridRowAdapter.add(getString(R.string.personal_settings));
@@ -423,12 +425,31 @@ public class MainFragment extends BrowseSupportFragment
                 startActivity(intent);
 
             } else if (item instanceof String) {
-                if (((String) item).contains(getString(R.string.grid_view))) {
-                    Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
-                    Bundle bundle =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
-                                    .toBundle();
-                    startActivity(intent, bundle);
+	            if (((String) item).contains(getString(R.string.refresh_links))) {
+		            VideoDbHelper_yt mDbHelper;
+		            mDbHelper = new VideoDbHelper_yt(getActivity());
+		            SQLiteDatabase mSqlDb = mDbHelper.getWritableDatabase();
+		            try {
+			            mSqlDb.beginTransaction();
+			            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
+			            mSqlDb.setTransactionSuccessful();
+		            }
+		            catch (Exception e) {
+		            }
+		            finally {
+			            Toast.makeText(getActivity(),"Please wait, will refresh links.",Toast.LENGTH_SHORT).show();
+			            mSqlDb.endTransaction();
+		            }
+
+		            getActivity().finish();
+		            Intent intent  = new Intent(getActivity(),MainActivity.class);
+		            startActivity(intent);
+	            } else if (((String) item).contains(getString(R.string.grid_view))) {
+			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
+			            Bundle bundle =
+					            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
+							            .toBundle();
+			            startActivity(intent, bundle);
                 } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
                     Intent intent = new Intent(getActivity(), GuidedStepActivity.class);
                     Bundle bundle =

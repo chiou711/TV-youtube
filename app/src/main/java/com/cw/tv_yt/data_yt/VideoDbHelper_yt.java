@@ -31,7 +31,7 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 4;
 
     // The name of our database.
-    private static final String DATABASE_NAME = "tv_yt.db";
+    public static final String DATABASE_NAME = "tv_yt.db";
 
     public VideoDbHelper_yt(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
