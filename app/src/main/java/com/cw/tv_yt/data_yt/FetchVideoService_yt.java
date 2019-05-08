@@ -34,6 +34,7 @@ import java.util.List;
  */
 public class FetchVideoService_yt extends IntentService {
     private static final String TAG = "FetchVideoService_yt";
+    public static String serviceUrl;
 
     /**
      * Creates an IntentService with a default name for the worker thread.
@@ -44,12 +45,14 @@ public class FetchVideoService_yt extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent workIntent) {
-        System.out.println("FetchVideoService_yt / _onHandleIntent");
+        serviceUrl = workIntent.getStringExtra("FetchUrl");
+        System.out.println("FetchVideoService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
         VideoDbBuilder_yt builder = new VideoDbBuilder_yt(getApplicationContext());
 
         try {
             List<ContentValues> contentValuesList =
-                    builder.fetch(getResources().getString(R.string.catalog_url));
+//                    builder.fetch(getResources().getString(R.string.catalog_url));
+                    builder.fetch(serviceUrl);
 
             ContentValues[] downloadedVideoContentValues =
                     contentValuesList.toArray(new ContentValues[contentValuesList.size()]);

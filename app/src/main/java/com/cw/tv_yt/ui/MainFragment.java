@@ -288,8 +288,11 @@ public class MainFragment extends BrowseSupportFragment
 
         dataCursor = data;
         // workaround for keeping cursor position
-        if(isDataLoaded)
+        if(isDataLoaded) {
+            isDataLoaded = false;
+            rowsLoadedCount = 0;
             return;
+        }
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
@@ -341,7 +344,8 @@ public class MainFragment extends BrowseSupportFragment
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
-	            gridRowAdapter.add(getString(R.string.refresh_links));
+                gridRowAdapter.add(getString(R.string.refresh_links1));
+                gridRowAdapter.add(getString(R.string.refresh_links2));
 	            gridRowAdapter.add(getString(R.string.grid_view));
                 gridRowAdapter.add(getString(R.string.guidedstep_first_title));
                 gridRowAdapter.add(getString(R.string.error_fragment));
@@ -401,7 +405,7 @@ public class MainFragment extends BrowseSupportFragment
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-             // case: with details
+             //todo case: with details
 //                Video video = (Video) item;
 //                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
 //                intent.putExtra(VideoDetailsActivity.VIDEO, video);
@@ -412,38 +416,17 @@ public class MainFragment extends BrowseSupportFragment
 //                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
 //                getActivity().startActivity(intent, bundle);
 
-            //todo
-            // case: no details
+            //todo case: no details
                 String idStr = getYoutubeId(((Video) item).videoUrl );
                 Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
                 startActivity(intent);
 
             } else if (item instanceof String) {
-	            if (((String) item).contains(getString(R.string.refresh_links))) {
-
-	                // delete database
-                    ContentResolver resolver = getActivity().getContentResolver();
-                    ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
-                    VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
-                    provider.onCreate();
-
-                    getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                        client.close();
-                    else
-                        client.release();
-
-                    // start new fetch video service
-                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-                    getActivity().startService(serviceIntent);
-
-                    // start new intent
-                    getActivity().finish();
-		            Intent intent  = new Intent(getActivity(),MainActivity.class);
-		            startActivity(intent);
-
-	            } else if (((String) item).contains(getString(R.string.grid_view))) {
+	            if (((String) item).contains(getString(R.string.refresh_links1))) {
+	                startFetchService( getString(R.string.catalog_url_1));
+	            } else if (((String) item).contains(getString(R.string.refresh_links2))) {
+	                startFetchService( getString(R.string.catalog_url_2));
+                } else if (((String) item).contains(getString(R.string.grid_view))) {
 			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			            Bundle bundle =
 					            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
@@ -471,6 +454,46 @@ public class MainFragment extends BrowseSupportFragment
                 }
             }
         }
+    }
+
+    // start fetch service by URL string
+    private void startFetchService(String url)
+    {
+        ContentProviderClient client = null;
+        ContentResolver resolver;
+        // delete database
+        try {
+            resolver = getActivity().getContentResolver();
+            client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
+            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+//                    provider.onCreate();
+
+            provider.mContentResolver = resolver;//context.getContentResolver();
+            provider.mOpenHelper = new VideoDbHelper_yt(getActivity());
+
+            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                client.close();
+            else
+                client.release();
+
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        // start new fetch video service
+        Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+        serviceIntent.putExtra("FetchUrl",url);
+        getActivity().startService(serviceIntent);
+
+        // start new intent
+        getActivity().finish();
+        Intent intent  = new Intent(getActivity(),MainActivity.class);
+        startActivity(intent);
     }
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {

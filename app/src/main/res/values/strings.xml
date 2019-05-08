@@ -24,6 +24,8 @@
     <string name="popular_header">TV YouTube</string>
     <string name="more_samples">More Samples</string>
     <string name="refresh_links">Refresh Links</string>
+    <string name="refresh_links1">Refresh Links1</string>
+    <string name="refresh_links2">Refresh Links2</string>
     <string name="grid_view">Vertical Grid View</string>
     <string name="error_fragment">Error Fragment</string>
     <string name="personal_settings">Personal Settings</string>
@@ -41,8 +43,16 @@
 
     <string name="catalog_url">
     <!--tv row fist-->
-    https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json
+    <!--https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json-->
     <!--https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_2.json-->
+    </string>
+
+    <string name="catalog_url_1">
+        https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/9eacbb889060c31741b45b5c21f47f2899d6e467/youtube_list_1.json
+    </string>
+
+    <string name="catalog_url_2">
+        https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/7c7a052f315b95bab29cc743f12da94d2e3fb869/youtube_list_2.json
     </string>
 
     <!-- Error messages -->

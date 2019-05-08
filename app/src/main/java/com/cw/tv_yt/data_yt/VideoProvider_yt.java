@@ -37,7 +37,7 @@ import androidx.annotation.NonNull;
  */
 public class VideoProvider_yt extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    private VideoDbHelper_yt mOpenHelper;
+    public VideoDbHelper_yt mOpenHelper;
 
     // These codes are returned from sUriMatcher#match when the respective Uri matches.
     private static final int VIDEO = 1;
@@ -48,7 +48,7 @@ public class VideoProvider_yt extends ContentProvider {
     private static final SQLiteQueryBuilder sVideosContainingQueryBuilder;
     private static final String[] sVideosContainingQueryColumns;
     private static final HashMap<String, String> sColumnMap = buildColumnMap();
-    private ContentResolver mContentResolver;
+    public ContentResolver mContentResolver;
 
     @Override
     public boolean onCreate() {
