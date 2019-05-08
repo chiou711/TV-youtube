@@ -31,7 +31,6 @@ import androidx.leanback.app.BrowseSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.CursorObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
-import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
@@ -46,7 +45,6 @@ import androidx.core.content.ContextCompat;
 import androidx.loader.content.Loader;
 import androidx.loader.content.CursorLoader;
 
-import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.Toast;
@@ -66,18 +64,9 @@ import com.cw.tv_yt.presenter.GridItemPresenter;
 import com.cw.tv_yt.presenter.IconHeaderItemPresenter;
 import com.cw.tv_yt.recommendation.UpdateRecommendationsService;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
 import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
 import com.google.android.youtube.player.YouTubeIntents;
 
@@ -442,8 +431,12 @@ public class MainFragment extends BrowseSupportFragment
 		            }
 
 		            getActivity().finish();
-		            Intent intent  = new Intent(getActivity(),MainActivity.class);
-		            startActivity(intent);
+//		            Intent intent  = new Intent(getActivity(),MainActivity.class);
+//		            startActivity(intent);
+
+//                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+//                    getActivity().startService(serviceIntent);
+//                    getActivity().recreate();
 	            } else if (((String) item).contains(getString(R.string.grid_view))) {
 			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			            Bundle bundle =
