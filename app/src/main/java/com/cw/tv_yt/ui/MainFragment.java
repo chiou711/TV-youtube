@@ -16,13 +16,15 @@
 
 package com.cw.tv_yt.ui;
 
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -57,6 +59,7 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
+import com.cw.tv_yt.data_yt.VideoProvider_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -278,10 +281,12 @@ public class MainFragment extends BrowseSupportFragment
         }
     }
 
+    Cursor dataCursor;
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        dataCursor = data;
         // workaround for keeping cursor position
         if(isDataLoaded)
             return;
@@ -415,28 +420,29 @@ public class MainFragment extends BrowseSupportFragment
 
             } else if (item instanceof String) {
 	            if (((String) item).contains(getString(R.string.refresh_links))) {
-		            VideoDbHelper_yt mDbHelper;
-		            mDbHelper = new VideoDbHelper_yt(getActivity());
-		            SQLiteDatabase mSqlDb = mDbHelper.getWritableDatabase();
-		            try {
-			            mSqlDb.beginTransaction();
-			            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
-			            mSqlDb.setTransactionSuccessful();
-		            }
-		            catch (Exception e) {
-		            }
-		            finally {
-			            Toast.makeText(getActivity(),"Please wait, will refresh links.",Toast.LENGTH_SHORT).show();
-			            mSqlDb.endTransaction();
-		            }
 
-		            getActivity().finish();
-//		            Intent intent  = new Intent(getActivity(),MainActivity.class);
-//		            startActivity(intent);
+	                // delete database
+                    ContentResolver resolver = getActivity().getContentResolver();
+                    ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
+                    VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+                    provider.onCreate();
 
-//                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-//                    getActivity().startService(serviceIntent);
-//                    getActivity().recreate();
+                    getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                        client.close();
+                    else
+                        client.release();
+
+                    // start new fetch video service
+                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+                    getActivity().startService(serviceIntent);
+
+                    // start new intent
+                    getActivity().finish();
+		            Intent intent  = new Intent(getActivity(),MainActivity.class);
+		            startActivity(intent);
+
 	            } else if (((String) item).contains(getString(R.string.grid_view))) {
 			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			            Bundle bundle =
