@@ -96,10 +96,8 @@ public class MainFragment extends BrowseSupportFragment
 
     int rowsCount;
 
-    // workaround for keeping cursor position
-    private boolean isDataLoaded;
+    // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
-
 
     @Override
     public void onAttach(Context context) {
@@ -151,8 +149,6 @@ public class MainFragment extends BrowseSupportFragment
         //todo temporary mark
 //        updateRecommendations();
 
-        // workaround for keeping cursor position
-        isDataLoaded = false;
         rowsLoadedCount = 0;
     }
 
@@ -281,12 +277,15 @@ public class MainFragment extends BrowseSupportFragment
         }
     }
 
-    Cursor dataCursor;
-
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        dataCursor = data;
+        System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = " + rowsLoadedCount);
+        System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
+
+        if( (rowsLoadedCount!=0 ) &&
+            (rowsLoadedCount>= mVideoCursorAdapters.size()) )
+            return;
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
@@ -294,8 +293,9 @@ public class MainFragment extends BrowseSupportFragment
             if (loaderId == CATEGORY_LOADER) {
                 System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER");
 
-                //todo workaround for keeping cursor position
-                if(!isDataLoaded) {
+                if(rowsLoadedCount != mVideoCursorAdapters.size())
+                {
+                    System.out.println("MainFragment / _onLoadFinished /  mCategoryRowAdapter.clear()");
                     // Every time we have to re-get the category loader, we must re-create the sidebar.
                     mCategoryRowAdapter.clear();
                 }
@@ -313,6 +313,7 @@ public class MainFragment extends BrowseSupportFragment
                     int videoLoaderId = category.hashCode(); // Create unique int from category.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
                     if (existingAdapter == null) {
+                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is null ");
 
                         // Map video results from the database to Video objects.
                         CursorObjectAdapter videoCursorAdapter =
@@ -327,16 +328,15 @@ public class MainFragment extends BrowseSupportFragment
                         Bundle args = new Bundle();
                         args.putString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, category);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
-                        System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / 1 ");
                     } else {
+                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
                         ListRow row = new ListRow(header, existingAdapter);
                         mCategoryRowAdapter.add(row);
-                        System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / 2 ");
                     }
 
+                    System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                     data.moveToNext();
                 }
-                System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                 // Create a row for this special case with more samples.
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
@@ -356,17 +356,13 @@ public class MainFragment extends BrowseSupportFragment
             } else {
                 System.out.println("MainFragment / _onLoadFinished / loaderId != CATEGORY_LOADER");
                 System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
-                System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
-                // workaround for keeping cursor position
                 rowsLoadedCount++;
-                if(mVideoCursorAdapters.size() == rowsLoadedCount)
-                    isDataLoaded = true;
             }
         } else {
-            System.out.println("MainFragment / _onLoadFinished / data == null or !data.moveToFirst()");
+            System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService");
             // Start an Intent to fetch the videos.
             Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
             serviceIntent.putExtra("FetchUrl",getString(R.string.catalog_url));
@@ -488,7 +484,8 @@ public class MainFragment extends BrowseSupportFragment
         serviceIntent.putExtra("FetchUrl",url);
         getActivity().startService(serviceIntent);
 
-        getActivity().recreate();
+        // init for DB is just recreated
+        rowsLoadedCount = 0;
     }
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
