@@ -287,12 +287,6 @@ public class MainFragment extends BrowseSupportFragment
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         dataCursor = data;
-        // workaround for keeping cursor position
-        if(isDataLoaded) {
-            isDataLoaded = false;
-            rowsLoadedCount = 0;
-            return;
-        }
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
@@ -300,8 +294,11 @@ public class MainFragment extends BrowseSupportFragment
             if (loaderId == CATEGORY_LOADER) {
                 System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER");
 
-                // Every time we have to re-get the category loader, we must re-create the sidebar.
-                mCategoryRowAdapter.clear();
+                //todo workaround for keeping cursor position
+                if(!isDataLoaded) {
+                    // Every time we have to re-get the category loader, we must re-create the sidebar.
+                    mCategoryRowAdapter.clear();
+                }
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
@@ -372,6 +369,7 @@ public class MainFragment extends BrowseSupportFragment
             System.out.println("MainFragment / _onLoadFinished / data == null or !data.moveToFirst()");
             // Start an Intent to fetch the videos.
             Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+            serviceIntent.putExtra("FetchUrl",getString(R.string.catalog_url));
             getActivity().startService(serviceIntent);
         }
     }
@@ -466,9 +464,10 @@ public class MainFragment extends BrowseSupportFragment
             resolver = getActivity().getContentResolver();
             client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
             VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
-//                    provider.onCreate();
+//            provider.onCreate();
 
             provider.mContentResolver = resolver;//context.getContentResolver();
+            provider.mOpenHelper.close();
             provider.mOpenHelper = new VideoDbHelper_yt(getActivity());
 
             getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
@@ -477,7 +476,6 @@ public class MainFragment extends BrowseSupportFragment
                 client.close();
             else
                 client.release();
-
 
         } catch (Exception e)
         {
@@ -490,10 +488,7 @@ public class MainFragment extends BrowseSupportFragment
         serviceIntent.putExtra("FetchUrl",url);
         getActivity().startService(serviceIntent);
 
-        // start new intent
-        getActivity().finish();
-        Intent intent  = new Intent(getActivity(),MainActivity.class);
-        startActivity(intent);
+        getActivity().recreate();
     }
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
