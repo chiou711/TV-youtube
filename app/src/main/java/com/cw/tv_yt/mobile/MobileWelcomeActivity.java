@@ -4,12 +4,17 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.ui.LeanbackActivity;
 
-public class MobileWelcomeActivity extends Activity {
+//todo temp mark
+//public class MobileWelcomeActivity extends Activity {
+public class MobileWelcomeActivity extends LeanbackActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mobile_welcome);
+        //todo temp mark
+//        setContentView(R.layout.activity_mobile_welcome);
+        setContentView(R.layout.main);
     }
 }
