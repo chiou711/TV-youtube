@@ -53,8 +53,8 @@
     </string>
 
     <string name="catalog_url_2">
-        https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/7c7a052f315b95bab29cc743f12da94d2e3fb869/youtube_list_2.json
-    </string>
+        <!--https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/7c7a052f315b95bab29cc743f12da94d2e3fb869/youtube_list_2.json-->
+        https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/9b77003a147c1e32a3f144b2aa08fb2abba6835d/youtube_list_2.json    </string>
 
     <!-- Error messages -->
 

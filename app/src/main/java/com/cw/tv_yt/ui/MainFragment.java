@@ -16,10 +16,12 @@
 
 package com.cw.tv_yt.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -46,6 +48,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.Loader;
 import androidx.loader.content.CursorLoader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -70,6 +73,7 @@ import com.cw.tv_yt.recommendation.UpdateRecommendationsService;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
 import com.google.android.youtube.player.YouTubeIntents;
 
@@ -98,6 +102,7 @@ public class MainFragment extends BrowseSupportFragment
 
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
+    FetchServiceResponseReceiver responseReceiver;
 
     @Override
     public void onAttach(Context context) {
@@ -111,6 +116,15 @@ public class MainFragment extends BrowseSupportFragment
         // Start loading the categories from the database.
         mLoaderManager = LoaderManager.getInstance(this);
         mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
+
+        // receiver for fetch video service
+        IntentFilter statusIntentFilter = new IntentFilter(
+                FetchVideoService_yt.Constants.BROADCAST_ACTION);
+        responseReceiver = new FetchServiceResponseReceiver();
+
+        // Registers the FetchServiceResponseReceiver and its intent filters
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                responseReceiver, statusIntentFilter );
     }
 
 
@@ -153,9 +167,22 @@ public class MainFragment extends BrowseSupportFragment
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("MainFragment / _onResume");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        System.out.println("MainFragment / _onPause");
+    }
+
+    @Override
     public void onDestroy() {
         mHandler.removeCallbacks(mBackgroundTask);
         mBackgroundManager = null;
+        System.out.println("MainFragment / _onDestroy");
         super.onDestroy();
     }
 
@@ -281,11 +308,15 @@ public class MainFragment extends BrowseSupportFragment
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
         System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = " + rowsLoadedCount);
-        System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
 
+        if(mVideoCursorAdapters != null)
+            System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
+
+        // return when load is OK
         if( (rowsLoadedCount!=0 ) &&
-            (rowsLoadedCount>= mVideoCursorAdapters.size()) )
+            (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
             return;
+        }
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
@@ -293,6 +324,7 @@ public class MainFragment extends BrowseSupportFragment
             if (loaderId == CATEGORY_LOADER) {
                 System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER");
 
+                // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
                 {
                     System.out.println("MainFragment / _onLoadFinished /  mCategoryRowAdapter.clear()");
@@ -359,14 +391,20 @@ public class MainFragment extends BrowseSupportFragment
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
+                // one row added
                 rowsLoadedCount++;
             }
         } else {
-            System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService");
+            System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService / rowsLoadedCount = " + rowsLoadedCount);
             // Start an Intent to fetch the videos.
-            Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-            serviceIntent.putExtra("FetchUrl",getString(R.string.catalog_url));
-            getActivity().startService(serviceIntent);
+
+            // data base is not created yet, call service for the first time
+            if(rowsLoadedCount == 0)
+            {
+                Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+                serviceIntent.putExtra("FetchUrl", getString(R.string.catalog_url));
+                getActivity().startService(serviceIntent);
+            }
         }
     }
 
@@ -453,20 +491,17 @@ public class MainFragment extends BrowseSupportFragment
     // start fetch service by URL string
     private void startFetchService(String url)
     {
-        ContentProviderClient client = null;
-        ContentResolver resolver;
         // delete database
         try {
-            resolver = getActivity().getContentResolver();
-            client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
-            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
-//            provider.onCreate();
+            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
 
-            provider.mContentResolver = resolver;//context.getContentResolver();
+            ContentResolver resolver = getActivity().getContentResolver();
+            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
+            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+
+            provider.mContentResolver = resolver;
             provider.mOpenHelper.close();
             provider.mOpenHelper = new VideoDbHelper_yt(getActivity());
-
-            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();
@@ -483,9 +518,6 @@ public class MainFragment extends BrowseSupportFragment
         Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
         serviceIntent.putExtra("FetchUrl",url);
         getActivity().startService(serviceIntent);
-
-        // init for DB is just recreated
-        rowsLoadedCount = 0;
     }
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
@@ -642,5 +674,36 @@ public class MainFragment extends BrowseSupportFragment
 //    setAdapter(rowsAdapter);
 //}
 ///
+
+    // Broadcast receiver for receiving status updates from the IntentService
+    private class FetchServiceResponseReceiver extends BroadcastReceiver {
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        public void onReceive(Context context, Intent intent) {
+            /*
+             * You get notified here when your IntentService is done
+             * obtaining data form the server!
+             */
+            System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
+
+            String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("MainFragment / _MyResponseReceiver / _onReceive / statusStr = " + statusStr);
+            if(statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
+            {
+                if (context != null) {
+
+                    LocalBroadcastManager.getInstance(context)
+                            .unregisterReceiver(responseReceiver);
+
+                    if(getActivity() != null)
+                        getActivity().finish();
+
+                    Intent new_intent = new Intent(context, MainActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent);
+                }
+            }
+
+        }
+    }
 
 }

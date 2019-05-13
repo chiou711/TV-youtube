@@ -17,6 +17,7 @@
 package com.cw.tv_yt.data_yt;
 
 import android.app.IntentService;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.util.Log;
@@ -27,6 +28,8 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.List;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * FetchVideoService is responsible for fetching the videos from the Internet and inserting the
@@ -57,12 +60,36 @@ public class FetchVideoService_yt extends IntentService {
             ContentValues[] downloadedVideoContentValues =
                     contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
 
-            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
-                    downloadedVideoContentValues);
+//            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
+//                    downloadedVideoContentValues);
+            ContentResolver contentResolver = getApplicationContext().getContentResolver();
+            System.out.println("FetchVideoService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
+
+            contentResolver.bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI, downloadedVideoContentValues);
+
 
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Error occurred in downloading videos");
             e.printStackTrace();
         }
+
+
+
+        // Puts the status into the Intent
+        String status = "FetchVideoServiceIsDone"; // any data that you want to send back to receivers
+        Intent localIntent =  new Intent(Constants.BROADCAST_ACTION);
+        localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
+        // Broadcasts the Intent to receivers in this app.
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+        System.out.println("FetchVideoService_yt / _onHandleIntent / sendBroadcast");
+    }
+
+    public final class Constants {
+        // Defines a custom Intent action
+        public static final String BROADCAST_ACTION =
+                "com.cw.tv_yt.BROADCAST";
+        // Defines the key for the status "extra" in an Intent
+        public static final String EXTENDED_DATA_STATUS =
+                "com.cw.tv_yt.STATUS";
     }
 }

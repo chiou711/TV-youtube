@@ -60,9 +60,6 @@ public class VideoDbBuilder_yt {
     /**
      * Default constructor that can be used for tests
      */
-    public VideoDbBuilder_yt() {
-
-    }
 
     public VideoDbBuilder_yt(Context mContext) {
         this.mContext = mContext;
