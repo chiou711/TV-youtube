@@ -20,11 +20,12 @@
     <string name="browse_title"><![CDATA[TV YouTube]]></string>
     <string name="related_movies">Related Videos</string>
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
+    <string name="select_links_title"><![CDATA[Select Links]]></string>
 
     <string name="popular_header">TV YouTube</string>
     <string name="more_samples">More Samples</string>
     <string name="refresh_links">Refresh Links</string>
-    <string name="refresh_links1">Refresh Links1</string>
+    <string name="select_links">Select Links</string>
     <string name="refresh_links2">Refresh Links2</string>
     <string name="grid_view">Vertical Grid View</string>
     <string name="error_fragment">Error Fragment</string>
@@ -49,12 +50,30 @@
     </string>
 
     <string name="catalog_url_1">
-        https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/9eacbb889060c31741b45b5c21f47f2899d6e467/youtube_list_1.json
+        <!--https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/9eacbb889060c31741b45b5c21f47f2899d6e467/youtube_list_1.json-->
+        <!--https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/a6960c6e8d6fb697996e3d3af82ba79e41cb3369/youtube_list_1.json-->
+        <!--https://my.pcloud.com/publink/show?code=XZtjxI7ZGn1qVLT6EpmF3fMOjcBh3yFatTEy-->
+        <!--https://filedn.com/lq5OTNf0dGLJYNRmXvMCsIh/files/youtube_list_1.json-->
+        <!--https://drive.google.com/open?id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F- -->
+        <!--https://drive.google.com/file/d/1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F- -->
+        https://drive.google.com/uc?export=download&amp;id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F-
     </string>
 
     <string name="catalog_url_2">
-        <!--https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/7c7a052f315b95bab29cc743f12da94d2e3fb869/youtube_list_2.json-->
-        https://gist.githubusercontent.com/chiou711/a3b7b069aca7ae6ff1aaa3ec9524522a/raw/9b77003a147c1e32a3f144b2aa08fb2abba6835d/youtube_list_2.json    </string>
+        https://drive.google.com/uc?export=download&amp;id=1f2lrfddu7IlZw60vbSlkvm0ZGYDCPVVc
+    </string>
+
+    <string name="catalog_url_3">
+        https://drive.google.com/uc?export=download&amp;id=1f2lrfddu7IlZw60vbSlkvm0ZGYDCPVVc
+    </string>
+
+    <string name="catalog_url_4">
+        https://drive.google.com/uc?export=download&amp;id=1f2lrfddu7IlZw60vbSlkvm0ZGYDCPVVc
+    </string>
+
+    <string name="catalog_url_5">
+        https://drive.google.com/uc?export=download&amp;id=1f2lrfddu7IlZw60vbSlkvm0ZGYDCPVVc
+    </string>
 
     <!-- Error messages -->
 

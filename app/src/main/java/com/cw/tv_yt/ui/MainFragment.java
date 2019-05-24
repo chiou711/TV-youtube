@@ -373,8 +373,7 @@ public class MainFragment extends BrowseSupportFragment
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
-                gridRowAdapter.add(getString(R.string.refresh_links1));
-                gridRowAdapter.add(getString(R.string.refresh_links2));
+                gridRowAdapter.add(getString(R.string.select_links));
 	            gridRowAdapter.add(getString(R.string.grid_view));
                 gridRowAdapter.add(getString(R.string.guidedstep_first_title));
                 gridRowAdapter.add(getString(R.string.error_fragment));
@@ -454,10 +453,12 @@ public class MainFragment extends BrowseSupportFragment
                 startActivity(intent);
 
             } else if (item instanceof String) {
-	            if (((String) item).contains(getString(R.string.refresh_links1))) {
-	                startFetchService( getString(R.string.catalog_url_1));
-	            } else if (((String) item).contains(getString(R.string.refresh_links2))) {
-	                startFetchService( getString(R.string.catalog_url_2));
+	            if (((String) item).contains(getString(R.string.select_links))) {
+                    Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
+                    Bundle bundle =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
+                                    .toBundle();
+                    startActivity(intent, bundle);
                 } else if (((String) item).contains(getString(R.string.grid_view))) {
 			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			            Bundle bundle =

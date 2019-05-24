@@ -114,6 +114,11 @@
             android:exported="true"
             android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
+        <activity
+            android:name="com.cw.tv_yt.ui.SelectLinksActivity"
+            android:exported="true"
+            android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
+            android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity android:name="com.cw.tv_yt.ui.SearchActivity" />
         <activity
             android:name="com.cw.tv_yt.ui.GuidedStepActivity"
