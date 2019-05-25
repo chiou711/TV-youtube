@@ -50,7 +50,7 @@ import androidx.leanback.widget.VerticalGridPresenter;
 public class SelectLinksFragment extends VerticalGridSupportFragment {
     private static final String TAG = "Select links";
     private static final int NUM_COLUMNS = 5;
-    private static final int NUM_ITEMS = 10;
+    private static final int NUM_MAX = 10;
     private static final int HEIGHT = 200;
 
     private static class Adapter extends ArrayObjectAdapter {
@@ -111,25 +111,9 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
                 Log.i(TAG, "onItemClicked: " + item + " row " + row);
                 mAdapter.callNotifyChanged();
 
-                switch (item.toString()) {
-                    case "1":
-                        startFetchService(getString(R.string.catalog_url_1));
-                        break;
-                    case "2":
-                        startFetchService(getString(R.string.catalog_url_2));
-                        break;
-                    case "3":
-                        startFetchService(getString(R.string.catalog_url_3));
-                        break;
-                    case "4":
-                        startFetchService(getString(R.string.catalog_url_4));
-                        break;
-                    case "5":
-                        startFetchService(getString(R.string.catalog_url_5));
-                        break;
-                    default:
-                        break;
-                }
+                String pre_str = "catalog_url_";
+                int res_id = getActivity().getResources().getIdentifier(pre_str.concat(item.toString()),"string",getActivity().getPackageName());
+                startFetchService(getString(res_id) );
             }
         });
         setOnSearchClickedListener(new View.OnClickListener() {
@@ -141,8 +125,22 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         });
     }
 
+
     private void loadData() {
-        for (int i = 1; i <= NUM_ITEMS; i++) {
+
+        int count=1;
+        for(int i=1;i<=NUM_MAX;i++) {
+            String pre_str = "catalog_url_";
+            int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(i)),
+                                                            "string",
+                                                                    getActivity().getPackageName());
+            if(id !=0 )
+                count = i;
+        }
+
+        System.out.println("SelectLinksFragment / max = " + count);
+
+        for (int i = 1; i <= count; i++) {
             mAdapter.add(Integer.toString(i));
         }
     }
