@@ -18,6 +18,7 @@ package com.cw.tv_yt;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
@@ -115,5 +116,22 @@ public class Utils {
             }
         }
         return videoId;
+    }
+
+
+    // set category name
+    public static void setPref_category_name(Context context, int pageNumber, String categoryStr )
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyName = "category_name_" + pageNumber;
+        pref.edit().putString(keyName, categoryStr).apply();
+    }
+
+    // get category name
+    public static String getPref_category_name(Context context,int pageNumber)
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyName = "category_name_" + pageNumber;
+        return pref.getString(keyName, String.valueOf(pageNumber)); // folder table Id: default is 1
     }
 }

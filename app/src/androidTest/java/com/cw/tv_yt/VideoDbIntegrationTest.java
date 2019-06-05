@@ -195,7 +195,7 @@ public class VideoDbIntegrationTest {
         // Create some test videos
         VideoDbBuilder videoDbBuilder = new VideoDbBuilder(mContext);
         List<ContentValues> contentValuesList =
-                videoDbBuilder.fetch(mContext.getResources().getString(R.string.catalog_url));
+                videoDbBuilder.fetch(mContext.getResources().getString(R.string.catalog_url_default));
         // Insert into database
         ContentValues[] downloadedVideoContentValues =
                 contentValuesList.toArray(new ContentValues[contentValuesList.size()]);

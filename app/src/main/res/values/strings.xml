@@ -42,11 +42,9 @@
     <string name="no_search_results">No search results found for \'%1$s\'</string>
     <!--<string name="catalog_url">https://storage.googleapis.com/android-tv/android_tv_videos_new.json</string>-->
 
-    <string name="catalog_url">
-    <!--tv row fist-->
-    <!--https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_1.json-->
-    <!--https://raw.githubusercontent.com/chiou711/TV-youtube/master/app/src/assets/youtube_list_2.json-->
-        https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/9eacbb889060c31741b45b5c21f47f2899d6e467/youtube_list_1.json
+    <string name="catalog_url_default">
+        <!--https://drive.google.com/uc?export=download&amp;id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F- -->
+        https://drive.google.com/uc?export=download&amp;id=1Cy_GhptCs1PA2nduwDLRK2S8tMszKqc8
     </string>
 
     <string name="catalog_url_1">

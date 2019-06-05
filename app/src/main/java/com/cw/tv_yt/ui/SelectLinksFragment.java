@@ -16,10 +16,12 @@
 
 package com.cw.tv_yt.ui;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +31,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
@@ -43,6 +47,9 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
@@ -64,11 +71,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
     }
 
     private Adapter mAdapter;
-
+    FetchServiceResponseReceiver responseReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
+        System.out.println("SelectLinksFragment / _onCreate");
+
         super.onCreate(savedInstanceState);
 
         mAdapter = new Adapter(new StringPresenter());
@@ -79,14 +87,22 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         if (savedInstanceState == null) {
             prepareEntranceTransition();
         }
+
         setupFragment();
+
+        // receiver for fetch video service
+        IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+        responseReceiver = new FetchServiceResponseReceiver();
+
+        // Registers the FetchCategoryResponseReceiver and its intent filters
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
     }
 
+    // setup fragment
     private void setupFragment() {
         VerticalGridPresenter gridPresenter = new VerticalGridPresenter();
         gridPresenter.setNumberOfColumns(NUM_COLUMNS);
         setGridPresenter(gridPresenter);
-
 
         // After 500ms, start the animation to transition the cards into view.
         new Handler().postDelayed(new Runnable() {
@@ -108,13 +124,27 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
             @Override
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                       RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Log.i(TAG, "onItemClicked: " + item + " row " + row);
+                Log.i(TAG, "onItemClicked: item = " + item + " row = " + row );
+
                 mAdapter.callNotifyChanged();
 
-                String pre_str = "catalog_url_";
-                int res_id = getActivity().getResources().getIdentifier(pre_str.concat(item.toString()),"string",getActivity().getPackageName());
-                startFetchService(getString(res_id) );
+                // get clicked position
+                int clickedPos = 0;
+                for(int i = 1; i<= countCategory; i++) {
+
+                    String categoryName = Utils.getPref_category_name(getActivity(), i);
+                    if (categoryName.equalsIgnoreCase(item.toString())) {
+                        clickedPos = i;
+                    }
+                }
+
+                int res_id = getResourceIdentifier(String.valueOf(clickedPos));
+                if(res_id == 0)
+                    res_id = getResourceIdentifier(item.toString());
+
+                startFetchService(getString(res_id));
             }
+
         });
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
@@ -125,23 +155,53 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         });
     }
 
+    // get resource Identifier
+    int getResourceIdentifier(String bodyStr)
+    {
+	    String pre_str = "catalog_url_";
+	    int res_id = getActivity().getResources().getIdentifier(pre_str.concat(bodyStr),
+                                                            "string",
+                                                                    getActivity().getPackageName());
+	    System.out.print("SelectLinksFragment / _getResourceIdentifier / res_id = " + res_id);
+	    return res_id;
+    }
 
+    private int countCategory;
     private void loadData() {
 
-        int count=1;
+        countCategory =1;
         for(int i=1;i<=NUM_MAX;i++) {
             String pre_str = "catalog_url_";
             int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(i)),
                                                             "string",
                                                                     getActivity().getPackageName());
             if(id !=0 )
-                count = i;
+                countCategory = i;
         }
 
-        System.out.println("SelectLinksFragment / max = " + count);
+        System.out.println("SelectLinksFragment / max = " + countCategory);
 
-        for (int i = 1; i <= count; i++) {
-            mAdapter.add(Integer.toString(i));
+        String[] urlArray = new String[countCategory];
+        for(int i = 0; i< countCategory; i++) {
+            int id = getResourceIdentifier(String.valueOf(i+1));
+            urlArray[i] = getActivity().getResources().getString(id);
+
+            String categoryName = Utils.getPref_category_name(getActivity(),i+1);
+            System.out.println("SelectLinksFragment / _loadData / categoryName = " + categoryName);
+
+            if( categoryName.equalsIgnoreCase(String.valueOf(i+1))) {
+                mAdapter.add(categoryName);
+                System.out.println("SelectLinksFragment / i+1 = " + (i+1));
+                System.out.println("SelectLinksFragment / categoryName = " + categoryName);
+                // start new fetch category service
+                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+                serviceIntent.putExtra("FetchCategoryIndex", i+1);
+                serviceIntent.putExtra("FetchCategoryUrl", urlArray[i]);
+                getActivity().startService(serviceIntent);
+                break;
+            }
+            else
+                mAdapter.add(categoryName);
         }
     }
 
@@ -173,6 +233,34 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
         serviceIntent.putExtra("FetchUrl", url);
         getActivity().startService(serviceIntent);
+    }
+
+    // Broadcast receiver for receiving status updates from the IntentService
+    private class FetchServiceResponseReceiver extends BroadcastReceiver {
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        public void onReceive(Context context, Intent intent) {
+            /*
+             * You get notified here when your IntentService is done
+             * obtaining data form the server!
+             */
+            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
+
+            if(statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+            {
+                if (context != null) {
+
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
+
+                    if(getActivity() != null)
+                        getActivity().finish();
+
+                    Intent new_intent = new Intent(context, SelectLinksActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent);
+                }
+            }
+        }
     }
 
 }

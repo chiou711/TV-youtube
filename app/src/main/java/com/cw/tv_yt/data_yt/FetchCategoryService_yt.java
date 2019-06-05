@@ -18,14 +18,11 @@ package com.cw.tv_yt.data_yt;
 
 import android.app.IntentService;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.util.Log;
 
 import org.json.JSONException;
-
 import java.io.IOException;
-import java.util.List;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -33,38 +30,31 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
  * FetchVideoService is responsible for fetching the videos from the Internet and inserting the
  * results into a local SQLite database.
  */
-public class FetchVideoService_yt extends IntentService {
-    private static final String TAG = "FetchVideoService_yt";
+public class FetchCategoryService_yt extends IntentService {
+    private static final String TAG = "FetchCategoryService_yt";
     public static String serviceUrl;
 
     /**
      * Creates an IntentService with a default name for the worker thread.
      */
-    public FetchVideoService_yt() {
+    public FetchCategoryService_yt() {
         super(TAG);
     }
 
     @Override
     protected void onHandleIntent(Intent workIntent) {
-        serviceUrl = workIntent.getStringExtra("FetchUrl");
-        System.out.println("FetchVideoService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
-        VideoDbBuilder_yt builder = new VideoDbBuilder_yt(getApplicationContext());
+        serviceUrl = workIntent.getStringExtra("FetchCategoryUrl");
+        System.out.println("FetchCategoryService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
+
+        int index = workIntent.getIntExtra("FetchCategoryIndex",1);
+
+        CategoryDbBuilder_yt builder = new CategoryDbBuilder_yt(getApplicationContext());
 
         try {
-            List<ContentValues> contentValuesList =
-//                    builder.fetch(getResources().getString(R.string.catalog_url));
-                    builder.fetch(serviceUrl);
+            builder.fetch(serviceUrl,index);
 
-            ContentValues[] downloadedVideoContentValues =
-                    contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
-
-//            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
-//                    downloadedVideoContentValues);
             ContentResolver contentResolver = getApplicationContext().getContentResolver();
-            System.out.println("FetchVideoService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
-
-            contentResolver.bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI, downloadedVideoContentValues);
-
+            System.out.println("FetchCategoryService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
 
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Error occurred in downloading videos");
@@ -72,21 +62,22 @@ public class FetchVideoService_yt extends IntentService {
         }
 
         // Puts the status into the Intent
-        String status = "FetchVideoServiceIsDone"; // any data that you want to send back to receivers
+        String status = "FetchCategoryServiceIsDone"; // any data that you want to send back to receivers
         Intent localIntent =  new Intent(Constants.BROADCAST_ACTION);
         localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
 
         // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-        System.out.println("FetchVideoService_yt / _onHandleIntent / sendBroadcast");
+
+        System.out.println("FetchCategoryService_yt / _onHandleIntent / sendBroadcast");
     }
 
     public final class Constants {
         // Defines a custom Intent action
         public static final String BROADCAST_ACTION =
-                "com.cw.tv_yt.BROADCAST";
+                "com.cw.tv_yt.BROADCAST.category";
         // Defines the key for the status "extra" in an Intent
         public static final String EXTENDED_DATA_STATUS =
-                "com.cw.tv_yt.STATUS";
+                "com.cw.tv_yt.STATUS.category";
     }
 }

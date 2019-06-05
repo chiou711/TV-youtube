@@ -98,8 +98,6 @@ public class MainFragment extends BrowseSupportFragment
     // Maps a Loader Id to its CursorObjectAdapter.
     private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
 
-    int rowsCount;
-
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
     FetchServiceResponseReceiver responseReceiver;
@@ -147,7 +145,7 @@ public class MainFragment extends BrowseSupportFragment
 //        getRowsTask.execute();
 //        while (!getRowsTask.isGetReady)
 //            SystemClock.sleep(1000);
-//        rowsCount = getRowsTask.count;
+//        rowsCount = getRowsTask.countCategory;
 //
 //        loadRows();
         ///
@@ -401,7 +399,7 @@ public class MainFragment extends BrowseSupportFragment
             if(rowsLoadedCount == 0)
             {
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-                serviceIntent.putExtra("FetchUrl", getString(R.string.catalog_url));
+                serviceIntent.putExtra("FetchUrl", getString(R.string.catalog_url_default));
                 getActivity().startService(serviceIntent);
             }
         }
@@ -538,7 +536,7 @@ public class MainFragment extends BrowseSupportFragment
 //private class GetRowsTask extends AsyncTask<Void, Void, Void> {
 //    BrowseErrorActivity.SpinnerFragment mSpinnerFragment;
 //    boolean isGetReady;
-//    int count;
+//    int countCategory;
 //
 //    @Override
 //    protected void onPreExecute() {
@@ -604,7 +602,7 @@ public class MainFragment extends BrowseSupportFragment
 //            for (int i = 0; i < jsonArray.length(); i++)
 //            {
 //                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-//                count = jsonObject.getInt("totalPagesCount");
+//                countCategory = jsonObject.getInt("totalPagesCount");
 //            }
 //            isGetReady = true;
 //        }

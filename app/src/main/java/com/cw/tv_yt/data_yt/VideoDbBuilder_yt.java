@@ -18,6 +18,7 @@ package com.cw.tv_yt.data_yt;
 import android.content.ContentValues;
 import android.content.Context;
 import android.media.Rating;
+import android.net.Uri;
 import android.util.Log;
 
 import com.cw.tv_yt.R;
@@ -43,15 +44,16 @@ import androidx.annotation.NonNull;
  */
 public class VideoDbBuilder_yt {
 //    public static final String TAG_MEDIA = "videos";
-    public static final String TAG_MEDIA = "links";
-    public static final String TAG_GOOGLE_VIDEOS = "link_page";//"googlevideos";
+    public static final String TAG_LINK_PAGE = "link_page";//"googlevideos";
     public static final String TAG_CATEGORY = "category";
-    public static final String TAG_STUDIO = "studio";
-    public static final String TAG_SOURCES = "sources";
-    public static final String TAG_DESCRIPTION = "description";
-    public static final String TAG_CARD_THUMB = "card";
-    public static final String TAG_BACKGROUND = "background";
+    public static final String TAG_MEDIA = "links";
     public static final String TAG_TITLE = "title";
+//    public static final String TAG_STUDIO = "studio";
+//    public static final String TAG_SOURCES = "sources";
+//    public static final String TAG_DESCRIPTION = "description";
+//    public static final String TAG_CARD_THUMB = "card";
+//    public static final String TAG_BACKGROUND = "background";
+//    public static final String TAG_TITLE = "title";
 
     private static final String TAG = "VideoDbBuilder";
 
@@ -85,7 +87,7 @@ public class VideoDbBuilder_yt {
         System.out.println("VideoDbBuilder / _buildMedia / jsonObj.toString = " + jsonObj.toString());
 
         //todo mark for simple check
-        JSONArray categoryArray = jsonObj.getJSONArray(TAG_GOOGLE_VIDEOS);
+        JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
         List<ContentValues> videosToInsert = new ArrayList<>();
 
         for (int i = 0; i < categoryArray.length(); i++)
@@ -93,8 +95,7 @@ public class VideoDbBuilder_yt {
             JSONArray videoArray;
 
             JSONObject category = categoryArray.getJSONObject(i);
-            String categoryName = category.getString(TAG_CATEGORY);
-            //String categoryName = "category";
+            String titleName = category.getString(TAG_TITLE);
             videoArray = category.getJSONArray(TAG_MEDIA);
 
             ///
@@ -119,7 +120,8 @@ public class VideoDbBuilder_yt {
                 String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
                 System.out.println("--- videoUrl = " + videoUrl);
 //                String bgImageUrl = video.optString(TAG_BACKGROUND);
-                String bgImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/Google%2B/Google%2B_%20Instant%20Upload/bg.jpg";
+                Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
+                String bgImageUrl = myURI.toString();
 //                String cardImageUrl = video.optString(TAG_CARD_THUMB);
 //                String cardImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Explore%20Treasure%20Mode%20with%20Google%20Maps/card.jpg";
                 String cardImageUrl = "http://img.youtube.com/vi/"+ Utils.getYoutubeId(videoUrl)+"/0.jpg";
@@ -127,7 +129,7 @@ public class VideoDbBuilder_yt {
                 String studio = "STUDIO";
 
                 ContentValues videoValues = new ContentValues();
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, categoryName);
+                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, titleName);
                 videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, title);
                 videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DESC, description);
                 videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, videoUrl);
