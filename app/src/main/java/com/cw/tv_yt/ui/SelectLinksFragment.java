@@ -89,13 +89,6 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         }
 
         setupFragment();
-
-        // receiver for fetch video service
-        IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-        responseReceiver = new FetchServiceResponseReceiver();
-
-        // Registers the FetchCategoryResponseReceiver and its intent filters
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
     }
 
     // setup fragment
@@ -141,6 +134,17 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
                 int res_id = getResourceIdentifier(String.valueOf(clickedPos));
                 if(res_id == 0)
                     res_id = getResourceIdentifier(item.toString());
+
+
+
+                // receiver for fetch video service
+                IntentFilter statusIntentFilter = new IntentFilter(
+                        FetchVideoService_yt.Constants.BROADCAST_ACTION);
+                responseReceiver = new FetchServiceResponseReceiver();
+
+                // Registers the FetchServiceResponseReceiver and its intent filters
+                LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+                        responseReceiver, statusIntentFilter );
 
                 startFetchService(getString(res_id));
             }
@@ -191,8 +195,14 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
 
             if( categoryName.equalsIgnoreCase(String.valueOf(i+1))) {
                 mAdapter.add(categoryName);
-                System.out.println("SelectLinksFragment / i+1 = " + (i+1));
-                System.out.println("SelectLinksFragment / categoryName = " + categoryName);
+
+	            // receiver for fetch category service
+	            IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+	            responseReceiver = new FetchServiceResponseReceiver();
+
+	            // Registers the FetchCategoryResponseReceiver and its intent filters
+	            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
+
                 // start new fetch category service
                 Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
                 serviceIntent.putExtra("FetchCategoryIndex", i+1);
@@ -243,10 +253,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
              * You get notified here when your IntentService is done
              * obtaining data form the server!
              */
+
+            // for fetch category
             String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
             System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
 
-            if(statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
             {
                 if (context != null) {
 
@@ -255,7 +267,30 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
                     if(getActivity() != null)
                         getActivity().finish();
 
-                    Intent new_intent = new Intent(context, SelectLinksActivity.class);
+                    Intent new_intent;
+                    new_intent = new Intent(context, SelectLinksActivity.class);
+
+                    //new_intent = new Intent(context, MainActivity.class);
+
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent);
+                }
+            }
+
+            // for fetch video service
+            statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
+            if((statusStr != null ) && statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
+            {
+                if (context != null) {
+
+                    LocalBroadcastManager.getInstance(context)
+                            .unregisterReceiver(responseReceiver);
+
+                    if(getActivity() != null)
+                        getActivity().finish();
+
+                    Intent new_intent = new Intent(context, MainActivity.class);
                     new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(new_intent);
                 }

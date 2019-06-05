@@ -100,7 +100,7 @@ public class MainFragment extends BrowseSupportFragment
 
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
-    FetchServiceResponseReceiver responseReceiver;
+    private FetchServiceResponseReceiver responseReceiver;
 
     @Override
     public void onAttach(Context context) {
@@ -511,7 +511,6 @@ public class MainFragment extends BrowseSupportFragment
         {
             e.printStackTrace();
         }
-
 
         // start new fetch video service
         Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
