@@ -118,6 +118,21 @@ public class Utils {
         return videoId;
     }
 
+    // set category name
+    public static void setPref_focus_category_number(Context context, int pageNumber )
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyName = "current_category_number";
+        pref.edit().putInt(keyName, pageNumber).apply();
+    }
+
+    // get category name
+    public static int getPref_focus_category_number (Context context)
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyName = "current_category_number";
+        return pref.getInt(keyName, 1); // folder table Id: default is 1
+    }
 
     // set category name
     public static void setPref_category_name(Context context, int pageNumber, String categoryStr )

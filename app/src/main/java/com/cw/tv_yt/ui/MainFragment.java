@@ -59,6 +59,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
@@ -200,9 +201,17 @@ public class MainFragment extends BrowseSupportFragment
     }
 
     private void setupUIElements() {
-        setBadgeDrawable(
-                getActivity().getResources().getDrawable(R.drawable.tt, null));
-//        setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
+
+        // option: drawable
+//        setBadgeDrawable(getActivity().getResources().getDrawable(R.drawable.tt, null));
+
+        // option: title
+        int focusNumber = Utils.getPref_focus_category_number(getActivity());
+        String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
+
+        //setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
+        setTitle(categoryName);
+
         setHeadersState(HEADERS_ENABLED);
 	    setHeadersTransitionOnBackEnabled(true); //true: focus will return to header, false: will close App
 

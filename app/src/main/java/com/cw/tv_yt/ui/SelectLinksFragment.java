@@ -101,6 +101,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 loadData();
+                setSelectedPosition(Utils.getPref_focus_category_number(getActivity())-1);
                 startEntranceTransition();
             }
         }, 500);
@@ -135,7 +136,8 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
                 if(res_id == 0)
                     res_id = getResourceIdentifier(item.toString());
 
-
+                // set focus category number
+                Utils.setPref_focus_category_number(getActivity(),clickedPos);
 
                 // receiver for fetch video service
                 IntentFilter statusIntentFilter = new IntentFilter(
