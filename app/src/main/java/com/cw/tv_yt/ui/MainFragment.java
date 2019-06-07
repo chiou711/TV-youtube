@@ -207,7 +207,8 @@ public class MainFragment extends BrowseSupportFragment
         String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
 
         //setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
-        setTitle(categoryName);
+        if(categoryName != String.valueOf(focusNumber))
+            setTitle(categoryName);
 
         setHeadersState(HEADERS_ENABLED);
 	    setHeadersTransitionOnBackEnabled(true); //true: focus will return to header, false: will close App

@@ -21,7 +21,9 @@ import android.graphics.drawable.Drawable;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
 import androidx.core.content.ContextCompat;
+
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -39,10 +41,8 @@ public class CardPresenter extends Presenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        mDefaultBackgroundColor =
-            ContextCompat.getColor(parent.getContext(), R.color.default_background);
-        mSelectedBackgroundColor =
-                ContextCompat.getColor(parent.getContext(), R.color.selected_background);
+        mDefaultBackgroundColor = ContextCompat.getColor(parent.getContext(), R.color.default_background);
+        mSelectedBackgroundColor = ContextCompat.getColor(parent.getContext(), R.color.selected_background);
         mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie, null);
 
         ImageCardView cardView = new ImageCardView(parent.getContext()) {
@@ -74,7 +74,8 @@ public class CardPresenter extends Presenter {
 
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         cardView.setTitleText(video.title);
-        cardView.setContentText(video.studio);
+        ((TextView)cardView.findViewById(R.id.title_text)).setLines(3);// setMaxLines(5);
+//        cardView.setContentText(video.studio);
 
         if (video.cardImageUrl != null) {
             // Set card size from dimension resources.
