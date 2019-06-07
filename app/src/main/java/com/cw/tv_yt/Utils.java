@@ -149,4 +149,21 @@ public class Utils {
         String keyName = "category_name_" + pageNumber;
         return pref.getString(keyName, String.valueOf(pageNumber)); // folder table Id: default is 1
     }
+
+    // remove key of category name
+    public static void removePref_category_name(Context context,int index)
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyPrefix = "category_name_";
+        String keyName = keyPrefix.concat(String.valueOf(index));
+        pref.edit().remove(keyName).apply();
+    }
+
+    // remove key of category focus number
+    public static void removePref_focus_category_number(Context context)
+    {
+        SharedPreferences pref = context.getSharedPreferences("category", 0);
+        String keyName = "current_category_number";
+        pref.edit().remove(keyName).apply();
+    }
 }

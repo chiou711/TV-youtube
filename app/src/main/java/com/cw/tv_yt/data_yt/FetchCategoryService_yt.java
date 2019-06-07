@@ -51,6 +51,7 @@ public class FetchCategoryService_yt extends IntentService {
         CategoryDbBuilder_yt builder = new CategoryDbBuilder_yt(getApplicationContext());
 
         try {
+            // set category name to preference
             builder.fetch(serviceUrl,index);
 
             ContentResolver contentResolver = getApplicationContext().getContentResolver();
@@ -65,6 +66,7 @@ public class FetchCategoryService_yt extends IntentService {
         String status = "FetchCategoryServiceIsDone"; // any data that you want to send back to receivers
         Intent localIntent =  new Intent(Constants.BROADCAST_ACTION);
         localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
+//        localIntent.putExtra(Constants.EXTENDED_DATA_NAME, status);
 
         // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
@@ -79,5 +81,8 @@ public class FetchCategoryService_yt extends IntentService {
         // Defines the key for the status "extra" in an Intent
         public static final String EXTENDED_DATA_STATUS =
                 "com.cw.tv_yt.STATUS.category";
-    }
+        // Defines the key for the status "extra" in an Intent
+//        public static final String EXTENDED_DATA_NAME =
+//                "com.cw.tv_yt.NAME.category";
+        }
 }

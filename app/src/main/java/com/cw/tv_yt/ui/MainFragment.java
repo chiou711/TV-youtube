@@ -17,8 +17,6 @@
 package com.cw.tv_yt.ui;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -26,7 +24,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -60,10 +57,9 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
-import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
-import com.cw.tv_yt.data_yt.VideoProvider_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -95,6 +91,7 @@ public class MainFragment extends BrowseSupportFragment
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
     private static final int CATEGORY_LOADER = 123; // Unique ID for Category Loader.
+    private final int INIT_NUMBER = 3;
 
     // Maps a Loader Id to its CursorObjectAdapter.
     private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
@@ -408,8 +405,41 @@ public class MainFragment extends BrowseSupportFragment
             if(rowsLoadedCount == 0)
             {
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-                serviceIntent.putExtra("FetchUrl", getString(R.string.catalog_url_default));
-                getActivity().startService(serviceIntent);
+                int initNumber = INIT_NUMBER;
+                Utils.setPref_focus_category_number(getActivity(),initNumber);
+
+                String categoryName = Utils.getPref_category_name(getActivity(),initNumber);
+                System.out.println("MainFragment / _onLoadFinished / categoryName = " + categoryName);
+
+                String pre_str = "catalog_url_";
+                int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
+                        "string",
+                        getActivity().getPackageName());
+                String default_url = getString(id);
+
+                if( categoryName.equalsIgnoreCase(String.valueOf(initNumber))) {
+
+                    // receiver for fetch category service
+                    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+                    responseReceiver = new FetchServiceResponseReceiver();
+
+                    // Registers the FetchCategoryResponseReceiver and its intent filters
+                    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
+
+                    // start new fetch category service
+                    serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+                    serviceIntent.putExtra("FetchCategoryIndex", initNumber);
+                    serviceIntent.putExtra("FetchCategoryUrl", default_url);
+                    getActivity().startService(serviceIntent);
+
+                }
+                else {
+
+                    serviceIntent.putExtra("FetchUrl", default_url);
+                    getActivity().startService(serviceIntent);
+
+//                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
+                }
             }
         }
     }
@@ -494,37 +524,6 @@ public class MainFragment extends BrowseSupportFragment
                 }
             }
         }
-    }
-
-    // start fetch service by URL string
-    private void startFetchService(String url)
-    {
-        // delete database
-        try {
-            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
-
-            ContentResolver resolver = getActivity().getContentResolver();
-            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
-            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
-
-            provider.mContentResolver = resolver;
-            provider.mOpenHelper.close();
-            provider.mOpenHelper = new VideoDbHelper_yt(getActivity());
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                client.close();
-            else
-                client.release();
-
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // start new fetch video service
-        Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-        serviceIntent.putExtra("FetchUrl",url);
-        getActivity().startService(serviceIntent);
     }
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
@@ -683,7 +682,7 @@ public class MainFragment extends BrowseSupportFragment
 ///
 
     // Broadcast receiver for receiving status updates from the IntentService
-    private class FetchServiceResponseReceiver extends BroadcastReceiver {
+    class FetchServiceResponseReceiver extends BroadcastReceiver {
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         public void onReceive(Context context, Intent intent) {
             /*
@@ -692,9 +691,30 @@ public class MainFragment extends BrowseSupportFragment
              */
             System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
 
-            String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
-            System.out.println("MainFragment / _MyResponseReceiver / _onReceive / statusStr = " + statusStr);
-            if(statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
+            // for fetch category
+            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
+
+            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+            {
+                if (context != null) {
+
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
+
+                    if(getActivity() != null)
+                        getActivity().finish();
+
+                    Intent new_intent;
+                    new_intent = new Intent(context, MainActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent);
+                }
+            }
+
+			// for fetch video
+            statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
+            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
             {
                 if (context != null) {
 

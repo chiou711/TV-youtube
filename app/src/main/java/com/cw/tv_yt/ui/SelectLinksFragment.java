@@ -152,11 +152,21 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
             }
 
         });
+        //todo add a real refresh links button
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SearchActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), SearchActivity.class);
+//                startActivity(intent);
+
+                // remove reference keys
+                Utils.removePref_focus_category_number(getActivity());
+
+                for(int i=1;i<=countCategory;i++)
+                    Utils.removePref_category_name(getActivity(),i);
+
+                getActivity().recreate();
+
             }
         });
     }

@@ -48,7 +48,7 @@ public class FetchVideoService extends IntentService {
 
         try {
             List<ContentValues> contentValuesList =
-                    builder.fetch(getResources().getString(R.string.catalog_url_default));
+                    builder.fetch(getResources().getString(R.string.catalog_url_1));
             ContentValues[] downloadedVideoContentValues =
                     contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
             getApplicationContext().getContentResolver().bulkInsert(VideoContract.VideoEntry.CONTENT_URI,
