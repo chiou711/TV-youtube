@@ -75,6 +75,9 @@
         https://drive.google.com/uc?export=download&amp;id=1Hm3-8lk6IuM7LESOrAhRoVGlLAHF1q7G
     </string>
 
+    <string name="catalog_url_8">
+        https://drive.google.com/uc?export=download&amp;id=1jWESR4LEzoXKRpDR47Q94FDLLZaeaEtO
+    </string>
     <!-- Error messages -->
 
     <string name="videos_loading_error">Failed to load videos. Please check your network connection.</string>

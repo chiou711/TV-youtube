@@ -17,6 +17,7 @@ package com.cw.tv_yt.data_yt;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.Rating;
 import android.net.Uri;
 import android.util.Log;
@@ -71,9 +72,11 @@ public class VideoDbBuilder_yt {
      * Fetches JSON data representing videos from a server and populates that in a database
      * @param url The location of the video list
      */
-    public @NonNull List<ContentValues> fetch(String url)
+//    public @NonNull List<ContentValues> fetch(String url)
+    public @NonNull List<List<ContentValues>> fetch(String url)
             throws IOException, JSONException {
         JSONObject videoData = fetchJSON(url);
+	    System.out.println("VideoDbBuilder_yt / _fetch / videoData = " + videoData.toString());
         return buildMedia(videoData);
     }
 
@@ -82,87 +85,147 @@ public class VideoDbBuilder_yt {
      * @param jsonObj The JSON object of videos
      * @throws JSONException if the JSON object is invalid
      */
-    public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
+//    public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
+    public List<List<ContentValues>> buildMedia(JSONObject jsonObj) throws JSONException {
 
-        System.out.println("VideoDbBuilder / _buildMedia / jsonObj.toString = " + jsonObj.toString());
+        System.out.println("VideoDbBuilder_yt / _buildMedia / jsonObj.toString = " + jsonObj.toString());
 
-        //todo mark for simple check
-        JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
-        List<ContentValues> videosToInsert = new ArrayList<>();
+        JSONArray contentArray = jsonObj.getJSONArray("content");
+        List<List<ContentValues>> contentList = new ArrayList<>();
+        List<ContentValues> videosToInsert = null;
+        System.out.println("VideoDbBuilder_yt / _buildMedia / contentArray.length() = " + contentArray.length());
 
-        for (int i = 0; i < categoryArray.length(); i++)
-        {
-            JSONArray videoArray;
+        for (int h = 0; h < contentArray.length(); h++) {
 
-            JSONObject category = categoryArray.getJSONObject(i);
-            String titleName = category.getString(TAG_TITLE);
-            videoArray = category.getJSONArray(TAG_MEDIA);
+            JSONObject contentObj = contentArray.getJSONObject(h);
 
-            ///
-            // links
-            //videoArray = jsonObj.getJSONArray(TAG_MEDIA);
+//            JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
+            JSONArray categoryArray = contentObj.getJSONArray(TAG_LINK_PAGE);
 
-            for (int j = 0; j < videoArray.length(); j++) {
-                JSONObject video = videoArray.getJSONObject(j);
+//            List<ContentValues> videosToInsert = new ArrayList<>();
+            videosToInsert = new ArrayList<>();
 
-                // If there are no URLs, skip this video entry.
+            for (int i = 0; i < categoryArray.length(); i++) {
+
+                JSONArray videoArray;
+
+                JSONObject category = categoryArray.getJSONObject(i);
+                String titleName = category.getString(TAG_TITLE);
+                videoArray = category.getJSONArray(TAG_MEDIA);
+
+                ///
+                // links
+                //videoArray = jsonObj.getJSONArray(TAG_MEDIA);
+
+                for (int j = 0; j < videoArray.length(); j++) {
+                    JSONObject video = videoArray.getJSONObject(j);
+
+                    // If there are no URLs, skip this video entry.
 //                JSONArray urls = video.optJSONArray(TAG_SOURCES);
 //                if (urls == null || urls.length() == 0) {
 //                    continue;
 //                }
 
 //                String title = video.optString(TAG_TITLE);
-                String title = video.optString("note_title");
-                System.out.println("--- title = " + title);
+                    String title = video.optString("note_title");
+                    System.out.println("--- title = " + title);
+
 //                String description = video.optString(TAG_DESCRIPTION);
-                String description = "DESCRIPTION";
+                    String description = "DESCRIPTION";
+
 //                String videoUrl = (String) urls.get(0); // Get the first video only.
-                String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
-                System.out.println("--- videoUrl = " + videoUrl);
+                    String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
+                    System.out.println("--- videoUrl = " + videoUrl);
+
 //                String bgImageUrl = video.optString(TAG_BACKGROUND);
-                Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
-                String bgImageUrl = myURI.toString();
+                    Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
+                    String bgImageUrl = myURI.toString();
+
 //                String cardImageUrl = video.optString(TAG_CARD_THUMB);
 //                String cardImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Explore%20Treasure%20Mode%20with%20Google%20Maps/card.jpg";
-                String cardImageUrl = "http://img.youtube.com/vi/"+ Utils.getYoutubeId(videoUrl)+"/0.jpg";
+                    String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(videoUrl) + "/0.jpg";
+
 //                String studio = video.optString(TAG_STUDIO);
-                String studio = "STUDIO";
+                    String studio = "STUDIO";
 
-                ContentValues videoValues = new ContentValues();
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, titleName);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, title);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DESC, description);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, videoUrl);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CARD_IMG, cardImageUrl);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL, bgImageUrl);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_STUDIO, studio);
+                    ContentValues videoValues = new ContentValues();
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, titleName);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, title);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DESC, description);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, videoUrl);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CARD_IMG, cardImageUrl);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL, bgImageUrl);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_STUDIO, studio);
 
-                // Fixed defaults.
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CONTENT_TYPE, "video/mp4");
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_IS_LIVE, false);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG, "2.0");
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_PRODUCTION_YEAR, 2014);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DURATION, 0);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RATING_STYLE,
-                        Rating.RATING_5_STARS);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RATING_SCORE, 3.5f);
-                if (mContext != null) {
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_PURCHASE_PRICE,
-                            mContext.getResources().getString(R.string.buy_2));
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RENTAL_PRICE,
-                            mContext.getResources().getString(R.string.rent_2));
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_ACTION,
-                            mContext.getResources().getString(R.string.global_search));
+                    // Fixed defaults.
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CONTENT_TYPE, "video/mp4");
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_IS_LIVE, false);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG, "2.0");
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_PRODUCTION_YEAR, 2014);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DURATION, 0);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RATING_STYLE, Rating.RATING_5_STARS);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RATING_SCORE, 3.5f);
+                    if (mContext != null) {
+                        videoValues.put(VideoContract_yt.VideoEntry.COLUMN_PURCHASE_PRICE,
+                                mContext.getResources().getString(R.string.buy_2));
+                        videoValues.put(VideoContract_yt.VideoEntry.COLUMN_RENTAL_PRICE,
+                                mContext.getResources().getString(R.string.rent_2));
+                        videoValues.put(VideoContract_yt.VideoEntry.COLUMN_ACTION,
+                                mContext.getResources().getString(R.string.global_search));
+                    }
+
+                    // TODO: Get these dimensions.
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_WIDTH, 1280);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_HEIGHT, 720);
+
+                    videosToInsert.add(videoValues);
                 }
 
-                // TODO: Get these dimensions.
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_WIDTH, 1280);
-                videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_HEIGHT, 720);
-
-                videosToInsert.add(videoValues);
             }
+
+            ///
+            VideoDbHelper_yt mOpenHelper = new VideoDbHelper_yt(mContext);
+
+            // Will call VideoDbHelper_yt.onCreate()first time when WritableDatabase is not created yet
+            SQLiteDatabase mSqlDb;
+            mSqlDb = mOpenHelper.getWritableDatabase();
+
+            String tableId = String.valueOf(h+1); //Id starts from 1
+            // Create a table to hold videos.
+            final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.VideoEntry.TABLE_NAME.concat(tableId) + " (" +
+                    VideoContract_yt.VideoEntry._ID + " INTEGER PRIMARY KEY," +
+                    VideoContract_yt.VideoEntry.COLUMN_CATEGORY + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL + " TEXT UNIQUE NOT NULL, " + // Make the URL unique.
+                    VideoContract_yt.VideoEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_DESC + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_STUDIO + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_CARD_IMG + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_CONTENT_TYPE + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_IS_LIVE + " INTEGER DEFAULT 0, " +
+                    VideoContract_yt.VideoEntry.COLUMN_VIDEO_WIDTH + " INTEGER NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_VIDEO_HEIGHT + " INTEGER NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_PURCHASE_PRICE + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_RENTAL_PRICE + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_RATING_STYLE + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_RATING_SCORE + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_PRODUCTION_YEAR + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_DURATION + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_ACTION + " TEXT NOT NULL " +
+                    " );";
+
+            // Do the creating of the databases.
+            mSqlDb.execSQL(SQL_CREATE_VIDEO_TABLE);
+
+
+                ///
+
+            contentList.add(videosToInsert);
         }
-        return videosToInsert;
+//        return videosToInsert;
+//        return contentList.get(1);
+        return contentList;
     }
 
     /**

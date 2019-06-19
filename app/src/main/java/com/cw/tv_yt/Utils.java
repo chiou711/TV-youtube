@@ -131,7 +131,7 @@ public class Utils {
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "current_category_number";
-        return pref.getInt(keyName, 1); // folder table Id: default is 1
+        return pref.getInt(keyName, 1); // focus table Id: default is 1
     }
 
     // set category name

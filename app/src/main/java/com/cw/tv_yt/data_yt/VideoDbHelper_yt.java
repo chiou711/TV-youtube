@@ -35,12 +35,17 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
 
     public VideoDbHelper_yt(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        System.out.println("VideoDbHelper_yt / constructor");
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        System.out.println("VideoDbHelper_yt / _onCreate");
+
+        //todo temp
         // Create a table to hold videos.
-        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE " + VideoEntry.TABLE_NAME + " (" +
+//        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + "video1" + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 VideoEntry.COLUMN_CATEGORY + " TEXT NOT NULL, " +
                 VideoEntry.COLUMN_VIDEO_URL + " TEXT UNIQUE NOT NULL, " + // Make the URL unique.
@@ -65,6 +70,10 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
 
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_VIDEO_TABLE);
+
+        //
+
+
     }
 
     @Override

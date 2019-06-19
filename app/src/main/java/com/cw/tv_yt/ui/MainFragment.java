@@ -17,6 +17,8 @@
 package com.cw.tv_yt.ui;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -60,6 +62,7 @@ import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
+import com.cw.tv_yt.data_yt.VideoProvider_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -91,7 +94,7 @@ public class MainFragment extends BrowseSupportFragment
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
     private static final int CATEGORY_LOADER = 123; // Unique ID for Category Loader.
-    private final int INIT_NUMBER = 3;
+    private final int INIT_NUMBER = 1;//3;
 
     // Maps a Loader Id to its CursorObjectAdapter.
     private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
@@ -408,39 +411,43 @@ public class MainFragment extends BrowseSupportFragment
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                 int initNumber = INIT_NUMBER;
                 Utils.setPref_focus_category_number(getActivity(),initNumber);
-
-                String categoryName = Utils.getPref_category_name(getActivity(),initNumber);
-                System.out.println("MainFragment / _onLoadFinished / categoryName = " + categoryName);
-
+//
+//                String categoryName = Utils.getPref_category_name(getActivity(),initNumber);
+//                System.out.println("MainFragment / _onLoadFinished / categoryName = " + categoryName);
+//
+//                // todo use catalog_url_1 to be default URL
                 String pre_str = "catalog_url_";
                 int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
                         "string",
                         getActivity().getPackageName());
                 String default_url = getString(id);
-
-                if( categoryName.equalsIgnoreCase(String.valueOf(initNumber))) {
-
-                    // receiver for fetch category service
-                    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-                    responseReceiver = new FetchServiceResponseReceiver();
-
-                    // Registers the FetchCategoryResponseReceiver and its intent filters
-                    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-
-                    // start new fetch category service
-                    serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-                    serviceIntent.putExtra("FetchCategoryIndex", initNumber);
-                    serviceIntent.putExtra("FetchCategoryUrl", default_url);
-                    getActivity().startService(serviceIntent);
-
-                }
-                else {
-
+//
+//                // when new installation
+//                if( categoryName.equalsIgnoreCase(String.valueOf(initNumber))) {
+//
+//                    // receiver for fetch category service
+//                    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+//                    responseReceiver = new FetchServiceResponseReceiver();
+//
+//                    // Registers the FetchCategoryResponseReceiver and its intent filters
+//                    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
+//
+//                    // start new fetch category service
+//                    serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+//                    serviceIntent.putExtra("FetchCategoryIndex", initNumber);
+//                    serviceIntent.putExtra("FetchCategoryUrl", default_url);
+//                    getActivity().startService(serviceIntent);
+//
+//                }
+//                else
+//                {
+                    System.out.println("MainFragment / onLoadFinished / start service");
+                    System.out.println("MainFragment / onLoadFinished / start service =================================");
                     serviceIntent.putExtra("FetchUrl", default_url);
                     getActivity().startService(serviceIntent);
 
 //                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
-                }
+//                }
             }
         }
     }
