@@ -48,7 +48,7 @@ public final class VideoContract_yt {
         public static final String TABLE_NAME = "video";
 
         // Column with the foreign key into the category table.
-        public static final String COLUMN_CATEGORY = "category";
+        public static final String COLUMN_TITLE = "title";
 
         // Name of the video.
         public static final String COLUMN_NAME = SearchManager.SUGGEST_COLUMN_TEXT_1;

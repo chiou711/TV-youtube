@@ -17,8 +17,6 @@
 package com.cw.tv_yt.ui;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -59,10 +57,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
-import com.cw.tv_yt.data_yt.VideoProvider_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -86,14 +82,14 @@ public class MainFragment extends BrowseSupportFragment
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private final Handler mHandler = new Handler();
-    private ArrayObjectAdapter mCategoryRowAdapter;
+    private ArrayObjectAdapter mTitleRowAdapter;
     private Drawable mDefaultBackground;
     private DisplayMetrics mMetrics;
     private Runnable mBackgroundTask;
     private Uri mBackgroundURI;
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
-    private static final int CATEGORY_LOADER = 123; // Unique ID for Category Loader.
+    private static final int TITLE_LOADER = 123; // Unique ID for Category Loader.
     private final int INIT_NUMBER = 1;//3;
 
     // Maps a Loader Id to its CursorObjectAdapter.
@@ -112,18 +108,16 @@ public class MainFragment extends BrowseSupportFragment
         // Each adapter is used to render a specific row of videos in the MainFragment.
         mVideoCursorAdapters = new HashMap<>();
 
-        // Start loading the categories from the database.
+        // Start loading the titles from the database.
         mLoaderManager = LoaderManager.getInstance(this);
-        mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
+        mLoaderManager.initLoader(TITLE_LOADER, null, this);
 
         // receiver for fetch video service
-        IntentFilter statusIntentFilter = new IntentFilter(
-                FetchVideoService_yt.Constants.BROADCAST_ACTION);
+        IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.BROADCAST_ACTION);
         responseReceiver = new FetchServiceResponseReceiver();
 
         // Registers the FetchServiceResponseReceiver and its intent filters
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                responseReceiver, statusIntentFilter );
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
     }
 
 
@@ -154,11 +148,11 @@ public class MainFragment extends BrowseSupportFragment
         setupEventListeners();
         prepareEntranceTransition();
 
-        // Map category results from the database to ListRow objects.
+        // Map title results from the database to ListRow objects.
         // This Adapter is used to render the MainFragment sidebar labels.
 
-        mCategoryRowAdapter = new ArrayObjectAdapter(new ListRowPresenter());
-        setAdapter(mCategoryRowAdapter);
+        mTitleRowAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        setAdapter(mTitleRowAdapter);
         //todo temporary mark
 //        updateRecommendations();
 
@@ -280,33 +274,33 @@ public class MainFragment extends BrowseSupportFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         System.out.println("MainFragment / _onCreateLoader");
-        if (id == CATEGORY_LOADER) {
-            System.out.println("MainFragment / _onCreateLoader / id == CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
+        if (id == TITLE_LOADER) {
+            System.out.println("MainFragment / _onCreateLoader / id == TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
                     VideoContract_yt.VideoEntry.CONTENT_URI);
-            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
+            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
             return new CursorLoader(
                     getContext(),
                     VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
-                    new String[]{"DISTINCT " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY},
+                    new String[]{"DISTINCT " + VideoContract_yt.VideoEntry.COLUMN_TITLE},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
                     null  // Default sort order
             );
         } else {
-            System.out.println("MainFragment / _onCreateLoader / id != CATEGORY_LOADER / VideoContract.VideoEntry.CONTENT_URI = " +
+            System.out.println("MainFragment / _onCreateLoader / id != TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI = " +
                     VideoContract_yt.VideoEntry.CONTENT_URI );
-            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_CATEGORY = " + VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
+            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
             // Assume it is for a video.
-            String category = args.getString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
+            String title = args.getString(VideoContract_yt.VideoEntry.COLUMN_TITLE);
 
             // This just creates a CursorLoader that gets all videos.
             return new CursorLoader(
                     getContext(),
                     VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
                     null, // Projection to return - null means return all fields
-                    VideoContract_yt.VideoEntry.COLUMN_CATEGORY + " = ?", // Selection clause
-                    new String[]{category},  // Select based on the category id.
+                    VideoContract_yt.VideoEntry.COLUMN_TITLE + " = ?", // Selection clause
+                    new String[]{title},  // Select based on the category id.
                     null // Default sort order
             );
         }
@@ -329,54 +323,53 @@ public class MainFragment extends BrowseSupportFragment
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
 
-            if (loaderId == CATEGORY_LOADER) {
-                System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER");
+            if (loaderId == TITLE_LOADER) {
+                System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER");
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
                 {
-                    System.out.println("MainFragment / _onLoadFinished /  mCategoryRowAdapter.clear()");
+                    System.out.println("MainFragment / _onLoadFinished /  mTitleRowAdapter.clear()");
                     // Every time we have to re-get the category loader, we must re-create the sidebar.
-                    mCategoryRowAdapter.clear();
+                    mTitleRowAdapter.clear();
                 }
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
 
-                    int categoryIndex =
-                            data.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
-                    String category = data.getString(categoryIndex);
+                    int titleIndex = data.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_TITLE);
+                    String title = data.getString(titleIndex);
 
                     // Create header for this category.
-                    HeaderItem header = new HeaderItem(category);
+                    HeaderItem header = new HeaderItem(title);
 
-                    int videoLoaderId = category.hashCode(); // Create unique int from category.
+                    int videoLoaderId = title.hashCode(); // Create unique int from title.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
                     if (existingAdapter == null) {
-                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is null ");
+                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / videoLoaderId = " + videoLoaderId);
 
                         // Map video results from the database to Video objects.
-                        CursorObjectAdapter videoCursorAdapter =
-                                new CursorObjectAdapter(new CardPresenter());
+                        CursorObjectAdapter videoCursorAdapter = new CursorObjectAdapter(new CardPresenter());
                         videoCursorAdapter.setMapper(new VideoCursorMapper());
                         mVideoCursorAdapters.put(videoLoaderId, videoCursorAdapter);
 
                         ListRow row = new ListRow(header, videoCursorAdapter);
-                        mCategoryRowAdapter.add(row);
+                        mTitleRowAdapter.add(row);
 
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
-                        args.putString(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, category);
+                        args.putString(VideoContract_yt.VideoEntry.COLUMN_TITLE, title);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
                     } else {
                         System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
                         ListRow row = new ListRow(header, existingAdapter);
-                        mCategoryRowAdapter.add(row);
+                        mTitleRowAdapter.add(row);
                     }
 
-                    System.out.println("MainFragment / _onLoadFinished / loaderId == CATEGORY_LOADER / rowsLoadedCount = " + rowsLoadedCount);
+                    System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                     data.moveToNext();
                 }
+
                 // Create a row for this special case with more samples.
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
@@ -387,13 +380,13 @@ public class MainFragment extends BrowseSupportFragment
                 gridRowAdapter.add(getString(R.string.error_fragment));
                 gridRowAdapter.add(getString(R.string.personal_settings));
                 ListRow row = new ListRow(gridHeader, gridRowAdapter);
-                mCategoryRowAdapter.add(row);
+                mTitleRowAdapter.add(row);
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
 
             } else {
-                System.out.println("MainFragment / _onLoadFinished / loaderId != CATEGORY_LOADER");
+                System.out.println("MainFragment / _onLoadFinished / loaderId != TITLE_LOADER");
                 System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
@@ -457,10 +450,10 @@ public class MainFragment extends BrowseSupportFragment
         System.out.println("MainFragment / _onLoaderReset");
 
         int loaderId = loader.getId();
-        if (loaderId != CATEGORY_LOADER) {
+        if (loaderId != TITLE_LOADER) {
             mVideoCursorAdapters.get(loaderId).changeCursor(null);
         } else {
-            mCategoryRowAdapter.clear();
+            mTitleRowAdapter.clear();
         }
     }
 
@@ -500,35 +493,25 @@ public class MainFragment extends BrowseSupportFragment
             } else if (item instanceof String) {
 	            if (((String) item).contains(getString(R.string.select_links))) {
                     Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
-                    Bundle bundle =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
-                                    .toBundle();
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
                 } else if (((String) item).contains(getString(R.string.grid_view))) {
-			            Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
-			            Bundle bundle =
-					            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
-							            .toBundle();
-			            startActivity(intent, bundle);
+			        Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
+			        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+			        startActivity(intent, bundle);
                 } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
                     Intent intent = new Intent(getActivity(), GuidedStepActivity.class);
-                    Bundle bundle =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
-                                    .toBundle();
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
                 } else if (((String) item).contains(getString(R.string.error_fragment))) {
                     BrowseErrorFragment errorFragment = new BrowseErrorFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment)
-                            .addToBackStack(null).commit();
+                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment).addToBackStack(null).commit();
                 } else if(((String) item).contains(getString(R.string.personal_settings))) {
                     Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                    Bundle bundle =
-                            ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity())
-                                    .toBundle();
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
                 } else {
-                    Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -700,27 +683,27 @@ public class MainFragment extends BrowseSupportFragment
             System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
 
             // for fetch category
-            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
-            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
-
-            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
-            {
-                if (context != null) {
-
-                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
-
-                    if(getActivity() != null)
-                        getActivity().finish();
-
-                    Intent new_intent;
-                    new_intent = new Intent(context, MainActivity.class);
-                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(new_intent);
-                }
-            }
+//            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+//            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
+//
+//            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+//            {
+//                if (context != null) {
+//
+//                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
+//
+//                    if(getActivity() != null)
+//                        getActivity().finish();
+//
+//                    Intent new_intent;
+//                    new_intent = new Intent(context, MainActivity.class);
+//                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+//                    context.startActivity(new_intent);
+//                }
+//            }
 
 			// for fetch video
-            statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
+            String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
             System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
             if((statusStr != null) && statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
             {
@@ -731,6 +714,7 @@ public class MainFragment extends BrowseSupportFragment
 
                     if(getActivity() != null)
                         getActivity().finish();
+                    System.out.println("MainFragment / _FetchServiceResponseReceiver / will start new intent ");
 
                     Intent new_intent = new Intent(context, MainActivity.class);
                     new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);

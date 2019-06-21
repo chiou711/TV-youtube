@@ -147,9 +147,9 @@
         <service
             android:name="com.cw.tv_yt.data_yt.FetchVideoService_yt"
             android:exported="false" />
-        <service
-            android:name="com.cw.tv_yt.data_yt.FetchCategoryService_yt"
-            android:exported="false" />
+        <!--<service-->
+            <!--android:name="com.cw.tv_yt.data_yt.FetchCategoryService_yt"-->
+            <!--android:exported="false" />-->
         <service
             android:name="com.cw.tv_yt.recommendation.UpdateRecommendationsService"
             android:enabled="true" />

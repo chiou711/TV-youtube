@@ -17,6 +17,7 @@ package com.cw.tv_yt.data_yt;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.Rating;
 import android.net.Uri;
@@ -102,6 +103,17 @@ public class VideoDbBuilder_yt {
 //            JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
             JSONArray categoryArray = contentObj.getJSONArray(TAG_LINK_PAGE);
 
+            String category_name = contentObj.getString("category");
+
+            System.out.println("=============== category_name = " + category_name);
+            //TODO add to DB
+            // save category names
+            VideoDbHelper_yt openHelper = new VideoDbHelper_yt(mContext);
+            ContentValues categoryValues = new ContentValues();
+            //categoryValues.put("category_name", category_name);
+            long _id = openHelper.getWritableDatabase().insert("category", null, categoryValues);
+            //System.out.println("=============== _id = " + _id);
+
 //            List<ContentValues> videosToInsert = new ArrayList<>();
             videosToInsert = new ArrayList<>();
 
@@ -149,7 +161,7 @@ public class VideoDbBuilder_yt {
                     String studio = "STUDIO";
 
                     ContentValues videoValues = new ContentValues();
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, titleName);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_TITLE, titleName);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, title);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DESC, description);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, videoUrl);
@@ -187,14 +199,13 @@ public class VideoDbBuilder_yt {
             VideoDbHelper_yt mOpenHelper = new VideoDbHelper_yt(mContext);
 
             // Will call VideoDbHelper_yt.onCreate()first time when WritableDatabase is not created yet
-            SQLiteDatabase mSqlDb;
-            mSqlDb = mOpenHelper.getWritableDatabase();
-
+            SQLiteDatabase sqlDb;
+            sqlDb = mOpenHelper.getWritableDatabase();
             String tableId = String.valueOf(h+1); //Id starts from 1
             // Create a table to hold videos.
             final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.VideoEntry.TABLE_NAME.concat(tableId) + " (" +
                     VideoContract_yt.VideoEntry._ID + " INTEGER PRIMARY KEY," +
-                    VideoContract_yt.VideoEntry.COLUMN_CATEGORY + " TEXT NOT NULL, " +
+                    VideoContract_yt.VideoEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
                     VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL + " TEXT UNIQUE NOT NULL, " + // Make the URL unique.
                     VideoContract_yt.VideoEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                     VideoContract_yt.VideoEntry.COLUMN_DESC + " TEXT NOT NULL, " +
@@ -216,10 +227,8 @@ public class VideoDbBuilder_yt {
                     " );";
 
             // Do the creating of the databases.
-            mSqlDb.execSQL(SQL_CREATE_VIDEO_TABLE);
-
-
-                ///
+            sqlDb.execSQL(SQL_CREATE_VIDEO_TABLE);
+            ///
 
             contentList.add(videosToInsert);
         }

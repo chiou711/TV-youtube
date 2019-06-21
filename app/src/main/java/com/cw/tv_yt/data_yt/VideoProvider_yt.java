@@ -34,8 +34,6 @@ import java.util.HashMap;
 
 import androidx.annotation.NonNull;
 
-import static com.cw.tv_yt.Utils.getPref_focus_category_number;
-
 /**
  * VideoProvider is a ContentProvider that provides videos for the rest of applications.
  */
@@ -71,13 +69,14 @@ public class VideoProvider_yt extends ContentProvider {
 //        int focusCategoryNumber = 1;
         table_id = String.valueOf(focusCategoryNumber);
         System.out.println("VideoProvider / _onCreate / table_id = " + table_id);
+
         sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
         sVideosContainingQueryBuilder.setTables(VideoContract_yt.VideoEntry.TABLE_NAME.concat(table_id)); //todo temp
         sVideosContainingQueryBuilder.setProjectionMap(sColumnMap);
         sVideosContainingQueryColumns = new String[]{
                 VideoContract_yt.VideoEntry._ID,
                 VideoContract_yt.VideoEntry.COLUMN_NAME,
-                VideoContract_yt.VideoEntry.COLUMN_CATEGORY,
+                VideoContract_yt.VideoEntry.COLUMN_TITLE,
                 VideoContract_yt.VideoEntry.COLUMN_DESC,
                 VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL,
                 VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL,
@@ -109,7 +108,7 @@ public class VideoProvider_yt extends ContentProvider {
 //        sVideosContainingQueryColumns = new String[]{
 //                VideoContract_yt.VideoEntry._ID,
 //                VideoContract_yt.VideoEntry.COLUMN_NAME,
-//                VideoContract_yt.VideoEntry.COLUMN_CATEGORY,
+//                VideoContract_yt.VideoEntry.COLUMN_TITLE,
 //                VideoContract_yt.VideoEntry.COLUMN_DESC,
 //                VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL,
 //                VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL,
@@ -164,7 +163,7 @@ public class VideoProvider_yt extends ContentProvider {
         map.put(VideoContract_yt.VideoEntry._ID, VideoContract_yt.VideoEntry._ID);
         map.put(VideoContract_yt.VideoEntry.COLUMN_NAME, VideoContract_yt.VideoEntry.COLUMN_NAME);
         map.put(VideoContract_yt.VideoEntry.COLUMN_DESC, VideoContract_yt.VideoEntry.COLUMN_DESC);
-        map.put(VideoContract_yt.VideoEntry.COLUMN_CATEGORY, VideoContract_yt.VideoEntry.COLUMN_CATEGORY);
+        map.put(VideoContract_yt.VideoEntry.COLUMN_TITLE, VideoContract_yt.VideoEntry.COLUMN_TITLE);
         map.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL,
                 VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL);
         map.put(VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL,

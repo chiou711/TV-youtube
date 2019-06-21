@@ -143,8 +143,11 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
                 for(int i = 1; i<= countCategory; i++) {
 
                     String categoryName = Utils.getPref_category_name(getActivity(), i);
+                    System.out.println("------------------categoryName = " + categoryName);
+                    System.out.println("------------------i = " + i);
                     if (categoryName.equalsIgnoreCase(item.toString())) {
                         clickedPos = i;
+                        System.out.println("------------------clickedPos = " + clickedPos);
                     }
                 }
 //
@@ -166,16 +169,13 @@ public class SelectLinksFragment extends VerticalGridSupportFragment {
 //
 //                startFetchService(getString(res_id));
 
-
-
                 VideoProvider_yt.table_id =  String.valueOf(clickedPos);
+
+                Intent new_intent = new Intent(getActivity(), MainActivity.class);
+                getActivity().startActivity(new_intent);
 
                 if(getActivity() != null)
                     getActivity().finish();
-
-                Intent new_intent = new Intent(getActivity(), MainActivity.class);
-                new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                getActivity().startActivity(new_intent);
             }
 
         });

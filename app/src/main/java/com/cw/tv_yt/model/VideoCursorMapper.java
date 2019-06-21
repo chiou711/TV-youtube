@@ -20,6 +20,7 @@ import android.database.Cursor;
 import androidx.leanback.database.CursorMapper;
 
 import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.data_yt.VideoContract_yt;
 
 /**
  * VideoCursorMapper maps a database Cursor to a Video object.
@@ -44,7 +45,8 @@ public final class VideoCursorMapper extends CursorMapper {
         bgImageUrlIndex = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL);
         cardImageUrlIndex = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_CARD_IMG);
         studioIndex = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_STUDIO);
-        categoryIndex = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_CATEGORY);
+//        categoryIndex = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_CATEGORY);
+        categoryIndex = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_TITLE);
     }
 
     @Override
