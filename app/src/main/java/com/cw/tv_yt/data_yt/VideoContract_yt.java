@@ -109,4 +109,32 @@ public final class VideoContract_yt {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }
+
+    // The content paths.
+    public static final String PATH_CATEGORY = "category";
+//    public static final String PATH_CATEGORY = "video";
+
+    public static final class CategoryEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CATEGORY).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "." + PATH_CATEGORY;
+
+        // Name of the video table.
+        public static final String TABLE_NAME = "category";
+
+        // Column with the foreign key into the category table.
+        public static final String COLUMN_CATEGORY_NAME = "category_name";
+
+
+
+        // Returns the Uri referencing a video with the specified id.
+        public static Uri buildCategoryUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+
 }

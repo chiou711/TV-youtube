@@ -57,6 +57,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
+//import com.cw.tv_yt.data_yt.CategoryContract;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.model.Video;
@@ -273,11 +274,12 @@ public class MainFragment extends BrowseSupportFragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        System.out.println("MainFragment / _onCreateLoader");
+        System.out.println("MainFragment / _onCreateLoader / id = " + id);
+
         if (id == TITLE_LOADER) {
-            System.out.println("MainFragment / _onCreateLoader / id == TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI =" +
-                    VideoContract_yt.VideoEntry.CONTENT_URI);
-            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
+//            System.out.println("MainFragment / _onCreateLoader / id == TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI =" + VideoContract_yt.VideoEntry.CONTENT_URI);
+//            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
+
             return new CursorLoader(
                     getContext(),
                     VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
@@ -287,10 +289,22 @@ public class MainFragment extends BrowseSupportFragment
                     null, // No selection arguments
                     null  // Default sort order
             );
+
+//	        return new CursorLoader(
+//			        getContext(),
+//                    VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
+//			        new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+//			        // Only categories
+//			        null, // No selection clause
+//			        null, // No selection arguments
+//			        null  // Default sort order
+//	        );
+
+
         } else {
-            System.out.println("MainFragment / _onCreateLoader / id != TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI = " +
-                    VideoContract_yt.VideoEntry.CONTENT_URI );
-            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
+//            System.out.println("MainFragment / _onCreateLoader / id != TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI = " + VideoContract_yt.VideoEntry.CONTENT_URI );
+//            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
+
             // Assume it is for a video.
             String title = args.getString(VideoContract_yt.VideoEntry.COLUMN_TITLE);
 
@@ -309,27 +323,27 @@ public class MainFragment extends BrowseSupportFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = " + rowsLoadedCount);
+//        System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = " + rowsLoadedCount);
 
-        if(mVideoCursorAdapters != null)
-            System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
+//        if(mVideoCursorAdapters != null)
+//            System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
 
         // return when load is OK
-        if( (rowsLoadedCount!=0 ) &&
-            (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
+        if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
             return;
         }
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
+	        System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
 
             if (loaderId == TITLE_LOADER) {
-                System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER");
+//                System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER");
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
                 {
-                    System.out.println("MainFragment / _onLoadFinished /  mTitleRowAdapter.clear()");
+                    //System.out.println("MainFragment / _onLoadFinished /  mTitleRowAdapter.clear()");
                     // Every time we have to re-get the category loader, we must re-create the sidebar.
                     mTitleRowAdapter.clear();
                 }
@@ -342,11 +356,11 @@ public class MainFragment extends BrowseSupportFragment
 
                     // Create header for this category.
                     HeaderItem header = new HeaderItem(title);
+                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
                     int videoLoaderId = title.hashCode(); // Create unique int from title.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
                     if (existingAdapter == null) {
-                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / videoLoaderId = " + videoLoaderId);
 
                         // Map video results from the database to Video objects.
                         CursorObjectAdapter videoCursorAdapter = new CursorObjectAdapter(new CardPresenter());
@@ -356,17 +370,19 @@ public class MainFragment extends BrowseSupportFragment
                         ListRow row = new ListRow(header, videoCursorAdapter);
                         mTitleRowAdapter.add(row);
 
+	                    System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
+
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
                         args.putString(VideoContract_yt.VideoEntry.COLUMN_TITLE, title);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
                     } else {
-                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
+                        //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
                         ListRow row = new ListRow(header, existingAdapter);
                         mTitleRowAdapter.add(row);
                     }
 
-                    System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER / rowsLoadedCount = " + rowsLoadedCount);
+                    //System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                     data.moveToNext();
                 }
 
@@ -386,8 +402,8 @@ public class MainFragment extends BrowseSupportFragment
                 // cursors have loaded.
 
             } else {
-                System.out.println("MainFragment / _onLoadFinished / loaderId != TITLE_LOADER");
-                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
+//                System.out.println("MainFragment / _onLoadFinished / loaderId != TITLE_LOADER");
+//                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
@@ -434,7 +450,6 @@ public class MainFragment extends BrowseSupportFragment
 //                }
 //                else
 //                {
-                    System.out.println("MainFragment / onLoadFinished / start service");
                     System.out.println("MainFragment / onLoadFinished / start service =================================");
                     serviceIntent.putExtra("FetchUrl", default_url);
                     getActivity().startService(serviceIntent);

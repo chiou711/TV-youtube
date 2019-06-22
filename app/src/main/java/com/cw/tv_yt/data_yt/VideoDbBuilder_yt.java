@@ -103,15 +103,15 @@ public class VideoDbBuilder_yt {
 //            JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
             JSONArray categoryArray = contentObj.getJSONArray(TAG_LINK_PAGE);
 
-            String category_name = contentObj.getString("category");
+//            String category_name = contentObj.getString("category");
 
-            System.out.println("=============== category_name = " + category_name);
+//            System.out.println("=============== category_name = " + category_name);
             //TODO add to DB
             // save category names
-            VideoDbHelper_yt openHelper = new VideoDbHelper_yt(mContext);
-            ContentValues categoryValues = new ContentValues();
+//            VideoDbHelper_yt openHelper = new VideoDbHelper_yt(mContext);
+//            ContentValues categoryValues = new ContentValues();
             //categoryValues.put("category_name", category_name);
-            long _id = openHelper.getWritableDatabase().insert("category", null, categoryValues);
+//            long _id = openHelper.getWritableDatabase().insert("category", null, categoryValues);
             //System.out.println("=============== _id = " + _id);
 
 //            List<ContentValues> videosToInsert = new ArrayList<>();

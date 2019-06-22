@@ -40,7 +40,7 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("VideoDbHelper_yt / _onCreate");
+        System.out.println("VideoDbHelper_yt / _onCreate (will create video1 table)");
 
         //todo temp
         // Create a table to hold videos.
@@ -72,7 +72,7 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_VIDEO_TABLE);
 
         ///
-        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + "category" + " (" +
+        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.CategoryEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 "category_name" + " TEXT NOT NULL " +
                 " );";

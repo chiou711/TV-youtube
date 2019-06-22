@@ -18,11 +18,14 @@ package com.cw.tv_yt.data_yt;
 
 import android.app.IntentService;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.util.Log;
 
 import org.json.JSONException;
+
 import java.io.IOException;
+import java.util.List;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -43,19 +46,32 @@ public class FetchCategoryService_yt extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent workIntent) {
-        serviceUrl = workIntent.getStringExtra("FetchCategoryUrl");
+        serviceUrl = workIntent.getStringExtra("FetchUrl");
         System.out.println("FetchCategoryService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
-
-        int index = workIntent.getIntExtra("FetchCategoryIndex",1);
-
-        CategoryDbBuilder_yt builder = new CategoryDbBuilder_yt(getApplicationContext());
+//	    VideoDbBuilder_yt builder = new VideoDbBuilder_yt(getApplicationContext());
+	    CategoryDbBuilder builder = new CategoryDbBuilder(getApplicationContext());
 
         try {
-            // set category name to preference
-            builder.fetch(serviceUrl,index);
+	        List<ContentValues> contentValuesList =
+//			        List<List<ContentValues>> contentValuesList =
+//                    builder.fetch(getResources().getString(R.string.catalog_url));
+                    builder.fetch(serviceUrl);
 
-            ContentResolver contentResolver = getApplicationContext().getContentResolver();
-            System.out.println("FetchCategoryService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
+//			for(int i=0;i<contentValuesList.size();i++)
+			{
+
+				ContentValues[] downloadedVideoContentValues =
+						contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
+//						contentValuesList.get(i).toArray(new ContentValues[contentValuesList.get(i).size()]);
+
+				ContentResolver contentResolver = getApplicationContext().getContentResolver();
+				System.out.println("FetchVideoService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
+
+//            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
+//                    downloadedVideoContentValues);
+//				VideoProvider_yt.tableId = String.valueOf(i+1);
+				contentResolver.bulkInsert(VideoContract_yt.CategoryEntry.CONTENT_URI, downloadedVideoContentValues);
+			}
 
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Error occurred in downloading videos");
@@ -66,23 +82,18 @@ public class FetchCategoryService_yt extends IntentService {
         String status = "FetchCategoryServiceIsDone"; // any data that you want to send back to receivers
         Intent localIntent =  new Intent(Constants.BROADCAST_ACTION);
         localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
-//        localIntent.putExtra(Constants.EXTENDED_DATA_NAME, status);
 
         // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
-
         System.out.println("FetchCategoryService_yt / _onHandleIntent / sendBroadcast");
     }
 
     public final class Constants {
         // Defines a custom Intent action
         public static final String BROADCAST_ACTION =
-                "com.cw.tv_yt.BROADCAST.category";
+                "com.cw.tv_yt.BROADCAST";
         // Defines the key for the status "extra" in an Intent
         public static final String EXTENDED_DATA_STATUS =
-                "com.cw.tv_yt.STATUS.category";
-        // Defines the key for the status "extra" in an Intent
-//        public static final String EXTENDED_DATA_NAME =
-//                "com.cw.tv_yt.NAME.category";
-        }
+                "com.cw.tv_yt.STATUS";
+    }
 }
