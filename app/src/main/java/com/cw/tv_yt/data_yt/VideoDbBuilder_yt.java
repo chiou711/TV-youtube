@@ -77,7 +77,8 @@ public class VideoDbBuilder_yt {
     public @NonNull List<List<ContentValues>> fetch(String url)
             throws IOException, JSONException {
         JSONObject videoData = fetchJSON(url);
-	    System.out.println("VideoDbBuilder_yt / _fetch / videoData = " + videoData.toString());
+//        System.out.println("VideoDbBuilder_yt / _fetch / videoData = " + videoData.toString());
+        System.out.println("VideoDbBuilder_yt / _fetch / videoData length = " + videoData.length()) ;
         return buildMedia(videoData);
     }
 
@@ -140,14 +141,14 @@ public class VideoDbBuilder_yt {
 
 //                String title = video.optString(TAG_TITLE);
                     String title = video.optString("note_title");
-                    System.out.println("--- title = " + title);
+//                    System.out.println("--- title = " + title);
 
 //                String description = video.optString(TAG_DESCRIPTION);
                     String description = "DESCRIPTION";
 
 //                String videoUrl = (String) urls.get(0); // Get the first video only.
                     String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
-                    System.out.println("--- videoUrl = " + videoUrl);
+//                    System.out.println("--- videoUrl = " + videoUrl);
 
 //                String bgImageUrl = video.optString(TAG_BACKGROUND);
                     Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);

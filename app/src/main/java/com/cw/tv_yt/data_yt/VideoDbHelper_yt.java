@@ -72,6 +72,7 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_VIDEO_TABLE);
 
         ///
+        System.out.println("VideoDbHelper_yt / _onCreate (will create category table)");
         final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.CategoryEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 "category_name" + " TEXT NOT NULL " +

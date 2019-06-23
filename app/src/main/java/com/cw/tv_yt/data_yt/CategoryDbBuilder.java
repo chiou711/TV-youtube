@@ -76,7 +76,8 @@ public class CategoryDbBuilder {
     public @NonNull List<ContentValues> fetch(String url)
             throws IOException, JSONException {
         JSONObject videoData = fetchJSON(url);
-	    System.out.println("VideoDbBuilder_yt / _fetch / videoData = " + videoData.toString());
+//        System.out.println("CategoryDbBuilder / _fetch / videoData = " + videoData.toString());
+        System.out.println("CategoryDbBuilder / _fetch / videoData length = " + videoData.length());
         return buildMedia(videoData);
     }
 
@@ -88,12 +89,12 @@ public class CategoryDbBuilder {
 //    public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
     public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
 
-        System.out.println("VideoDbBuilder_yt / _buildMedia / jsonObj.toString = " + jsonObj.toString());
+        System.out.println("CategoryDbBuilder_yt / _buildMedia / jsonObj.toString = " + jsonObj.toString());
 
         JSONArray contentArray = jsonObj.getJSONArray("content");
 //        List<ContentValues> contentList = new ArrayList<>();
         List<ContentValues> videosToInsert = new ArrayList<>();
-        System.out.println("VideoDbBuilder_yt / _buildMedia / contentArray.length() = " + contentArray.length());
+        System.out.println("CategoryDbBuilder_yt / _buildMedia / contentArray.length() = " + contentArray.length());
 
         for (int h = 0; h < contentArray.length(); h++) {
 

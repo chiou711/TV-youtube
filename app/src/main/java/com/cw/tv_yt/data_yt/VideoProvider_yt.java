@@ -218,6 +218,7 @@ public class VideoProvider_yt extends ContentProvider {
         System.out.println("----------------VideoProvider_yt / _query/ uri =  " + uri.toString());
 
         table_id = String.valueOf(Utils.getPref_focus_category_number(context));
+        System.out.println("----------------VideoProvider_yt / _query/ table_id =  " + table_id);
 
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
@@ -396,7 +397,7 @@ public class VideoProvider_yt extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-                        System.out.println("VideoProvider_yt / _bulkInsert / title = " + value.getAsString("suggest_text_1"));
+//                        System.out.println("VideoProvider_yt / _bulkInsert (case VIDEO) / title = " + value);
 
 //                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
                         long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME.concat(tableId),
@@ -405,7 +406,7 @@ public class VideoProvider_yt extends ContentProvider {
 //                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
 //                                null, value, SQLiteDatabase.CONFLICT_IGNORE);
 
-                        System.out.println("VideoProvider_yt / _bulkInsert / _id = " + _id);
+                        System.out.println("VideoProvider_yt / _bulkInsert (case VIDEO) / _id = " + _id);
                         if (_id != -1) {
                             returnCount++;
                         }
@@ -425,7 +426,7 @@ public class VideoProvider_yt extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-                        System.out.println("VideoProvider_yt / _bulkInsert / title = " + value.getAsString("suggest_text_1"));
+//                        System.out.println("VideoProvider_yt / _bulkInsert (case CATEGORY) / value = " + value);//value.getAsString("suggest_text_1"));
 
 //                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
                         long _id = db.insertWithOnConflict(VideoContract_yt.CategoryEntry.TABLE_NAME,
@@ -434,7 +435,7 @@ public class VideoProvider_yt extends ContentProvider {
 //                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
 //                                null, value, SQLiteDatabase.CONFLICT_IGNORE);
 
-                        System.out.println("VideoProvider_yt / _bulkInsert / _id = " + _id);
+                        System.out.println("VideoProvider_yt / _bulkInsert (case CATEGORY) / _id = " + _id);
                         if (_id != -1) {
                             returnCount++;
                         }

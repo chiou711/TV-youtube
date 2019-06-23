@@ -452,6 +452,7 @@ public class MainFragment extends BrowseSupportFragment
 //                {
                     System.out.println("MainFragment / onLoadFinished / start service =================================");
                     serviceIntent.putExtra("FetchUrl", default_url);
+                    serviceIntent.putExtra("Session", "install");
                     getActivity().startService(serviceIntent);
 
 //                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
@@ -507,9 +508,11 @@ public class MainFragment extends BrowseSupportFragment
 
             } else if (item instanceof String) {
 	            if (((String) item).contains(getString(R.string.select_links))) {
+
                     Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
+
                 } else if (((String) item).contains(getString(R.string.grid_view))) {
 			        Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
@@ -724,8 +727,7 @@ public class MainFragment extends BrowseSupportFragment
             {
                 if (context != null) {
 
-                    LocalBroadcastManager.getInstance(context)
-                            .unregisterReceiver(responseReceiver);
+                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
 
                     if(getActivity() != null)
                         getActivity().finish();

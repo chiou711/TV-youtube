@@ -65,7 +65,7 @@ public class FetchCategoryService_yt extends IntentService {
 //						contentValuesList.get(i).toArray(new ContentValues[contentValuesList.get(i).size()]);
 
 				ContentResolver contentResolver = getApplicationContext().getContentResolver();
-				System.out.println("FetchVideoService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
+				System.out.println("FetchCategoryService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
 
 //            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
 //                    downloadedVideoContentValues);
