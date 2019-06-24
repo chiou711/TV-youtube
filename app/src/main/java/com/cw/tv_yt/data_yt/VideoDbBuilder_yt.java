@@ -17,7 +17,6 @@ package com.cw.tv_yt.data_yt;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.Rating;
 import android.net.Uri;
@@ -45,17 +44,9 @@ import androidx.annotation.NonNull;
  * to be placed into a local database
  */
 public class VideoDbBuilder_yt {
-//    public static final String TAG_MEDIA = "videos";
     public static final String TAG_LINK_PAGE = "link_page";//"googlevideos";
-    public static final String TAG_CATEGORY = "category";
     public static final String TAG_MEDIA = "links";
     public static final String TAG_TITLE = "title";
-//    public static final String TAG_STUDIO = "studio";
-//    public static final String TAG_SOURCES = "sources";
-//    public static final String TAG_DESCRIPTION = "description";
-//    public static final String TAG_CARD_THUMB = "card";
-//    public static final String TAG_BACKGROUND = "background";
-//    public static final String TAG_TITLE = "title";
 
     private static final String TAG = "VideoDbBuilder";
 
@@ -73,11 +64,9 @@ public class VideoDbBuilder_yt {
      * Fetches JSON data representing videos from a server and populates that in a database
      * @param url The location of the video list
      */
-//    public @NonNull List<ContentValues> fetch(String url)
     public @NonNull List<List<ContentValues>> fetch(String url)
             throws IOException, JSONException {
         JSONObject videoData = fetchJSON(url);
-//        System.out.println("VideoDbBuilder_yt / _fetch / videoData = " + videoData.toString());
         System.out.println("VideoDbBuilder_yt / _fetch / videoData length = " + videoData.length()) ;
         return buildMedia(videoData);
     }
@@ -87,7 +76,6 @@ public class VideoDbBuilder_yt {
      * @param jsonObj The JSON object of videos
      * @throws JSONException if the JSON object is invalid
      */
-//    public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
     public List<List<ContentValues>> buildMedia(JSONObject jsonObj) throws JSONException {
 
         System.out.println("VideoDbBuilder_yt / _buildMedia / jsonObj.toString = " + jsonObj.toString());
@@ -101,21 +89,8 @@ public class VideoDbBuilder_yt {
 
             JSONObject contentObj = contentArray.getJSONObject(h);
 
-//            JSONArray categoryArray = jsonObj.getJSONArray(TAG_LINK_PAGE);
             JSONArray categoryArray = contentObj.getJSONArray(TAG_LINK_PAGE);
 
-//            String category_name = contentObj.getString("category");
-
-//            System.out.println("=============== category_name = " + category_name);
-            //TODO add to DB
-            // save category names
-//            VideoDbHelper_yt openHelper = new VideoDbHelper_yt(mContext);
-//            ContentValues categoryValues = new ContentValues();
-            //categoryValues.put("category_name", category_name);
-//            long _id = openHelper.getWritableDatabase().insert("category", null, categoryValues);
-            //System.out.println("=============== _id = " + _id);
-
-//            List<ContentValues> videosToInsert = new ArrayList<>();
             videosToInsert = new ArrayList<>();
 
             for (int i = 0; i < categoryArray.length(); i++) {
@@ -128,37 +103,20 @@ public class VideoDbBuilder_yt {
 
                 ///
                 // links
-                //videoArray = jsonObj.getJSONArray(TAG_MEDIA);
-
                 for (int j = 0; j < videoArray.length(); j++) {
                     JSONObject video = videoArray.getJSONObject(j);
 
-                    // If there are no URLs, skip this video entry.
-//                JSONArray urls = video.optJSONArray(TAG_SOURCES);
-//                if (urls == null || urls.length() == 0) {
-//                    continue;
-//                }
-
-//                String title = video.optString(TAG_TITLE);
                     String title = video.optString("note_title");
-//                    System.out.println("--- title = " + title);
 
-//                String description = video.optString(TAG_DESCRIPTION);
                     String description = "DESCRIPTION";
 
-//                String videoUrl = (String) urls.get(0); // Get the first video only.
                     String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
-//                    System.out.println("--- videoUrl = " + videoUrl);
 
-//                String bgImageUrl = video.optString(TAG_BACKGROUND);
                     Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
                     String bgImageUrl = myURI.toString();
 
-//                String cardImageUrl = video.optString(TAG_CARD_THUMB);
-//                String cardImageUrl = "https://storage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Explore%20Treasure%20Mode%20with%20Google%20Maps/card.jpg";
                     String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(videoUrl) + "/0.jpg";
 
-//                String studio = video.optString(TAG_STUDIO);
                     String studio = "STUDIO";
 
                     ContentValues videoValues = new ContentValues();
@@ -196,7 +154,6 @@ public class VideoDbBuilder_yt {
 
             }
 
-            ///
             VideoDbHelper_yt mOpenHelper = new VideoDbHelper_yt(mContext);
 
             // Will call VideoDbHelper_yt.onCreate()first time when WritableDatabase is not created yet
@@ -229,12 +186,9 @@ public class VideoDbBuilder_yt {
 
             // Do the creating of the databases.
             sqlDb.execSQL(SQL_CREATE_VIDEO_TABLE);
-            ///
 
             contentList.add(videosToInsert);
         }
-//        return videosToInsert;
-//        return contentList.get(1);
         return contentList;
     }
 

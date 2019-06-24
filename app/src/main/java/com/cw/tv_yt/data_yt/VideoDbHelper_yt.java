@@ -44,7 +44,6 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
 
         //todo temp
         // Create a table to hold videos.
-//        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoEntry.TABLE_NAME + " (" +
         final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + "video1" + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 VideoEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
@@ -71,7 +70,6 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_VIDEO_TABLE);
 
-        ///
         System.out.println("VideoDbHelper_yt / _onCreate (will create category table)");
         final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.CategoryEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
@@ -80,9 +78,6 @@ public class VideoDbHelper_yt extends SQLiteOpenHelper {
 
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_CATEGORY_TABLE);
-        ///
-
-
     }
 
     @Override

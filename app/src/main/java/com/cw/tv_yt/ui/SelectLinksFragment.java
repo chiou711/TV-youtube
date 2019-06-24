@@ -99,27 +99,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
     @Override
     public void onAttach(Context context) {
-
         super.onAttach(context);
-
-//        CategoryDbHelper mOpenHelper = new CategoryDbHelper(getActivity());
-//        SQLiteDatabase sqlDb = mOpenHelper.getWritableDatabase();
-
-//        // Create a list to contain all the CursorObjectAdapters.
-//        // Each adapter is used to render a specific row of videos in the MainFragment.
-//        mCategoryCursorAdapters = new HashMap<>();
-//
-//        // Start loading the categories from the database.
-//        mLoaderManager = LoaderManager.getInstance(this);
-//        mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
-//
-//        // receiver for fetch category service
-//        IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-//        responseReceiver = new FetchServiceResponseReceiver();
-//
-//        // Registers the FetchCategoryResponseReceiver and its intent filters
-//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-
     }
 
     @Override
@@ -174,25 +154,17 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 
-//        if (id == CATEGORY_LOADER)
-        {
-            System.out.println("SelectLinksFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
-//            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
+        System.out.println("SelectLinksFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
 
-            return new CursorLoader(
-                    getContext(),
-//                    CategoryContract.CategoryEntry.CONTENT_URI, // Table to query
-                    VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
-//                    new String[]{"DISTINCT " + CategoryContract.CategoryEntry.COLUMN_CATEGORY_NAME},
-                    new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
-                    // Only categories
-                    null, // No selection clause
-                    null, // No selection arguments
-                    null  // Default sort order
-            );
-        }
-//        else
-//            return null;
+        return new CursorLoader(
+                getContext(),
+                VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
+                new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+                // Only categories
+                null, // No selection clause
+                null, // No selection arguments
+                null  // Default sort order
+        );
     }
 
 
@@ -201,35 +173,11 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
         System.out.println("SelectLinksFragment / _onLoadFinished" );
 
-//        if(mVideoCursorAdapters != null)
-//            System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
-
-        // return when load is OK
-//        if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
-//            return;
-//        }
-
-        if(data == null)
-            System.out.println("SelectLinksFragment / _onLoadFinished / data = null" );
-        else
-            System.out.println("SelectLinksFragment / _onLoadFinished / data != null" );
-
-
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
             System.out.println("SelectLinksFragment / _onLoadFinished / loaderId = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
-//                System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER");
-
-                // clear for not adding duplicate rows
-//                if(rowsLoadedCount != mVideoCursorAdapters.size())
-//                {
-//                    //System.out.println("MainFragment / _onLoadFinished /  mTitleRowAdapter.clear()");
-//                    // Every time we have to re-get the category loader, we must re-create the sidebar.
-//                    mTitleRowAdapter.clear();
-//                }
-
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
 
@@ -237,110 +185,27 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                     String category_name = data.getString(categoryIndex);
                     System.out.println("SelectLinksFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
-                    // Create header for this category.
-//                    HeaderItem header = new HeaderItem(title);
-//                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
-
-//                    int videoLoaderId = title.hashCode(); // Create unique int from title.
-//                    CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
-//                    if (existingAdapter == null) {
-//
-//                        // Map video results from the database to Video objects.
-//                        CursorObjectAdapter videoCursorAdapter = new CursorObjectAdapter(new CardPresenter());
-//                        videoCursorAdapter.setMapper(new VideoCursorMapper());
-//                        mVideoCursorAdapters.put(videoLoaderId, videoCursorAdapter);
-//
-//                        ListRow row = new ListRow(header, videoCursorAdapter);
-//                        mTitleRowAdapter.add(row);
-//
-//                        System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
-//
-//                        // Start loading the videos from the database for a particular category.
-//                        Bundle args = new Bundle();
-//                        args.putString(VideoContract_yt.VideoEntry.COLUMN_TITLE, title);
-//                        mLoaderManager.initLoader(videoLoaderId, args, this);
-//                    } else {
-//                        //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
-//                        ListRow row = new ListRow(header, existingAdapter);
-//                        mTitleRowAdapter.add(row);
-//                    }
-
-                    //System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER / rowsLoadedCount = " + rowsLoadedCount);
                     data.moveToNext();
                 }
-
-                // Create a row for this special case with more samples.
-//                HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
-//                GridItemPresenter gridPresenter = new GridItemPresenter(this);
-//                ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
-//                gridRowAdapter.add(getString(R.string.select_links));
-//                gridRowAdapter.add(getString(R.string.grid_view));
-//                gridRowAdapter.add(getString(R.string.guidedstep_first_title));
-//                gridRowAdapter.add(getString(R.string.error_fragment));
-//                gridRowAdapter.add(getString(R.string.personal_settings));
-//                ListRow row = new ListRow(gridHeader, gridRowAdapter);
-//                mTitleRowAdapter.add(row);
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
 
             }
-//            else {
-//                System.out.println("MainFragment / _onLoadFinished / loaderId != TITLE_LOADER");
-//                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
-                // The CursorAdapter contains a Cursor pointing to all videos.
-//                mVideoCursorAdapters.get(loaderId).changeCursor(data);
-//
-//                // one row added
-//                rowsLoadedCount++;
-//            }
         } else {
-//            System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService / rowsLoadedCount = " + rowsLoadedCount);
-            // Start an Intent to fetch the videos.
+            Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+            int initNumber = 1;
+            Utils.setPref_focus_category_number(getActivity(),initNumber);
+            // todo use catalog_url_1 to be default URL
+            String pre_str = "catalog_url_";
+            int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
+                    "string",
+                    getActivity().getPackageName());
+            String default_url = getString(id);
+            System.out.println("SelectLinksFragment / onLoadFinished / start service =================================");
+            serviceIntent.putExtra("FetchUrl", default_url);
+            getActivity().startService(serviceIntent);
 
-            // data base is not created yet, call service for the first time
-//            if(rowsLoadedCount == 0)
-            {
-                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-                int initNumber = 1;
-                Utils.setPref_focus_category_number(getActivity(),initNumber);
-//
-//                String categoryName = Utils.getPref_category_name(getActivity(),initNumber);
-//                System.out.println("MainFragment / _onLoadFinished / categoryName = " + categoryName);
-//
-//                // todo use catalog_url_1 to be default URL
-                String pre_str = "catalog_url_";
-                int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
-                        "string",
-                        getActivity().getPackageName());
-                String default_url = getString(id);
-//
-//                // when new installation
-//                if( categoryName.equalsIgnoreCase(String.valueOf(initNumber))) {
-//
-//                    // receiver for fetch category service
-//                    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-//                    responseReceiver = new FetchServiceResponseReceiver();
-//
-//                    // Registers the FetchCategoryResponseReceiver and its intent filters
-//                    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-//
-//                    // start new fetch category service
-//                    serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-//                    serviceIntent.putExtra("FetchCategoryIndex", initNumber);
-//                    serviceIntent.putExtra("FetchCategoryUrl", default_url);
-//                    getActivity().startService(serviceIntent);
-//
-//                }
-//                else
-//                {
-                System.out.println("SelectLinksFragment / onLoadFinished / start service =================================");
-                serviceIntent.putExtra("FetchUrl", default_url);
-                getActivity().startService(serviceIntent);
-
-//                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
-//                }
-            }
         }
     }
 
@@ -380,26 +245,8 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
                 mAdapter.callNotifyChanged();
 
-                // get clicked position
-//                int clickedPos = 0;
-//                for(int i = 1; i<= countVideoTables; i++) {
-//
-//                    String categoryName = Utils.getPref_category_name(getActivity(), i);
-//                    System.out.println("------------------categoryName = " + categoryName);
-//                    System.out.println("------------------i = " + i);
-//                    if (categoryName.equalsIgnoreCase(item.toString())) {
-//                        clickedPos = i;
-//                        System.out.println("------------------clickedPos = " + clickedPos);
-//                    }
-//                }
-
-
                 int clickedPos = 0;
                 for(int i = 1; i<= mCategoryNames.size(); i++) {
-
-//                    String categoryName = ;
-//                    System.out.println("------------------categoryName = " + categoryName);
-//                    System.out.println("------------------i = " + i);
                     if (mCategoryNames.get(i-1).equalsIgnoreCase(item.toString()))
                     {
                         clickedPos = i;
@@ -407,27 +254,8 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                     }
                 }
 
-//
-//                int res_id = getResourceIdentifier(String.valueOf(clickedPos));
-//                if(res_id == 0)
-//                    res_id = getResourceIdentifier(item.toString());
-//
-//                // set focus category number
                 Utils.setPref_focus_category_number(getActivity(),clickedPos);
-//
-//                // receiver for fetch video service
-//                IntentFilter statusIntentFilter = new IntentFilter(
-//                        FetchVideoService_yt.Constants.BROADCAST_ACTION);
-//                responseReceiver = new FetchServiceResponseReceiver();
-//
-//                // Registers the FetchServiceResponseReceiver and its intent filters
-//                LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-//                        responseReceiver, statusIntentFilter );
-//
-//                startFetchService(getString(res_id));
 
-//                VideoProvider_yt.table_id =  String.valueOf(clickedPos);
-//
                 if(getActivity() != null)
                     getActivity().finish();
 
@@ -444,13 +272,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(getActivity(), SearchActivity.class);
-//                startActivity(intent);
-
-                ///
                 int res_id = getResourceIdentifier(String.valueOf(1));
-//                if(res_id == 0)
-//                    res_id = getResourceIdentifier(item.toString());
 
                 // receiver for fetch video service
                 IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.SELECT_LINKS_BROADCAST_ACTION);
@@ -460,16 +282,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                 LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
 
                 startFetchService(getString(res_id));
-                ///
 
                 // remove reference keys
                 Utils.removePref_focus_category_number(getActivity());
 
                 for(int i = 1; i<= countVideoTables; i++)
                     Utils.removePref_category_name(getActivity(),i);
-
-                //getActivity().recreate();
-
             }
         });
     }
@@ -486,53 +304,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
     }
 
     private void loadData() {
-
-//        countVideoTables =1;
-//        for(int i=1;i<=NUM_MAX;i++) {
-//            String pre_str = "catalog_url_";
-//            int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(i)),
-//                                                            "string",
-//                                                                    getActivity().getPackageName());
-//            if(id !=0 )
-//                countVideoTables = i;
-//        }
-
         System.out.println("SelectLinksFragment / _loadData");
 
-//        String[] urlArray = new String[countVideoTables];
         for(int i = 0; i< mCategoryNames.size(); i++) {
-//            int id = getResourceIdentifier(String.valueOf(i+1));
-//            urlArray[i] = getActivity().getResources().getString(id);
-//
-//            String categoryName = Utils.getPref_category_name(getActivity(),i+1);
-//            System.out.println("SelectLinksFragment / _loadData / categoryName = " + categoryName);
-//
-//            if( categoryName.equalsIgnoreCase(String.valueOf(i+1))) {
-//                mAdapter.add(categoryName);
-//
-//	            // receiver for fetch category service
-//	            IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-//	            responseReceiver = new FetchServiceResponseReceiver();
-//
-//	            // Registers the FetchCategoryResponseReceiver and its intent filters
-//	            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-//
-//                // start new fetch category service
-//                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-//                serviceIntent.putExtra("FetchCategoryIndex", i+1);
-//                serviceIntent.putExtra("FetchCategoryUrl", urlArray[i]);
-//                getActivity().startService(serviceIntent);
-//                break;
-//            }
-//            else
-
             if((mCategoryNames != null) && (mCategoryNames.size() >0) ) {
                 String categoryName = mCategoryNames.get(i);
-//            ContentValues categoryValues = new ContentValues();
-                //categoryValues.put("category_name", category_name);
-//            long _id = openHelper.getWritableDatabase().insert("category", null, categoryValues);
                 mAdapter.add(categoryName);
-//              mAdapter.add(i+1);
             }
             else
                 mAdapter.add(i+1);
@@ -622,7 +399,6 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                     if(getActivity() != null)
                         getActivity().finish();
 
-//                    Intent new_intent = new Intent(context, MainActivity.class);
                     Intent new_intent = new Intent(context, SelectLinksActivity.class);
                     new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(new_intent);
@@ -631,7 +407,6 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
             }
         }
     }
-
 }
 
 class StringPresenter extends Presenter {

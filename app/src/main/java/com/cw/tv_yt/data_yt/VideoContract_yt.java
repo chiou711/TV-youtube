@@ -128,8 +128,6 @@ public final class VideoContract_yt {
         // Column with the foreign key into the category table.
         public static final String COLUMN_CATEGORY_NAME = "category_name";
 
-
-
         // Returns the Uri referencing a video with the specified id.
         public static Uri buildCategoryUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);

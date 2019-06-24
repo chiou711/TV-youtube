@@ -52,26 +52,15 @@ public class FetchCategoryService_yt extends IntentService {
 	    CategoryDbBuilder builder = new CategoryDbBuilder(getApplicationContext());
 
         try {
-	        List<ContentValues> contentValuesList =
-//			        List<List<ContentValues>> contentValuesList =
-//                    builder.fetch(getResources().getString(R.string.catalog_url));
-                    builder.fetch(serviceUrl);
+	        List<ContentValues> contentValuesList = builder.fetch(serviceUrl);
 
-//			for(int i=0;i<contentValuesList.size();i++)
-			{
+			ContentValues[] downloadedVideoContentValues =
+					contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
 
-				ContentValues[] downloadedVideoContentValues =
-						contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
-//						contentValuesList.get(i).toArray(new ContentValues[contentValuesList.get(i).size()]);
+			ContentResolver contentResolver = getApplicationContext().getContentResolver();
+			System.out.println("FetchCategoryService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
 
-				ContentResolver contentResolver = getApplicationContext().getContentResolver();
-				System.out.println("FetchCategoryService_yt / _onHandleIntent / contentResolver = " + contentResolver.toString());
-
-//            getApplicationContext().getContentResolver().bulkInsert(VideoContract_yt.VideoEntry.CONTENT_URI,
-//                    downloadedVideoContentValues);
-//				VideoProvider_yt.tableId = String.valueOf(i+1);
-				contentResolver.bulkInsert(VideoContract_yt.CategoryEntry.CONTENT_URI, downloadedVideoContentValues);
-			}
+			contentResolver.bulkInsert(VideoContract_yt.CategoryEntry.CONTENT_URI, downloadedVideoContentValues);
 
         } catch (IOException | JSONException e) {
             Log.e(TAG, "Error occurred in downloading videos");

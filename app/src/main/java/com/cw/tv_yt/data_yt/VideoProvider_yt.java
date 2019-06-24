@@ -49,17 +49,12 @@ public class VideoProvider_yt extends ContentProvider {
     private static final int SEARCH_SUGGEST = 4;
     private static final int REFRESH_SHORTCUT = 5;
 
-//    private static final SQLiteQueryBuilder sVideosContainingQueryBuilder;
-//    private static final String[] sVideosContainingQueryColumns;
     private static SQLiteQueryBuilder sVideosContainingQueryBuilder;
     private static String[] sVideosContainingQueryColumns;
     private static final HashMap<String, String> sColumnMap = buildColumnMap();
     public ContentResolver mContentResolver;
-    static public String table_id;// = "2";
+    static public String table_id;
     Context context;
-
-    //public VideoProvider_yt(){}
-    //public VideoProvider_yt(Context context){this.context = context;}
 
     @Override
     public boolean onCreate() {
@@ -70,7 +65,6 @@ public class VideoProvider_yt extends ContentProvider {
         mOpenHelper = new VideoDbHelper_yt(context);
 
         int focusCategoryNumber = Utils.getPref_focus_category_number(context);
-//        int focusCategoryNumber = 1;
         table_id = String.valueOf(focusCategoryNumber);
         System.out.println("VideoProvider_yt / _onCreate / table_id = " + table_id);
 
@@ -79,9 +73,6 @@ public class VideoProvider_yt extends ContentProvider {
 
         sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
         sVideosContainingQueryBuilder.setTables(VideoContract_yt.VideoEntry.TABLE_NAME.concat(table_id));
-//        sVideosContainingQueryBuilder.setTables(VideoContract_yt.VideoEntry.TABLE_NAME.concat(table_id)+","+
-//                                                VideoContract_yt.CategoryEntry.TABLE_NAME); //todo temp
-//        sVideosContainingQueryBuilder.setTables(VideoContract_yt.CategoryEntry.TABLE_NAME); //todo temp
         sVideosContainingQueryBuilder.setProjectionMap(sColumnMap);
         sVideosContainingQueryColumns = new String[]{
                 VideoContract_yt.VideoEntry._ID,
@@ -110,35 +101,6 @@ public class VideoProvider_yt extends ContentProvider {
 
         return true;
     }
-
-//    static {
-//        sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
-//        sVideosContainingQueryBuilder.setTables(VideoContract_yt.VideoEntry.TABLE_NAME.concat(table_id)); //todo temp
-//        sVideosContainingQueryBuilder.setProjectionMap(sColumnMap);
-//        sVideosContainingQueryColumns = new String[]{
-//                VideoContract_yt.VideoEntry._ID,
-//                VideoContract_yt.VideoEntry.COLUMN_NAME,
-//                VideoContract_yt.VideoEntry.COLUMN_TITLE,
-//                VideoContract_yt.VideoEntry.COLUMN_DESC,
-//                VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL,
-//                VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL,
-//                VideoContract_yt.VideoEntry.COLUMN_STUDIO,
-//                VideoContract_yt.VideoEntry.COLUMN_CARD_IMG,
-//                VideoContract_yt.VideoEntry.COLUMN_CONTENT_TYPE,
-//                VideoContract_yt.VideoEntry.COLUMN_IS_LIVE,
-//                VideoContract_yt.VideoEntry.COLUMN_VIDEO_WIDTH,
-//                VideoContract_yt.VideoEntry.COLUMN_VIDEO_HEIGHT,
-//                VideoContract_yt.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG,
-//                VideoContract_yt.VideoEntry.COLUMN_PURCHASE_PRICE,
-//                VideoContract_yt.VideoEntry.COLUMN_RENTAL_PRICE,
-//                VideoContract_yt.VideoEntry.COLUMN_RATING_STYLE,
-//                VideoContract_yt.VideoEntry.COLUMN_RATING_SCORE,
-//                VideoContract_yt.VideoEntry.COLUMN_PRODUCTION_YEAR,
-//                VideoContract_yt.VideoEntry.COLUMN_DURATION,
-//                VideoContract_yt.VideoEntry.COLUMN_ACTION,
-//                SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID
-//        };
-//    }
 
     static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -258,10 +220,6 @@ public class VideoProvider_yt extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
             }
         }
-        if(retCursor == null)
-            System.out.println("VideoProvider_yt / _query/ resCursor = null");
-        else
-            System.out.println("VideoProvider_yt / _query/ resCursor != null");
 
         retCursor.setNotificationUri(mContentResolver, uri);
         return retCursor;
@@ -397,14 +355,8 @@ public class VideoProvider_yt extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-//                        System.out.println("VideoProvider_yt / _bulkInsert (case VIDEO) / title = " + value);
-
-//                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
                         long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME.concat(tableId),
                                 null, value, SQLiteDatabase.CONFLICT_REPLACE);
-
-//                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
-//                                null, value, SQLiteDatabase.CONFLICT_IGNORE);
 
                         System.out.println("VideoProvider_yt / _bulkInsert (case VIDEO) / _id = " + _id);
                         if (_id != -1) {
@@ -426,14 +378,8 @@ public class VideoProvider_yt extends ContentProvider {
                 db.beginTransaction();
                 try {
                     for (ContentValues value : values) {
-//                        System.out.println("VideoProvider_yt / _bulkInsert (case CATEGORY) / value = " + value);//value.getAsString("suggest_text_1"));
-
-//                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
                         long _id = db.insertWithOnConflict(VideoContract_yt.CategoryEntry.TABLE_NAME,
                                 null, value, SQLiteDatabase.CONFLICT_REPLACE);
-
-//                        long _id = db.insertWithOnConflict(VideoContract_yt.VideoEntry.TABLE_NAME,
-//                                null, value, SQLiteDatabase.CONFLICT_IGNORE);
 
                         System.out.println("VideoProvider_yt / _bulkInsert (case CATEGORY) / _id = " + _id);
                         if (_id != -1) {

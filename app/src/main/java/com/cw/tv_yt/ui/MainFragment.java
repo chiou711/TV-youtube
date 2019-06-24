@@ -57,7 +57,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-//import com.cw.tv_yt.data_yt.CategoryContract;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.model.Video;
@@ -132,19 +131,6 @@ public class MainFragment extends BrowseSupportFragment
         prepareBackgroundManager();
 
         setupUIElements();
-
-        ///
-
-        //todo
-        // get total rows from server
-//        GetRowsTask getRowsTask = new GetRowsTask();
-//        getRowsTask.execute();
-//        while (!getRowsTask.isGetReady)
-//            SystemClock.sleep(1000);
-//        rowsCount = getRowsTask.countCategory;
-//
-//        loadRows();
-        ///
 
         setupEventListeners();
         prepareEntranceTransition();
@@ -277,9 +263,6 @@ public class MainFragment extends BrowseSupportFragment
         System.out.println("MainFragment / _onCreateLoader / id = " + id);
 
         if (id == TITLE_LOADER) {
-//            System.out.println("MainFragment / _onCreateLoader / id == TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI =" + VideoContract_yt.VideoEntry.CONTENT_URI);
-//            System.out.println("MainFragment / _onCreateLoader / DISTINCT VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
-
             return new CursorLoader(
                     getContext(),
                     VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
@@ -290,21 +273,7 @@ public class MainFragment extends BrowseSupportFragment
                     null  // Default sort order
             );
 
-//	        return new CursorLoader(
-//			        getContext(),
-//                    VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
-//			        new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
-//			        // Only categories
-//			        null, // No selection clause
-//			        null, // No selection arguments
-//			        null  // Default sort order
-//	        );
-
-
         } else {
-//            System.out.println("MainFragment / _onCreateLoader / id != TITLE_LOADER / VideoContract.VideoEntry.CONTENT_URI = " + VideoContract_yt.VideoEntry.CONTENT_URI );
-//            System.out.println("MainFragment / _onCreateLoader / VideoContract.VideoEntry.COLUMN_TITLE = " + VideoContract_yt.VideoEntry.COLUMN_TITLE);
-
             // Assume it is for a video.
             String title = args.getString(VideoContract_yt.VideoEntry.COLUMN_TITLE);
 
@@ -323,11 +292,6 @@ public class MainFragment extends BrowseSupportFragment
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-//        System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = " + rowsLoadedCount);
-
-//        if(mVideoCursorAdapters != null)
-//            System.out.println("MainFragment / _onLoadFinished / mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
-
         // return when load is OK
         if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
             return;
@@ -338,7 +302,6 @@ public class MainFragment extends BrowseSupportFragment
 	        System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
 
             if (loaderId == TITLE_LOADER) {
-//                System.out.println("MainFragment / _onLoadFinished / loaderId == TITLE_LOADER");
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
@@ -402,8 +365,6 @@ public class MainFragment extends BrowseSupportFragment
                 // cursors have loaded.
 
             } else {
-//                System.out.println("MainFragment / _onLoadFinished / loaderId != TITLE_LOADER");
-//                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
@@ -420,43 +381,19 @@ public class MainFragment extends BrowseSupportFragment
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                 int initNumber = INIT_NUMBER;
                 Utils.setPref_focus_category_number(getActivity(),initNumber);
-//
-//                String categoryName = Utils.getPref_category_name(getActivity(),initNumber);
-//                System.out.println("MainFragment / _onLoadFinished / categoryName = " + categoryName);
-//
-//                // todo use catalog_url_1 to be default URL
+
+                // todo use catalog_url_1 to be default URL
                 String pre_str = "catalog_url_";
                 int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
                         "string",
                         getActivity().getPackageName());
-                String default_url = getString(id);
-//
-//                // when new installation
-//                if( categoryName.equalsIgnoreCase(String.valueOf(initNumber))) {
-//
-//                    // receiver for fetch category service
-//                    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-//                    responseReceiver = new FetchServiceResponseReceiver();
-//
-//                    // Registers the FetchCategoryResponseReceiver and its intent filters
-//                    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-//
-//                    // start new fetch category service
-//                    serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-//                    serviceIntent.putExtra("FetchCategoryIndex", initNumber);
-//                    serviceIntent.putExtra("FetchCategoryUrl", default_url);
-//                    getActivity().startService(serviceIntent);
-//
-//                }
-//                else
-//                {
-                    System.out.println("MainFragment / onLoadFinished / start service =================================");
-                    serviceIntent.putExtra("FetchUrl", default_url);
-                    serviceIntent.putExtra("Session", "install");
-                    getActivity().startService(serviceIntent);
 
-//                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
-//                }
+                String default_url = getString(id);
+                System.out.println("MainFragment / onLoadFinished / start service =================================");
+                serviceIntent.putExtra("FetchUrl", default_url);
+                serviceIntent.putExtra("Session", "install");
+                getActivity().startService(serviceIntent);
+
             }
         }
     }
@@ -548,148 +485,6 @@ public class MainFragment extends BrowseSupportFragment
     }
 
 
-///
-//private class GetRowsTask extends AsyncTask<Void, Void, Void> {
-//    BrowseErrorActivity.SpinnerFragment mSpinnerFragment;
-//    boolean isGetReady;
-//    int countCategory;
-//
-//    @Override
-//    protected void onPreExecute() {
-//        mSpinnerFragment = new BrowseErrorActivity.SpinnerFragment();
-////        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
-//        getFragmentManager().beginTransaction().add(R.id.main_frame,mSpinnerFragment).commit();
-//    }
-//
-//    @Override
-//    protected Void doInBackground(Void... params) {
-//        // Do some background process here.
-//        // It just waits 5 sec in this Tutorial
-//        //SystemClock.sleep(5000);
-//
-//        String strResult = "";
-//
-//        // HTTPS POST
-//        String project = "LiteNote";
-//        String urlStr =  "https://" + project + ".ddns.net:8443/"+ project +"Web/client/viewTotalPages.jsp";
-//
-//        try {
-//            URL url = new URL(urlStr);
-//            MovieList.trustEveryone();
-//            HttpsURLConnection urlConnection = ((HttpsURLConnection)url.openConnection());
-//
-//            // set Timeout and method
-//            urlConnection.setReadTimeout(7000);
-//            urlConnection.setConnectTimeout(7000);
-//            urlConnection.setRequestMethod("POST");
-//            urlConnection.setDoInput(true);
-//            urlConnection.setDoOutput( true );
-//            urlConnection.setInstanceFollowRedirects( false );
-//            urlConnection.setRequestProperty( "Content-Type", "application/x-www-form-urlencoded");
-//            urlConnection.setRequestProperty( "charset", "utf-8");
-//            urlConnection.setUseCaches( false );
-//            try( DataOutputStream wr = new DataOutputStream( urlConnection.getOutputStream())) {
-//                wr.close();
-//                wr.flush();
-//            }
-//
-//            // Add any data you wish to post here
-//            urlConnection.connect();
-//            InputStream in = urlConnection.getInputStream();
-//
-//            if(in != null) {
-//                BufferedReader br = new BufferedReader(new InputStreamReader(in));
-//                String inputLine;
-//
-//                while ((inputLine = br.readLine()) != null) {
-//                    System.out.println("MainFragment / GetRowsTask / inputLine = " + inputLine);
-//                    strResult += inputLine;
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        System.out.println("MainFragment / GetRowsTask / result final = " + strResult);
-//
-//        // JSON array
-//        try {
-//            JSONArray jsonArray = new JSONArray(strResult);
-//            for (int i = 0; i < jsonArray.length(); i++)
-//            {
-//                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-//                countCategory = jsonObject.getInt("totalPagesCount");
-//            }
-//            isGetReady = true;
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-//
-//    @Override
-//    protected void onPostExecute(Void aVoid) {
-//        getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
-//    }
-//}
-//
-//
-//
-//private void loadRows() {
-//
-//    ArrayObjectAdapter rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
-//    CardPresenter cardPresenter = new CardPresenter();
-//
-//    int row;
-////		for (row = 0; row < NUM_ROWS; row++) {
-//    for (row = 0; row < rowsCount; row++) {
-//
-//        // prepare
-//        MovieList.isDataReady = false;
-//        MovieList.prepareList(row+1);//table name starts from 1
-//        while (!MovieList.isDataReady)
-//        {
-//            System.out.println("MainFragment / waiting ...");
-//            SystemClock.sleep(1000);
-//        }
-//
-//        // setup list
-//        List<Movie> list = MovieList.setupMovies();
-//
-//        //			if (row != 0) {
-////				Collections.shuffle(list);
-////			}
-//        ArrayObjectAdapter listRowAdapter = new ArrayObjectAdapter(cardPresenter);
-////			for (int j = 0; j < NUM_COLS; j++) {
-//
-//        for (int col = 0; col < list.size(); col++) {
-//            listRowAdapter.add(list.get(col));
-//        }
-//
-////			HeaderItem header = new HeaderItem(row, MovieList.MOVIE_CATEGORY[row]);
-//        HeaderItem header = new HeaderItem(row, "合集 "+(row+1));
-//        rowsAdapter.add(new ListRow(header, listRowAdapter));
-//    }
-//
-//    HeaderItem gridHeader = new HeaderItem(row, "PREFERENCES");
-//
-//    GridItemPresenter mGridPresenter = new GridItemPresenter(this);
-//    ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(mGridPresenter);
-//    gridRowAdapter.add(getResources().getString(R.string.grid_view));
-//    gridRowAdapter.add(getString(R.string.error_fragment));
-//    gridRowAdapter.add(getResources().getString(R.string.personal_settings));
-//    ///
-//    String GRID_STRING_SPINNER = "Spinner";
-//    gridRowAdapter.add(GRID_STRING_SPINNER);
-//    ///
-//    rowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
-//
-//    setAdapter(rowsAdapter);
-//}
-///
-
     // Broadcast receiver for receiving status updates from the IntentService
     class FetchServiceResponseReceiver extends BroadcastReceiver {
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
@@ -699,26 +494,6 @@ public class MainFragment extends BrowseSupportFragment
              * obtaining data form the server!
              */
             System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
-
-            // for fetch category
-//            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
-//            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
-//
-//            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
-//            {
-//                if (context != null) {
-//
-//                    LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
-//
-//                    if(getActivity() != null)
-//                        getActivity().finish();
-//
-//                    Intent new_intent;
-//                    new_intent = new Intent(context, MainActivity.class);
-//                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-//                    context.startActivity(new_intent);
-//                }
-//            }
 
 			// for fetch video
             String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
