@@ -57,6 +57,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.model.Video;
@@ -66,9 +67,12 @@ import com.cw.tv_yt.presenter.GridItemPresenter;
 import com.cw.tv_yt.presenter.IconHeaderItemPresenter;
 import com.cw.tv_yt.recommendation.UpdateRecommendationsService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
 import com.google.android.youtube.player.YouTubeIntents;
@@ -90,7 +94,9 @@ public class MainFragment extends BrowseSupportFragment
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
     private static final int TITLE_LOADER = 123; // Unique ID for Category Loader.
-    private final int INIT_NUMBER = 1;//3;
+	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
+	List<String> mCategoryNames = new ArrayList<>();
+    private final int INIT_NUMBER = 1;
 
     // Maps a Loader Id to its CursorObjectAdapter.
     private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
@@ -110,7 +116,7 @@ public class MainFragment extends BrowseSupportFragment
 
         // Start loading the titles from the database.
         mLoaderManager = LoaderManager.getInstance(this);
-        mLoaderManager.initLoader(TITLE_LOADER, null, this);
+        mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
 
         // receiver for fetch video service
         IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.BROADCAST_ACTION);
@@ -262,7 +268,19 @@ public class MainFragment extends BrowseSupportFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         System.out.println("MainFragment / _onCreateLoader / id = " + id);
 
-        if (id == TITLE_LOADER) {
+        if (id == CATEGORY_LOADER) {
+            return new CursorLoader(
+                    getContext(),
+                    VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
+                    new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+                    // Only categories
+                    null, // No selection clause
+                    null, // No selection arguments
+                    null  // Default sort order
+            );
+
+        }
+        else if (id == TITLE_LOADER) {
             return new CursorLoader(
                     getContext(),
                     VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
@@ -301,7 +319,23 @@ public class MainFragment extends BrowseSupportFragment
             final int loaderId = loader.getId();
 	        System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
 
-            if (loaderId == TITLE_LOADER) {
+            if (loaderId == CATEGORY_LOADER) {
+                // Iterate through each category entry and add it to the ArrayAdapter.
+                while (!data.isAfterLast()) {
+
+                    int categoryIndex = data.getColumnIndex(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
+                    String category_name = data.getString(categoryIndex);
+                    System.out.println("MainFragment / _onLoadFinished / category_name = " + category_name);
+                    mCategoryNames.add(category_name);
+                    data.moveToNext();
+                }
+
+                for(int i=1;i<= mCategoryNames.size();i++)
+                    Utils.setPref_category_name(getActivity(),i,mCategoryNames.get(i-1));
+
+                mLoaderManager.initLoader(TITLE_LOADER, null, this);
+
+            } else if (loaderId == TITLE_LOADER) {
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
@@ -373,10 +407,27 @@ public class MainFragment extends BrowseSupportFragment
             }
         } else {
             System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService / rowsLoadedCount = " + rowsLoadedCount);
-            // Start an Intent to fetch the videos.
 
-            // data base is not created yet, call service for the first time
-            if(rowsLoadedCount == 0)
+            if( (loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size()==0) )
+            {
+                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+                int initNumber = 1;
+                Utils.setPref_focus_category_number(getActivity(),initNumber);
+                // use catalog_url_1 to be default URL
+                String pre_str = "catalog_url_";
+                int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
+                        "string",
+                        getActivity().getPackageName());
+                String default_url = getString(id);
+                System.out.println("MainFragment / onLoadFinished / start service =================================");
+                serviceIntent.putExtra("FetchUrl", default_url);
+                getActivity().startService(serviceIntent);
+            }
+
+
+            // Start an Intent to fetch the videos.
+                // data base is not created yet, call service for the first time
+            else if(rowsLoadedCount == 0)
             {
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                 int initNumber = INIT_NUMBER;
@@ -495,7 +546,20 @@ public class MainFragment extends BrowseSupportFragment
              */
             System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
 
-			// for fetch video
+            // for fetch category
+            String statusStr1 = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr1 = " + statusStr1);
+
+            if((statusStr1 != null) && statusStr1.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+            {
+                if (context != null) {
+
+                }
+            }
+
+
+
+            // for fetch video
             String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
             System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
             if((statusStr != null) && statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
@@ -508,9 +572,13 @@ public class MainFragment extends BrowseSupportFragment
                         getActivity().finish();
                     System.out.println("MainFragment / _FetchServiceResponseReceiver / will start new intent ");
 
+
                     Intent new_intent = new Intent(context, MainActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
                     new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(new_intent);
+
+
                 }
             }
 

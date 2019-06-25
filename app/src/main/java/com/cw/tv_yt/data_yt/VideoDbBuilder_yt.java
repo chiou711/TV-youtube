@@ -154,9 +154,9 @@ public class VideoDbBuilder_yt {
 
             }
 
-            VideoDbHelper_yt mOpenHelper = new VideoDbHelper_yt(mContext);
+            DbHelper_yt mOpenHelper = new DbHelper_yt(mContext);
 
-            // Will call VideoDbHelper_yt.onCreate()first time when WritableDatabase is not created yet
+            // Will call DbHelper_yt.onCreate()first time when WritableDatabase is not created yet
             SQLiteDatabase sqlDb;
             sqlDb = mOpenHelper.getWritableDatabase();
             String tableId = String.valueOf(h+1); //Id starts from 1

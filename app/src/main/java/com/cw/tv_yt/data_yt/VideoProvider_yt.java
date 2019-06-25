@@ -39,8 +39,7 @@ import androidx.annotation.NonNull;
  */
 public class VideoProvider_yt extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    public VideoDbHelper_yt mOpenHelper;
-    public CategoryDbHelper mCategoryOpenHelper;
+    public DbHelper_yt mOpenHelper;
 
     // These codes are returned from sUriMatcher#match when the respective Uri matches.
     private static final int VIDEO = 1;
@@ -62,14 +61,12 @@ public class VideoProvider_yt extends ContentProvider {
         context = getContext();
         mContentResolver = context.getContentResolver();
 
-        mOpenHelper = new VideoDbHelper_yt(context);
+        mOpenHelper = new DbHelper_yt(context);
 
         int focusCategoryNumber = Utils.getPref_focus_category_number(context);
         table_id = String.valueOf(focusCategoryNumber);
         System.out.println("VideoProvider_yt / _onCreate / table_id = " + table_id);
 
-
-        mCategoryOpenHelper = new CategoryDbHelper(context);
 
         sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
         sVideosContainingQueryBuilder.setTables(VideoContract_yt.VideoEntry.TABLE_NAME.concat(table_id));
@@ -205,7 +202,7 @@ public class VideoProvider_yt extends ContentProvider {
                 break;
             }
             case CATEGORY: {
-                retCursor = mCategoryOpenHelper.getReadableDatabase().query(
+                retCursor = mOpenHelper.getReadableDatabase().query(
                         VideoContract_yt.CategoryEntry.TABLE_NAME,//todo temp
                         projection,
                         selection,
@@ -265,7 +262,7 @@ public class VideoProvider_yt extends ContentProvider {
                 break;
             }
             case CATEGORY: {
-                long _id = mCategoryOpenHelper.getWritableDatabase().insert(
+                long _id = mOpenHelper.getWritableDatabase().insert(
                         VideoContract_yt.CategoryEntry.TABLE_NAME, null, values);
                 if (_id > 0) {
                     returnUri = VideoContract_yt.CategoryEntry.buildCategoryUri(_id);
@@ -298,7 +295,7 @@ public class VideoProvider_yt extends ContentProvider {
                 break;
             }
             case CATEGORY: {
-                rowsDeleted = mCategoryOpenHelper.getWritableDatabase().delete(
+                rowsDeleted = mOpenHelper.getWritableDatabase().delete(
                         VideoContract_yt.CategoryEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             }
@@ -326,7 +323,7 @@ public class VideoProvider_yt extends ContentProvider {
                 break;
             }
             case CATEGORY: {
-                rowsUpdated = mCategoryOpenHelper.getWritableDatabase().update(
+                rowsUpdated = mOpenHelper.getWritableDatabase().update(
                         VideoContract_yt.CategoryEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             }
@@ -372,7 +369,7 @@ public class VideoProvider_yt extends ContentProvider {
                 return returnCount;
             }
             case CATEGORY: {
-                final SQLiteDatabase db = mCategoryOpenHelper.getWritableDatabase();
+                final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
                 int returnCount = 0;
 
                 db.beginTransaction();

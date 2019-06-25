@@ -34,11 +34,10 @@ import android.widget.TextView;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data_yt.CategoryDbHelper;
+import com.cw.tv_yt.data_yt.DbHelper_yt;
 import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
-import com.cw.tv_yt.data_yt.VideoDbHelper_yt;
 import com.cw.tv_yt.data_yt.VideoProvider_yt;
 
 import java.util.ArrayList;
@@ -100,6 +99,27 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+	    // Create a list to contain all the CursorObjectAdapters.
+	    // Each adapter is used to render a specific row of videos in the MainFragment.
+	    mCategoryCursorAdapters = new HashMap<>();
+
+	    // Start loading the categories from the database.
+	    mLoaderManager = LoaderManager.getInstance(this);
+	    mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
+
+	    // receiver for fetch category service
+	    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+	    responseReceiver = new FetchServiceResponseReceiver();
+
+	    // Registers the FetchCategoryResponseReceiver and its intent filters
+	    LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -107,23 +127,6 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         System.out.println("SelectLinksFragment / _onCreate");
 
         super.onCreate(savedInstanceState);
-
-        // Create a list to contain all the CursorObjectAdapters.
-        // Each adapter is used to render a specific row of videos in the MainFragment.
-        mCategoryCursorAdapters = new HashMap<>();
-
-        // Start loading the categories from the database.
-        mLoaderManager = LoaderManager.getInstance(this);
-        mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
-
-        // receiver for fetch category service
-        IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
-        responseReceiver = new FetchServiceResponseReceiver();
-
-        // Registers the FetchCategoryResponseReceiver and its intent filters
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
-
-
 
         mAdapter = new Adapter(new StringPresenter());
         setAdapter(mAdapter);
@@ -137,7 +140,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         setupFragment();
 
         // get categories count
-        VideoDbHelper_yt mOpenHelper = new VideoDbHelper_yt(getActivity());
+        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
         String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
@@ -187,6 +190,9 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                     mCategoryNames.add(category_name);
                     data.moveToNext();
                 }
+
+                for(int i=1;i<= mCategoryNames.size();i++)
+                    Utils.setPref_category_name(getActivity(),i,mCategoryNames.get(i-1));
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
@@ -255,6 +261,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                 }
 
                 Utils.setPref_focus_category_number(getActivity(),clickedPos);
+                Utils.setPref_category_name(getActivity(),clickedPos,mCategoryNames.get(clickedPos-1));
 
                 if(getActivity() != null)
                     getActivity().finish();
@@ -292,6 +299,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         });
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        System.out.println("SelectLinksFragment / _onDestroy");
+    }
+
     // get resource Identifier
     int getResourceIdentifier(String bodyStr)
     {
@@ -322,7 +335,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         // delete database
         try {
             System.out.println("SelectLinksFragment / _startFetchService / will delete DB");
-            getActivity().deleteDatabase(VideoDbHelper_yt.DATABASE_NAME);
+            getActivity().deleteDatabase(DbHelper_yt.DATABASE_NAME);
 
             ContentResolver resolver = getActivity().getContentResolver();
             ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
@@ -330,10 +343,8 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
             provider.mContentResolver = resolver;
             provider.mOpenHelper.close();
-            provider.mCategoryOpenHelper.close();
 
-            provider.mOpenHelper = new VideoDbHelper_yt(getActivity());
-            provider.mCategoryOpenHelper = new CategoryDbHelper(getActivity());
+            provider.mOpenHelper = new DbHelper_yt(getActivity());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();
@@ -376,13 +387,16 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                     if(getActivity() != null)
                         getActivity().finish();
 
-                    Intent new_intent;
-                    new_intent = new Intent(context, SelectLinksActivity.class);
+                    Intent new_intent1 = new Intent(context, MainActivity.class);
+                    new_intent1.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+                    new_intent1.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent1);
 
-                    //new_intent = new Intent(context, MainActivity.class);
 
-                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(new_intent);
+                    Intent new_intent2;
+                    new_intent2 = new Intent(context, SelectLinksActivity.class);
+                    new_intent2.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(new_intent2);
                 }
             }
 
