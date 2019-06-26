@@ -41,16 +41,13 @@ import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.cw.tv_yt.data_yt.VideoProvider_yt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.leanback.app.VerticalGridSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.CursorObjectAdapter;
 import androidx.leanback.widget.OnItemViewClickedListener;
 import androidx.leanback.widget.OnItemViewSelectedListener;
 import androidx.leanback.widget.Presenter;
@@ -68,41 +65,31 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
  */
-public class SelectLinksFragment extends VerticalGridSupportFragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SelectLinksFragment extends VerticalGridSupportFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "Select links";
     private static final int NUM_COLUMNS = 5;
-    private static final int NUM_MAX = 10;
-    private static final int HEIGHT = 200;
-
 
     private static class Adapter extends ArrayObjectAdapter {
-        public Adapter(StringPresenter presenter) {
+        Adapter(StringPresenter presenter) {
             super(presenter);
         }
-
-        public void callNotifyChanged() {
+        void callNotifyChanged() {
             super.notifyChanged();
         }
     }
 
     private Adapter mAdapter;
-    FetchServiceResponseReceiver responseReceiver;
+	private FetchServiceResponseReceiver responseReceiver;
     private int countVideoTables;
-    List<String> mCategoryNames = new ArrayList<>();
+	private List<String> mCategoryNames = new ArrayList<>();
 
     // Maps a Loader Id to its CursorObjectAdapter.
-    private Map<Integer, CursorObjectAdapter> mCategoryCursorAdapters;
     private LoaderManager mLoaderManager;
-    private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
+	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-	    // Create a list to contain all the CursorObjectAdapters.
-	    // Each adapter is used to render a specific row of videos in the MainFragment.
-	    mCategoryCursorAdapters = new HashMap<>();
 
 	    // Start loading the categories from the database.
 	    mLoaderManager = LoaderManager.getInstance(this);
@@ -159,14 +146,15 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
         System.out.println("SelectLinksFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
 
+        // id = CATEGORY_LOADER
         return new CursorLoader(
-                getContext(),
-                VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
-                new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
-                // Only categories
-                null, // No selection clause
-                null, // No selection arguments
-                null  // Default sort order
+		        getContext(),
+		        VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
+		        new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+		        // Only categories
+		        null, // No selection clause
+		        null, // No selection arguments
+		        null  // Default sort order
         );
     }
 
@@ -199,19 +187,17 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
 
             }
         } else {
+	        System.out.println("SelectLinksFragment / onLoadFinished / start Fetch category service =================================");
+	        Utils.setPref_focus_category_number(getActivity(),1);
+
+	        //use catalog_url_1 to be default URL
+	        String urlName = "catalog_url_".concat(String.valueOf(1));
+	        int id = getActivity().getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
+	        String default_url = getString(id);
+
             Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-            int initNumber = 1;
-            Utils.setPref_focus_category_number(getActivity(),initNumber);
-            // todo use catalog_url_1 to be default URL
-            String pre_str = "catalog_url_";
-            int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
-                    "string",
-                    getActivity().getPackageName());
-            String default_url = getString(id);
-            System.out.println("SelectLinksFragment / onLoadFinished / start service =================================");
             serviceIntent.putExtra("FetchUrl", default_url);
             getActivity().startService(serviceIntent);
-
         }
     }
 
@@ -288,7 +274,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
                 // Registers the FetchServiceResponseReceiver and its intent filters
                 LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
 
-                startFetchService(getString(res_id));
+                startRenewFetchService(getString(res_id));
 
                 // remove reference keys
                 Utils.removePref_focus_category_number(getActivity());
@@ -306,7 +292,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
     }
 
     // get resource Identifier
-    int getResourceIdentifier(String bodyStr)
+    private int getResourceIdentifier(String bodyStr)
     {
 	    String pre_str = "catalog_url_";
 	    int res_id = getActivity().getResources().getIdentifier(pre_str.concat(bodyStr),
@@ -320,17 +306,17 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         System.out.println("SelectLinksFragment / _loadData");
 
         for(int i = 0; i< mCategoryNames.size(); i++) {
-            if((mCategoryNames != null) && (mCategoryNames.size() >0) ) {
+//            if((mCategoryNames != null) && (mCategoryNames.size() >0) ) {
                 String categoryName = mCategoryNames.get(i);
                 mAdapter.add(categoryName);
-            }
-            else
-                mAdapter.add(i+1);
+//            }
+//            else
+//                mAdapter.add(i+1);
         }
     }
 
     // start fetch service by URL string
-    private void startFetchService(String url) {
+    private void startRenewFetchService(String url) {
         System.out.println("SelectLinksFragment / _startFetchService");
         // delete database
         try {
@@ -361,8 +347,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment
         serviceIntent.putExtra("FetchUrl", url);
         serviceIntent.putExtra("Session", "renew");
         getActivity().startService(serviceIntent);
-        System.out.println("SelectLinksFragment / _startFetchService / will start service");
-        System.out.println("-----");
+        System.out.println("SelectLinksFragment / _startFetchService / will start Fetch video service");
     }
 
     // Broadcast receiver for receiving status updates from the IntentService

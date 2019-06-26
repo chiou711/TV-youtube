@@ -48,7 +48,6 @@ public class FetchCategoryService_yt extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
         serviceUrl = workIntent.getStringExtra("FetchUrl");
         System.out.println("FetchCategoryService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
-//	    VideoDbBuilder_yt builder = new VideoDbBuilder_yt(getApplicationContext());
 	    CategoryDbBuilder builder = new CategoryDbBuilder(getApplicationContext());
 
         try {

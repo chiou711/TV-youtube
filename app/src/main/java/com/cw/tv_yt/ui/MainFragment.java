@@ -406,45 +406,28 @@ public class MainFragment extends BrowseSupportFragment
                 rowsLoadedCount++;
             }
         } else {
-            System.out.println("MainFragment / _onLoadFinished / will do FetchVideoService / rowsLoadedCount = " + rowsLoadedCount);
 
+            // data base is not created yet, call service for the first time
+
+            // Start an Intent to fetch the categories
             if( (loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size()==0) )
             {
+                Utils.setPref_focus_category_number(getActivity(),INIT_NUMBER);
+
+                System.out.println("MainFragment / onLoadFinished / start Fetch category service =================================");
                 Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
-                int initNumber = 1;
-                Utils.setPref_focus_category_number(getActivity(),initNumber);
-                // use catalog_url_1 to be default URL
-                String pre_str = "catalog_url_";
-                int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
-                        "string",
-                        getActivity().getPackageName());
-                String default_url = getString(id);
-                System.out.println("MainFragment / onLoadFinished / start service =================================");
-                serviceIntent.putExtra("FetchUrl", default_url);
+                serviceIntent.putExtra("FetchUrl", getDefaultUrl());
                 getActivity().startService(serviceIntent);
             }
-
-
-            // Start an Intent to fetch the videos.
-                // data base is not created yet, call service for the first time
+            // Start an Intent to fetch the videos
             else if(rowsLoadedCount == 0)
             {
+                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
+
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
-                int initNumber = INIT_NUMBER;
-                Utils.setPref_focus_category_number(getActivity(),initNumber);
-
-                // todo use catalog_url_1 to be default URL
-                String pre_str = "catalog_url_";
-                int id = getActivity().getResources().getIdentifier(pre_str.concat(String.valueOf(initNumber)),
-                        "string",
-                        getActivity().getPackageName());
-
-                String default_url = getString(id);
-                System.out.println("MainFragment / onLoadFinished / start service =================================");
-                serviceIntent.putExtra("FetchUrl", default_url);
+                serviceIntent.putExtra("FetchUrl", getDefaultUrl());
                 serviceIntent.putExtra("Session", "install");
                 getActivity().startService(serviceIntent);
-
             }
         }
     }
@@ -459,6 +442,15 @@ public class MainFragment extends BrowseSupportFragment
         } else {
             mTitleRowAdapter.clear();
         }
+    }
+
+    // get default URL
+    String getDefaultUrl()
+    {
+        // data base is not created yet, call service for the first time
+        String urlName = "catalog_url_".concat(String.valueOf(INIT_NUMBER));
+        int id = getActivity().getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
+        return getString(id);
     }
 
 
