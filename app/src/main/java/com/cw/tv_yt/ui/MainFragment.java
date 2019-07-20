@@ -49,7 +49,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -74,6 +73,7 @@ import java.util.Map;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.cw.tv_yt.Utils.getPref_focus_category_number;
 import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
 import com.google.android.youtube.player.YouTubeIntents;
 
@@ -93,7 +93,7 @@ public class MainFragment extends BrowseSupportFragment
     private Uri mBackgroundURI;
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
-    private static final int TITLE_LOADER = 123; // Unique ID for Category Loader.
+    private static final int TITLE_LOADER = 123; // Unique ID for Title Loader.
 	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
 	List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
@@ -126,11 +126,12 @@ public class MainFragment extends BrowseSupportFragment
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
     }
 
-
+    Bundle currentInstanceState;
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // Final initialization, modifying UI elements.
         super.onActivityCreated(savedInstanceState);
+        currentInstanceState = savedInstanceState;
 
         System.out.println("MainFragment / _onActivityCreated");
         // Prepare the manager that maintains the same background image between activities.
@@ -146,10 +147,12 @@ public class MainFragment extends BrowseSupportFragment
 
         mTitleRowAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         setAdapter(mTitleRowAdapter);
+
         //todo temporary mark
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
+
     }
 
     @Override
@@ -193,7 +196,7 @@ public class MainFragment extends BrowseSupportFragment
 //        setBadgeDrawable(getActivity().getResources().getDrawable(R.drawable.tt, null));
 
         // option: title
-        int focusNumber = Utils.getPref_focus_category_number(getActivity());
+        int focusNumber = getPref_focus_category_number(getActivity());
         String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
 
         //setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
@@ -337,6 +340,17 @@ public class MainFragment extends BrowseSupportFragment
 
             } else if (loaderId == TITLE_LOADER) {
 
+	            // Create a row for category selections at top
+	            HeaderItem gridHeaderCategory = new HeaderItem("Categories");
+	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this);
+	            ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
+
+                for(int i=1;i<= mCategoryNames.size();i++)
+                    gridRowAdapterCategory.add(mCategoryNames.get(i-1));
+
+	            ListRow rowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
+	            mTitleRowAdapter.add(rowCategory);
+
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
                 {
@@ -464,6 +478,7 @@ public class MainFragment extends BrowseSupportFragment
         }
     }
 
+//    boolean isKeyEventConsumed;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -487,6 +502,27 @@ public class MainFragment extends BrowseSupportFragment
                 startActivity(intent);
 
             } else if (item instanceof String) {
+
+                // category selection click
+                for(int i=1;i<= mCategoryNames.size();i++) {
+                      if (((String) item).equalsIgnoreCase(mCategoryNames.get(i-1))) {
+
+                          //Toast.makeText(getActivity(), (" Cate." + i +  " / " + (String) item  ), Toast.LENGTH_SHORT).show();
+
+                          int clickedPos = i;
+                          Utils.setPref_focus_category_number(getActivity(),clickedPos);
+                          Utils.setPref_category_name(getActivity(),clickedPos,mCategoryNames.get(clickedPos-1));
+
+                          if(getActivity() != null)
+                              getActivity().finish();
+
+                          Intent new_intent = new Intent(getActivity(), MainActivity.class);
+                          new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+                          new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                          getActivity().startActivity(new_intent);
+                    }
+                }
+
 	            if (((String) item).contains(getString(R.string.select_links))) {
 
                     Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
@@ -509,8 +545,9 @@ public class MainFragment extends BrowseSupportFragment
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
                 } else {
-                    Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();
                 }
+
             }
         }
     }
@@ -523,6 +560,39 @@ public class MainFragment extends BrowseSupportFragment
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
             }
+            ///
+            //todo How to show focus and update (not using Click)
+            else if (item instanceof String) {
+                System.out.println("---------- item = " + item.toString());
+                // category selection header
+                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
+                System.out.println("---------- focus cate_number = " + cate_number);
+                String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
+                System.out.println("---------- focus cate_name = " + cate_name);
+//                System.out.println("---------- isKeyEventConsumed = " + isKeyEventConsumed);
+
+                for(int i=1;i<=mCategoryNames.size();i++)
+                {
+                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i-1)))
+                    {
+                        int currentNavPosition = i;
+                        System.out.println("---------- current navigation position = " + currentNavPosition);
+                    }
+
+                }
+                // workaround: no way to synchronize focus position with clicked item yet
+//                if(!isKeyEventConsumed) //??? can not work after App open
+//                {
+//                    BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
+//                    for(int i=1;i<=cate_number;i++) {
+//                        mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
+//                        mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
+//                        System.out.println("---------- send key events " + i);
+//                    }
+//                    isKeyEventConsumed = true;
+//                }
+            }
+            ///
 
         }
     }
