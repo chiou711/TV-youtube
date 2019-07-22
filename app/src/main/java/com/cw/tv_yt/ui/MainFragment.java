@@ -348,8 +348,8 @@ public class MainFragment extends BrowseSupportFragment
                 for(int i=1;i<= mCategoryNames.size();i++)
                     gridRowAdapterCategory.add(mCategoryNames.get(i-1));
 
-	            ListRow rowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
-	            mTitleRowAdapter.add(rowCategory);
+	            ListRow listRowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
+	            mTitleRowAdapter.add(listRowCategory);
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
