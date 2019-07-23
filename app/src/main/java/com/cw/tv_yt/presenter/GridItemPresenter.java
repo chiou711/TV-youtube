@@ -21,6 +21,7 @@ import android.graphics.Color;
 import androidx.leanback.widget.Presenter;
 import androidx.core.content.ContextCompat;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -50,6 +51,22 @@ public class GridItemPresenter extends Presenter {
                 R.color.default_background));
         view.setTextColor(Color.WHITE);
         view.setGravity(Gravity.CENTER);
+
+
+
+        view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                System.out.println("currentNavPosition = " + MainFragment.currentNavPosition);
+                System.out.println("hasFocus = " + hasFocus);
+                if(v.isSelected()) {
+                    System.out.println("v is selected");
+                }else {
+                    System.out.println("v is not selected");
+                }
+            }
+        });
+
         return new ViewHolder(view);
     }
 
@@ -62,10 +79,12 @@ public class GridItemPresenter extends Presenter {
                                                                 Utils.getPref_focus_category_number(mainFragment.getContext()));
         if( item.toString().equalsIgnoreCase(currentCateName))
             ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.search_opaque));
+
     }
 
     @Override
     public void onUnbindViewHolder(ViewHolder viewHolder) {
     }
+
 
 }

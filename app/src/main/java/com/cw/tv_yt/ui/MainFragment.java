@@ -48,7 +48,9 @@ import androidx.loader.content.CursorLoader;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.BaseInputConnection;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -80,9 +82,7 @@ import com.google.android.youtube.player.YouTubeIntents;
 /*
  * Main class to show BrowseFragment with header and rows of videos
  */
-public class MainFragment extends BrowseSupportFragment
-        implements LoaderManager.LoaderCallbacks<Cursor> { //todo
-
+public class MainFragment extends BrowseSupportFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private final Handler mHandler = new Handler();
@@ -93,7 +93,7 @@ public class MainFragment extends BrowseSupportFragment
     private Uri mBackgroundURI;
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
-    private static final int TITLE_LOADER = 123; // Unique ID for Title Loader.
+    static public final int TITLE_LOADER = 123; // Unique ID for Title Loader.
 	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
 	List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
@@ -152,6 +152,7 @@ public class MainFragment extends BrowseSupportFragment
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
+        isKeyEventConsumed = false;
 
     }
 
@@ -351,6 +352,9 @@ public class MainFragment extends BrowseSupportFragment
 	            ListRow listRowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
 	            mTitleRowAdapter.add(listRowCategory);
 
+	            int row_number = 1;
+                listRowCategory.setId(row_number);
+
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
                 {
@@ -358,6 +362,7 @@ public class MainFragment extends BrowseSupportFragment
                     // Every time we have to re-get the category loader, we must re-create the sidebar.
                     mTitleRowAdapter.clear();
                 }
+
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
@@ -371,6 +376,7 @@ public class MainFragment extends BrowseSupportFragment
 
                     int videoLoaderId = title.hashCode(); // Create unique int from title.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
+                    row_number++;
                     if (existingAdapter == null) {
 
                         // Map video results from the database to Video objects.
@@ -380,7 +386,7 @@ public class MainFragment extends BrowseSupportFragment
 
                         ListRow row = new ListRow(header, videoCursorAdapter);
                         mTitleRowAdapter.add(row);
-
+                        row.setId(row_number);
 	                    System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
 
                         // Start loading the videos from the database for a particular category.
@@ -390,6 +396,7 @@ public class MainFragment extends BrowseSupportFragment
                     } else {
                         //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
                         ListRow row = new ListRow(header, existingAdapter);
+                        row.setId(row_number);
                         mTitleRowAdapter.add(row);
                     }
 
@@ -407,6 +414,8 @@ public class MainFragment extends BrowseSupportFragment
                 gridRowAdapter.add(getString(R.string.error_fragment));
                 gridRowAdapter.add(getString(R.string.personal_settings));
                 ListRow row = new ListRow(gridHeader, gridRowAdapter);
+                row_number++;
+                row.setId(row_number);
                 mTitleRowAdapter.add(row);
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
@@ -456,6 +465,7 @@ public class MainFragment extends BrowseSupportFragment
         } else {
             mTitleRowAdapter.clear();
         }
+
     }
 
     // get default URL
@@ -478,7 +488,17 @@ public class MainFragment extends BrowseSupportFragment
         }
     }
 
-//    boolean isKeyEventConsumed;
+    // switch Data base
+    void switchDB(int clickedPos)
+    {
+        Utils.setPref_focus_category_number(getActivity(),clickedPos);
+        Utils.setPref_category_name(getActivity(),clickedPos,mCategoryNames.get(clickedPos-1));
+        mLoaderManager.destroyLoader(TITLE_LOADER);
+
+        getActivity().recreate();
+    }
+
+    boolean isKeyEventConsumed;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -506,20 +526,8 @@ public class MainFragment extends BrowseSupportFragment
                 // category selection click
                 for(int i=1;i<= mCategoryNames.size();i++) {
                       if (((String) item).equalsIgnoreCase(mCategoryNames.get(i-1))) {
-
                           //Toast.makeText(getActivity(), (" Cate." + i +  " / " + (String) item  ), Toast.LENGTH_SHORT).show();
-
-                          int clickedPos = i;
-                          Utils.setPref_focus_category_number(getActivity(),clickedPos);
-                          Utils.setPref_category_name(getActivity(),clickedPos,mCategoryNames.get(clickedPos-1));
-
-                          if(getActivity() != null)
-                              getActivity().finish();
-
-                          Intent new_intent = new Intent(getActivity(), MainActivity.class);
-                          new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-                          new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                          getActivity().startActivity(new_intent);
+                          switchDB(i);
                     }
                 }
 
@@ -552,10 +560,15 @@ public class MainFragment extends BrowseSupportFragment
         }
     }
 
+
+    public static int currentNavPosition;
+
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
+
+
             if (item instanceof Video) {
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
@@ -569,30 +582,33 @@ public class MainFragment extends BrowseSupportFragment
                 System.out.println("---------- focus cate_number = " + cate_number);
                 String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
                 System.out.println("---------- focus cate_name = " + cate_name);
-//                System.out.println("---------- isKeyEventConsumed = " + isKeyEventConsumed);
 
                 for(int i=1;i<=mCategoryNames.size();i++)
                 {
                     if(item.toString().equalsIgnoreCase(mCategoryNames.get(i-1)))
                     {
-                        int currentNavPosition = i;
+                        currentNavPosition = i;
                         System.out.println("---------- current navigation position = " + currentNavPosition);
                     }
-
                 }
+
+
                 // workaround: no way to synchronize focus position with clicked item yet
-//                if(!isKeyEventConsumed) //??? can not work after App open
-//                {
-//                    BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
-//                    for(int i=1;i<=cate_number;i++) {
-//                        mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
-//                        mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
-//                        System.out.println("---------- send key events " + i);
-//                    }
-//                    isKeyEventConsumed = true;
-//                }
+                if((row.getId() == 1) && (cate_number>1) && (currentNavPosition == 1) ){
+                    if(!isKeyEventConsumed) //??? can not work after App open
+                    {
+                        BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
+                        for(int i=1;i<cate_number;i++)
+                        {
+                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
+                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
+                            System.out.println("---------- send key events " + i);
+                        }
+                        isKeyEventConsumed = true;
+                    }
+                }
+
             }
-            ///
 
         }
     }
