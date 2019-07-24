@@ -48,6 +48,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
+import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
@@ -93,13 +94,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private Uri mBackgroundURI;
     private BackgroundManager mBackgroundManager;
     private LoaderManager mLoaderManager;
-    static public final int TITLE_LOADER = 123; // Unique ID for Title Loader.
+    private static final int TITLE_LOADER = 123; // Unique ID for Title Loader.
 	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
-	List<String> mCategoryNames = new ArrayList<>();
+	private List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
 
     // Maps a Loader Id to its CursorObjectAdapter.
-    private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
+//    private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
+    private SparseArray<CursorObjectAdapter> mVideoCursorAdapters;
 
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
@@ -112,7 +114,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         // Create a list to contain all the CursorObjectAdapters.
         // Each adapter is used to render a specific row of videos in the MainFragment.
-        mVideoCursorAdapters = new HashMap<>();
+        mVideoCursorAdapters = new SparseArray<CursorObjectAdapter>();//new HashMap<>();
 
         // Start loading the titles from the database.
         mLoaderManager = LoaderManager.getInstance(this);
@@ -152,9 +154,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
-        isKeyEventConsumed = false;
-
+//        isKeyEventConsumed = false;
     }
+
 
     @Override
     public void onResume() {
@@ -421,6 +423,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
 
+                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(currentNavPosition-1));
+
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
@@ -491,14 +495,20 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     // switch Data base
     void switchDB(int clickedPos)
     {
-        Utils.setPref_focus_category_number(getActivity(),clickedPos);
-        Utils.setPref_category_name(getActivity(),clickedPos,mCategoryNames.get(clickedPos-1));
-        mLoaderManager.destroyLoader(TITLE_LOADER);
+        try {
+            Utils.setPref_focus_category_number(getContext(), clickedPos);
+            Utils.setPref_category_name(getContext(), clickedPos, mCategoryNames.get(clickedPos - 1));
+            mLoaderManager.destroyLoader(TITLE_LOADER);
 
-        getActivity().recreate();
+            getActivity().recreate();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    boolean isKeyEventConsumed;
+//    boolean isKeyEventConsumed;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -526,8 +536,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 // category selection click
                 for(int i=1;i<= mCategoryNames.size();i++) {
                       if (((String) item).equalsIgnoreCase(mCategoryNames.get(i-1))) {
-                          //Toast.makeText(getActivity(), (" Cate." + i +  " / " + (String) item  ), Toast.LENGTH_SHORT).show();
-                          switchDB(i);
+                          // After delay, start switch DB
+                          new Handler().postDelayed(new Runnable() {
+                              public void run() {
+                                  switchDB(currentNavPosition);
+                              }
+                          }, 100);
                     }
                 }
 
@@ -561,7 +575,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
 
-    public static int currentNavPosition;
+    private static int currentNavPosition;
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
@@ -593,20 +607,29 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 }
 
 
+//                // After delay, start switch DB
+//                new Handler().postDelayed(new Runnable() {
+//                    public void run() {
+//                        if(currentNavPosition != cate_number)
+//                            switchDB(currentNavPosition);
+//                    }
+//                }, 100);
+
+
                 // workaround: no way to synchronize focus position with clicked item yet
-                if((row.getId() == 1) && (cate_number>1) && (currentNavPosition == 1) ){
-                    if(!isKeyEventConsumed) //??? can not work after App open
-                    {
-                        BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
-                        for(int i=1;i<cate_number;i++)
-                        {
-                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
-                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
-                            System.out.println("---------- send key events " + i);
-                        }
-                        isKeyEventConsumed = true;
-                    }
-                }
+//                if((row.getId() == 1) && (cate_number>1) && (currentNavPosition == 1) ){
+//                    if(!isKeyEventConsumed) //todo ??? can not work after App just opened
+//                    {
+//                        BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
+//                        for(int i=1;i<cate_number;i++)
+//                        {
+//                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
+//                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
+//                            System.out.println("---------- send key events " + i);
+//                        }
+//                        isKeyEventConsumed = true;
+//                    }
+//                }
 
             }
 

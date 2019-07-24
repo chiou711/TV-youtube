@@ -57,13 +57,13 @@ public class GridItemPresenter extends Presenter {
         view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                System.out.println("currentNavPosition = " + MainFragment.currentNavPosition);
-                System.out.println("hasFocus = " + hasFocus);
-                if(v.isSelected()) {
-                    System.out.println("v is selected");
-                }else {
-                    System.out.println("v is not selected");
-                }
+//                System.out.println("currentNavPosition = " + MainFragment.currentNavPosition);
+//                System.out.println("hasFocus = " + hasFocus);
+//                if(v.isSelected()) {
+//                    System.out.println("v is selected");
+//                }else {
+//                    System.out.println("v is not selected");
+//                }
             }
         });
 
