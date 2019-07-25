@@ -345,7 +345,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
 	            // Create a row for category selections at top
 	            HeaderItem gridHeaderCategory = new HeaderItem("Categories");
-	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this);
+	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
 	            ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
 
                 for(int i=1;i<= mCategoryNames.size();i++)
@@ -354,8 +354,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	            ListRow listRowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
 	            mTitleRowAdapter.add(listRowCategory);
 
-	            int row_number = 1;
-                listRowCategory.setId(row_number);
+	            // row id count start
+	            int row_id = 0;
+                listRowCategory.setId(row_id);
 
                 // clear for not adding duplicate rows
                 if(rowsLoadedCount != mVideoCursorAdapters.size())
@@ -378,7 +379,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                     int videoLoaderId = title.hashCode(); // Create unique int from title.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
-                    row_number++;
+                    row_id++;
                     if (existingAdapter == null) {
 
                         // Map video results from the database to Video objects.
@@ -388,7 +389,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                         ListRow row = new ListRow(header, videoCursorAdapter);
                         mTitleRowAdapter.add(row);
-                        row.setId(row_number);
+                        row.setId(row_id);
 	                    System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
 
                         // Start loading the videos from the database for a particular category.
@@ -398,7 +399,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     } else {
                         //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
                         ListRow row = new ListRow(header, existingAdapter);
-                        row.setId(row_number);
+                        row.setId(row_id);
                         mTitleRowAdapter.add(row);
                     }
 
@@ -416,14 +417,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 gridRowAdapter.add(getString(R.string.error_fragment));
                 gridRowAdapter.add(getString(R.string.personal_settings));
                 ListRow row = new ListRow(gridHeader, gridRowAdapter);
-                row_number++;
-                row.setId(row_number);
+                row_id++;
+                row.setId(row_id);
                 mTitleRowAdapter.add(row);
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
 
-                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(currentNavPosition-1));
+                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(currentNavPosition));
 
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
@@ -539,7 +540,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                           // After delay, start switch DB
                           new Handler().postDelayed(new Runnable() {
                               public void run() {
-                                  switchDB(currentNavPosition);
+                                  switchDB(currentNavPosition+1);
                               }
                           }, 100);
                     }
@@ -597,9 +598,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
                 System.out.println("---------- focus cate_name = " + cate_name);
 
-                for(int i=1;i<=mCategoryNames.size();i++)
+                System.out.println("---------- itemViewHolder.view.getId() = " + itemViewHolder.view.getId());
+
+                for(int i=0;i<mCategoryNames.size();i++)
                 {
-                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i-1)))
+                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i)))
                     {
                         currentNavPosition = i;
                         System.out.println("---------- current navigation position = " + currentNavPosition);
@@ -617,7 +620,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
 
                 // workaround: no way to synchronize focus position with clicked item yet
-//                if((row.getId() == 1) && (cate_number>1) && (currentNavPosition == 1) ){
+//                if((row.getId() == 0) && (cate_number>1) && (currentNavPosition == 1) ){
 //                    if(!isKeyEventConsumed) //todo ??? can not work after App just opened
 //                    {
 //                        BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);

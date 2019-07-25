@@ -29,8 +29,16 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.ui.MainFragment;
 
+import java.util.List;
+
 public class GridItemPresenter extends Presenter {
     private final MainFragment mainFragment;
+
+    List<String> mCategoryNames;
+    public GridItemPresenter(MainFragment mainFragment, List<String> category_names) {
+        this.mainFragment = mainFragment;
+        mCategoryNames = category_names;
+    }
 
     public GridItemPresenter(MainFragment mainFragment) {
         this.mainFragment = mainFragment;
@@ -51,8 +59,6 @@ public class GridItemPresenter extends Presenter {
                 R.color.default_background));
         view.setTextColor(Color.WHITE);
         view.setGravity(Gravity.CENTER);
-
-
 
         view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -80,7 +86,17 @@ public class GridItemPresenter extends Presenter {
         if( item.toString().equalsIgnoreCase(currentCateName))
             ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.search_opaque));
 
+        // set item view id
+        if(mCategoryNames != null) {
+            for (int i = 0; i < mCategoryNames.size(); i++) {
+                if (((String) item).equalsIgnoreCase(mCategoryNames.get(i))) {
+                    viewHolder.view.setId(i);
+                    break;
+                }
+            }
+        }
     }
+
 
     @Override
     public void onUnbindViewHolder(ViewHolder viewHolder) {
