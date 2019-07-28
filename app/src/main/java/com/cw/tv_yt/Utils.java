@@ -137,6 +137,7 @@ public class Utils {
     // set category name
     public static void setPref_category_name(Context context, int pageNumber, String categoryStr )
     {
+        System.out.println("Utils / _setPref_category_name / pageNumber = " + pageNumber);
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "category_name_" + pageNumber;
         pref.edit().putString(keyName, categoryStr).apply();

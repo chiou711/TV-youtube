@@ -17,13 +17,17 @@
 package com.cw.tv_yt.ui;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -49,9 +53,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.BaseInputConnection;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -59,9 +61,11 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data_yt.DbHelper_yt;
 import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
 import com.cw.tv_yt.data_yt.FetchVideoService_yt;
 import com.cw.tv_yt.data_yt.VideoContract_yt;
+import com.cw.tv_yt.data_yt.VideoProvider_yt;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -70,9 +74,7 @@ import com.cw.tv_yt.presenter.IconHeaderItemPresenter;
 import com.cw.tv_yt.recommendation.UpdateRecommendationsService;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -100,12 +102,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private final int INIT_NUMBER = 1;
 
     // Maps a Loader Id to its CursorObjectAdapter.
-//    private Map<Integer, CursorObjectAdapter> mVideoCursorAdapters;
     private SparseArray<CursorObjectAdapter> mVideoCursorAdapters;
 
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
     private FetchServiceResponseReceiver responseReceiver;
+    LocalBroadcastManager localBroadcastMgr;
 
     @Override
     public void onAttach(Context context) {
@@ -119,21 +121,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         // Start loading the titles from the database.
         mLoaderManager = LoaderManager.getInstance(this);
         mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
-
-        // receiver for fetch video service
-        IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.BROADCAST_ACTION);
-        responseReceiver = new FetchServiceResponseReceiver();
-
-        // Registers the FetchServiceResponseReceiver and its intent filters
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(responseReceiver, statusIntentFilter );
     }
 
-    Bundle currentInstanceState;
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // Final initialization, modifying UI elements.
         super.onActivityCreated(savedInstanceState);
-        currentInstanceState = savedInstanceState;
 
         System.out.println("MainFragment / _onActivityCreated");
         // Prepare the manager that maintains the same background image between activities.
@@ -154,14 +147,22 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
-//        isKeyEventConsumed = false;
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
+
         System.out.println("MainFragment / _onResume");
+
+        // receiver for fetch video service
+        IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.BROADCAST_ACTION);
+        responseReceiver = new FetchServiceResponseReceiver();
+
+        // Registers the FetchServiceResponseReceiver and its intent filters
+        localBroadcastMgr = LocalBroadcastManager.getInstance(getActivity());
+        localBroadcastMgr.registerReceiver(responseReceiver, statusIntentFilter );
     }
 
     @Override
@@ -172,9 +173,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     @Override
     public void onDestroy() {
-        mHandler.removeCallbacks(mBackgroundTask);
+	    System.out.println("MainFragment / _onDestroy");
+
+	    mHandler.removeCallbacks(mBackgroundTask);
         mBackgroundManager = null;
-        System.out.println("MainFragment / _onDestroy");
+
+		// unregister receiver
+        localBroadcastMgr.unregisterReceiver(responseReceiver);
+        responseReceiver = null;
         super.onDestroy();
     }
 
@@ -203,7 +209,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
 
         //setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
-        if(categoryName != String.valueOf(focusNumber))
+        if(!categoryName.equalsIgnoreCase(String.valueOf(focusNumber)))
             setTitle(categoryName);
 
         setHeadersState(HEADERS_ENABLED);
@@ -272,7 +278,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        System.out.println("MainFragment / _onCreateLoader / id = " + id);
+        if (id == CATEGORY_LOADER)
+            System.out.println("MainFragment / _onCreateLoader / id = CATEGORY_LOADER");
+        else if(id == TITLE_LOADER)
+            System.out.println("MainFragment / _onCreateLoader / id = TITLE_LOADER");
+        else
+            System.out.println("MainFragment / _onCreateLoader / id = "+ id);
 
         if (id == CATEGORY_LOADER) {
             return new CursorLoader(
@@ -315,7 +326,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
+        System.out.println("MainFragment / _onLoadFinished");
         // return when load is OK
         if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
             return;
@@ -323,9 +334,16 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
-	        System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
+
+            if (loaderId == CATEGORY_LOADER)
+	            System.out.println("MainFragment / _onLoadFinished / loaderId = CATEGORY_LOADER");
+            else if(loaderId == TITLE_LOADER)
+                System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
+            else
+                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
+                mCategoryNames = new ArrayList<>();
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
 
@@ -411,6 +429,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
+                gridRowAdapter.add(getString(R.string.renew));
                 gridRowAdapter.add(getString(R.string.select_links));
 	            gridRowAdapter.add(getString(R.string.grid_view));
                 gridRowAdapter.add(getString(R.string.guidedstep_first_title));
@@ -424,7 +443,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
                 // cursors have loaded.
 
-                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(currentNavPosition));
+                // set focus category item position
+                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
+                setSelectedPosition(0);
+                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(cate_number-1));
 
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
@@ -432,15 +454,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // one row added
                 rowsLoadedCount++;
+                System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
             }
         } else {
 
             // data base is not created yet, call service for the first time
-
-            // Start an Intent to fetch the categories
-            if( (loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size()==0) )
-            {
-                Utils.setPref_focus_category_number(getActivity(),INIT_NUMBER);
+                // Start an Intent to fetch the categories
+            if ((loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size() == 0)) {
+                Utils.setPref_focus_category_number(getActivity(), INIT_NUMBER);
 
                 System.out.println("MainFragment / onLoadFinished / start Fetch category service =================================");
                 Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
@@ -448,13 +469,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 getActivity().startService(serviceIntent);
             }
             // Start an Intent to fetch the videos
-            else if(rowsLoadedCount == 0)
-            {
+            else if ((loader.getId() == TITLE_LOADER) && (rowsLoadedCount == 0)) {
                 System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
 
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                 serviceIntent.putExtra("FetchUrl", getDefaultUrl());
-                serviceIntent.putExtra("Session", "install");
                 getActivity().startService(serviceIntent);
             }
         }
@@ -474,7 +493,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // get default URL
-    String getDefaultUrl()
+    private String getDefaultUrl()
     {
         // data base is not created yet, call service for the first time
         String urlName = "catalog_url_".concat(String.valueOf(INIT_NUMBER));
@@ -494,7 +513,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // switch Data base
-    void switchDB(int clickedPos)
+    private void switchDB(int clickedPos)
     {
         try {
             Utils.setPref_focus_category_number(getContext(), clickedPos);
@@ -509,14 +528,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-//    boolean isKeyEventConsumed;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-             //todo case: with details
+                //todo case: with details
 //                Video video = (Video) item;
 //                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
 //                intent.putExtra(VideoDetailsActivity.VIDEO, video);
@@ -527,7 +545,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
 //                getActivity().startActivity(intent, bundle);
 
-            //todo case: no details
+                //todo case: no details
                 String idStr = getYoutubeId(((Video) item).videoUrl );
                 Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
                 startActivity(intent);
@@ -546,7 +564,34 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     }
                 }
 
-	            if (((String) item).contains(getString(R.string.select_links))) {
+                if (((String) item).contains(getString(R.string.renew))) {
+
+                    // renew DB
+                    int res_id = getResourceIdentifier(String.valueOf(1));
+
+                    startRenewFetchService(getString(res_id));
+
+                    // remove reference keys
+                    Utils.removePref_focus_category_number(getActivity());
+
+                    // get video tables count (same as categories count)
+                    DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+                    SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+
+                    String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
+                    Cursor cursor = sqlDb.rawQuery(SQL_GET_ALL_TABLES, null);
+                    int countVideoTables = cursor.getCount();
+                    cursor.close();
+                    sqlDb.close();
+
+                    // remove category name key
+                    for(int i = 1; i<= countVideoTables; i++)
+                        Utils.removePref_category_name(getActivity(),i);
+
+                } else if (((String) item).contains(getString(R.string.select_links))) {
+
+                    localBroadcastMgr.unregisterReceiver(responseReceiver);
+                    responseReceiver = null;
 
                     Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
@@ -575,6 +620,51 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
+    // get resource Identifier
+    private int getResourceIdentifier(String bodyStr)
+    {
+        String pre_str = "catalog_url_";
+        int res_id = getActivity().getResources().getIdentifier(pre_str.concat(bodyStr),
+                "string",
+                getActivity().getPackageName());
+        System.out.println("MainFragment / _getResourceIdentifier / res_id = " + res_id);
+        return res_id;
+    }
+
+
+    // start fetch service by URL string
+    private void startRenewFetchService(String url) {
+        System.out.println("MainFragment / _startFetchService");
+        // delete database
+        try {
+            System.out.println("MainFragment / _startFetchService / will delete DB");
+            getActivity().deleteDatabase(DbHelper_yt.DATABASE_NAME);
+
+            ContentResolver resolver = getActivity().getContentResolver();
+            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
+            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+
+            provider.mContentResolver = resolver;
+            provider.mOpenHelper.close();
+
+            provider.mOpenHelper = new DbHelper_yt(getActivity());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                client.close();
+            else
+                client.release();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // start new MainActivity
+        Intent new_intent = new Intent(getActivity(), MainActivity.class);
+        new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+        new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        getActivity().startActivity(new_intent);
+    }
+
 
     private static int currentNavPosition;
 
@@ -583,22 +673,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
-
             if (item instanceof Video) {
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
             }
-            ///
-            //todo How to show focus and update (not using Click)
             else if (item instanceof String) {
-                System.out.println("---------- item = " + item.toString());
                 // category selection header
-                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
-                System.out.println("---------- focus cate_number = " + cate_number);
-                String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
-                System.out.println("---------- focus cate_name = " + cate_name);
-
-                System.out.println("---------- itemViewHolder.view.getId() = " + itemViewHolder.view.getId());
+//                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
+//                System.out.println("---------- focus cate_number = " + cate_number);
+//                String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
+//                System.out.println("---------- focus cate_name = " + cate_name);
+//                System.out.println("---------- itemViewHolder.view.getId() = " + itemViewHolder.view.getId());
 
                 for(int i=0;i<mCategoryNames.size();i++)
                 {
@@ -608,34 +693,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         System.out.println("---------- current navigation position = " + currentNavPosition);
                     }
                 }
-
-
-//                // After delay, start switch DB
-//                new Handler().postDelayed(new Runnable() {
-//                    public void run() {
-//                        if(currentNavPosition != cate_number)
-//                            switchDB(currentNavPosition);
-//                    }
-//                }, 100);
-
-
-                // workaround: no way to synchronize focus position with clicked item yet
-//                if((row.getId() == 0) && (cate_number>1) && (currentNavPosition == 1) ){
-//                    if(!isKeyEventConsumed) //todo ??? can not work after App just opened
-//                    {
-//                        BaseInputConnection mInputConnection = new BaseInputConnection(itemViewHolder.view.getRootView(), true);
-//                        for(int i=1;i<cate_number;i++)
-//                        {
-//                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
-//                            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
-//                            System.out.println("---------- send key events " + i);
-//                        }
-//                        isKeyEventConsumed = true;
-//                    }
-//                }
-
             }
-
         }
     }
 
@@ -648,44 +706,30 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
              * You get notified here when your IntentService is done
              * obtaining data form the server!
              */
-            System.out.println("MainFragment / _MyResponseReceiver / _onReceive");
+            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
 
             // for fetch category
-            String statusStr1 = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
-            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr1 = " + statusStr1);
-
-            if((statusStr1 != null) && statusStr1.equalsIgnoreCase("FetchCategoryServiceIsDone"))
+            if((statusStr != null) && statusStr.equalsIgnoreCase("FetchCategoryServiceIsDone"))
             {
                 if (context != null) {
-
                 }
             }
 
-
-
             // for fetch video
-            String statusStr = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
-            System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
             if((statusStr != null) && statusStr.equalsIgnoreCase("FetchVideoServiceIsDone"))
             {
                 if (context != null) {
-
+                    // unregister receiver
                     LocalBroadcastManager.getInstance(context).unregisterReceiver(responseReceiver);
 
-                    if(getActivity() != null)
-                        getActivity().finish();
-                    System.out.println("MainFragment / _FetchServiceResponseReceiver / will start new intent ");
-
-
+                    System.out.println("MainFragment / _FetchServiceResponseReceiver / will start new main activity");
                     Intent new_intent = new Intent(context, MainActivity.class);
                     new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
                     new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(new_intent);
-
-
                 }
             }
-
         }
     }
 

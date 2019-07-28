@@ -81,10 +81,17 @@ public class GridItemPresenter extends Presenter {
         ((TextView) viewHolder.view).setText(((String) item));
 
         // highlight category name
-        String currentCateName = Utils.getPref_category_name(mainFragment.getContext(),
-                                                                Utils.getPref_focus_category_number(mainFragment.getContext()));
-        if( item.toString().equalsIgnoreCase(currentCateName))
-            ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.search_opaque));
+        try {
+            int cate_num = Utils.getPref_focus_category_number(mainFragment.getContext());
+            String cate_name = Utils.getPref_category_name(mainFragment.getContext(), cate_num);
+            if (item.toString().equalsIgnoreCase(cate_name))
+                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.search_opaque));
+            else
+                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
+        } catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         // set item view id
         if(mCategoryNames != null) {

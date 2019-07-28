@@ -47,14 +47,11 @@ public class FetchVideoService_yt extends IntentService {
     @Override
     protected void onHandleIntent(Intent workIntent) {
 	    serviceUrl = workIntent.getStringExtra("FetchUrl");
-	    String session = workIntent.getStringExtra("Session");
 	    System.out.println("FetchVideoService_yt / _onHandleIntent / serviceUrl = " + serviceUrl);
-	    System.out.println("FetchVideoService_yt / _onHandleIntent / session = " + session);
         VideoDbBuilder_yt builder = new VideoDbBuilder_yt(getApplicationContext());
 
         try {
-			        List<List<ContentValues>> contentValuesList =
-                    builder.fetch(serviceUrl);
+			List<List<ContentValues>> contentValuesList = builder.fetch(serviceUrl);
 
 			for(int i=0;i<contentValuesList.size();i++) {
 
@@ -76,15 +73,8 @@ public class FetchVideoService_yt extends IntentService {
         // Puts the status into the Intent
         String status = "FetchVideoServiceIsDone"; // any data that you want to send back to receivers
 
-	    Intent localIntent = null;
-	    if(session.equalsIgnoreCase("install")) {
-		    localIntent = new Intent(Constants.BROADCAST_ACTION);
-		    localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
-	    }else if(session.equalsIgnoreCase("renew"))
-	    {
-		    localIntent = new Intent(Constants.SELECT_LINKS_BROADCAST_ACTION);
-		    localIntent.putExtra(Constants.SELECT_LINKS_EXTENDED_DATA_STATUS, status);
-	    }
+	    Intent localIntent = new Intent(Constants.BROADCAST_ACTION);
+	    localIntent.putExtra(Constants.EXTENDED_DATA_STATUS, status);
 
         // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
@@ -93,15 +83,8 @@ public class FetchVideoService_yt extends IntentService {
 
     public final class Constants {
         // Defines a custom Intent action
-        public static final String BROADCAST_ACTION =
-		        "com.cw.tv_yt.BROADCAST";
+        public static final String BROADCAST_ACTION = "com.cw.tv_yt.BROADCAST";
 	    // Defines the key for the status "extra" in an Intent
-	    public static final String EXTENDED_DATA_STATUS =
-			    "com.cw.tv_yt.STATUS";
-	    public static final String SELECT_LINKS_BROADCAST_ACTION =
-			    "com.cw.tv_yt.SELECT_LINKS_BROADCAST";
-	    // Defines the key for the status "extra" in an Intent
-	    public static final String SELECT_LINKS_EXTENDED_DATA_STATUS =
-			    "com.cw.tv_yt.SELECT_LINKS_STATUS";
+	    public static final String EXTENDED_DATA_STATUS = "com.cw.tv_yt.STATUS";
     }
 }
