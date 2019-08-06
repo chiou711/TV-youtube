@@ -89,41 +89,44 @@ public class VideoDbBuilder_yt {
 
             JSONObject contentObj = contentArray.getJSONObject(h);
 
-            JSONArray categoryArray = contentObj.getJSONArray(TAG_LINK_PAGE);
+            JSONArray pageArray = contentObj.getJSONArray(TAG_LINK_PAGE);
 
             videosToInsert = new ArrayList<>();
 
-            for (int i = 0; i < categoryArray.length(); i++) {
+            for (int i = 0; i < pageArray.length(); i++) {
 
-                JSONArray videoArray;
+                JSONArray linksArray;
 
-                JSONObject category = categoryArray.getJSONObject(i);
-                String titleName = category.getString(TAG_TITLE);
-                videoArray = category.getJSONArray(TAG_MEDIA);
+                JSONObject page = pageArray.getJSONObject(i);
+                String pageTitle = page.getString(TAG_TITLE);
 
-                ///
+                System.out.println("VideoDbBuilder_yt / _buildMedia / pageTitle = " + pageTitle);
+
+                linksArray = page.getJSONArray(TAG_MEDIA);
+
                 // links
-                for (int j = 0; j < videoArray.length(); j++) {
-                    JSONObject video = videoArray.getJSONObject(j);
+                for (int j = 0; j < linksArray.length(); j++) {
+                    JSONObject link = linksArray.getJSONObject(j);
 
-                    String title = video.optString("note_title");
+                    String linkTitle = link.optString("note_title");
+                    System.out.println("VideoDbBuilder_yt / _buildMedia / linkTitle = " + linkTitle);
 
                     String description = "DESCRIPTION";
 
-                    String videoUrl = (String) video.opt("note_link_uri"); // Get the first video only.
+                    String linkUrl = (String) link.opt("note_link_uri"); // Get the first link only.
 
                     Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
                     String bgImageUrl = myURI.toString();
 
-                    String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(videoUrl) + "/0.jpg";
+                    String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
 
                     String studio = "STUDIO";
 
                     ContentValues videoValues = new ContentValues();
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_TITLE, titleName);
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, title);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_TITLE, pageTitle);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_NAME, linkTitle);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_DESC, description);
-                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, videoUrl);
+                    videoValues.put(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL, linkUrl);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_CARD_IMG, cardImageUrl);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL, bgImageUrl);
                     videoValues.put(VideoContract_yt.VideoEntry.COLUMN_STUDIO, studio);
@@ -164,7 +167,7 @@ public class VideoDbBuilder_yt {
             final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.VideoEntry.TABLE_NAME.concat(tableId) + " (" +
                     VideoContract_yt.VideoEntry._ID + " INTEGER PRIMARY KEY," +
                     VideoContract_yt.VideoEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                    VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL + " TEXT UNIQUE NOT NULL, " + // Make the URL unique.
+                    VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
                     VideoContract_yt.VideoEntry.COLUMN_NAME + " TEXT NOT NULL, " +
                     VideoContract_yt.VideoEntry.COLUMN_DESC + " TEXT NOT NULL, " +
                     VideoContract_yt.VideoEntry.COLUMN_BG_IMAGE_URL + " TEXT NOT NULL, " +
