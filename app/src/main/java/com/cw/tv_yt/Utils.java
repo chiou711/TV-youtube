@@ -119,11 +119,11 @@ public class Utils {
     }
 
     // set category name
-    public static void setPref_focus_category_number(Context context, int pageNumber )
+    public static void setPref_focus_category_number(Context context, int cateNumber )
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "current_category_number";
-        pref.edit().putInt(keyName, pageNumber).apply();
+        pref.edit().putInt(keyName, cateNumber).apply();
     }
 
     // get category name
@@ -135,20 +135,20 @@ public class Utils {
     }
 
     // set category name
-    public static void setPref_category_name(Context context, int pageNumber, String categoryStr )
+    public static void setPref_category_name(Context context, int cateNumber, String categoryStr )
     {
-        System.out.println("Utils / _setPref_category_name / pageNumber = " + pageNumber);
+        System.out.println("Utils / _setPref_category_name / cateNumber = " + cateNumber);
         SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "category_name_" + pageNumber;
+        String keyName = "category_name_" + cateNumber;
         pref.edit().putString(keyName, categoryStr).apply();
     }
 
     // get category name
-    public static String getPref_category_name(Context context,int pageNumber)
+    public static String getPref_category_name(Context context,int cateNumber)
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "category_name_" + pageNumber;
-        return pref.getString(keyName, String.valueOf(pageNumber)); // folder table Id: default is 1
+        String keyName = "category_name_" + cateNumber;
+        return pref.getString(keyName, String.valueOf(cateNumber)); // folder table Id: default is 1
     }
 
     // remove key of category name

@@ -472,6 +472,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             else if ((loader.getId() == TITLE_LOADER) && (rowsLoadedCount == 0)) {
                 System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
 
+                // avoid endless loop due to empty category selection
+                Utils.setPref_focus_category_number(getContext(),1);
+
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                 serviceIntent.putExtra("FetchUrl", getDefaultUrl());
                 getActivity().startService(serviceIntent);
