@@ -15,7 +15,7 @@
 -->
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/select_links_fragment"
-    android:name="com.cw.tv_yt.ui.SelectLinksFragment"
+    android:id="@+id/select_category_fragment"
+    android:name="com.cw.tv_yt.ui.SelectCategoryFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />

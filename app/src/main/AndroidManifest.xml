@@ -115,7 +115,7 @@
             android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name="com.cw.tv_yt.ui.SelectLinksActivity"
+            android:name="com.cw.tv_yt.ui.SelectCategoryActivity"
             android:exported="true"
             android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />

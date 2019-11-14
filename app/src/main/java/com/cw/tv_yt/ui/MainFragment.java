@@ -430,11 +430,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
                 gridRowAdapter.add(getString(R.string.renew));
-                gridRowAdapter.add(getString(R.string.select_links));
+                gridRowAdapter.add(getString(R.string.select_category));
 	            gridRowAdapter.add(getString(R.string.grid_view));
-                gridRowAdapter.add(getString(R.string.guidedstep_first_title));
-                gridRowAdapter.add(getString(R.string.error_fragment));
-                gridRowAdapter.add(getString(R.string.personal_settings));
+//                gridRowAdapter.add(getString(R.string.guidedstep_first_title));
+//                gridRowAdapter.add(getString(R.string.error_fragment));
+//                gridRowAdapter.add(getString(R.string.personal_settings));
                 ListRow row = new ListRow(gridHeader, gridRowAdapter);
                 row_id++;
                 row.setId(row_id);
@@ -591,12 +591,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     for(int i = 1; i<= countVideoTables; i++)
                         Utils.removePref_category_name(getActivity(),i);
 
-                } else if (((String) item).contains(getString(R.string.select_links))) {
+                } else if (((String) item).contains(getString(R.string.select_category))) {
 
                     localBroadcastMgr.unregisterReceiver(responseReceiver);
                     responseReceiver = null;
 
-                    Intent intent = new Intent(getActivity(), SelectLinksActivity.class);
+                    Intent intent = new Intent(getActivity(), SelectCategoryActivity.class);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                     startActivity(intent, bundle);
 

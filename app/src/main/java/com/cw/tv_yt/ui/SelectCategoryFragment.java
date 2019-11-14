@@ -65,7 +65,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
  */
-public class SelectLinksFragment extends VerticalGridSupportFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SelectCategoryFragment extends VerticalGridSupportFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "Select links";
     private static final int NUM_COLUMNS = 5;
 
@@ -113,14 +113,14 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        System.out.println("SelectLinksFragment / _onCreate");
+        System.out.println("SelectCategoryFragment / _onCreate");
 
         super.onCreate(savedInstanceState);
 
         mAdapter = new Adapter(new StringPresenter());
         setAdapter(mAdapter);
 
-        setTitle(getString(R.string.select_links_title));
+        setTitle(getString(R.string.select_category_title));
 
         if (savedInstanceState == null) {
             prepareEntranceTransition();
@@ -138,14 +138,14 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
         cursor.close();
         sqlDb.close();
 
-        System.out.println("SelectLinksFragment / _onCreate / video tables count = " + countVideoTables);
+        System.out.println("SelectCategoryFragment / _onCreate / video tables count = " + countVideoTables);
     }
 
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 
-        System.out.println("SelectLinksFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
+        System.out.println("SelectCategoryFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
 
         // id = CATEGORY_LOADER
         return new CursorLoader(
@@ -162,11 +162,11 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
-        System.out.println("SelectLinksFragment / _onLoadFinished" );
+        System.out.println("SelectCategoryFragment / _onLoadFinished" );
 
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
-            System.out.println("SelectLinksFragment / _onLoadFinished / loaderId = " + loaderId);
+            System.out.println("SelectCategoryFragment / _onLoadFinished / loaderId = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
 
@@ -176,7 +176,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
 
                     int categoryIndex = data.getColumnIndex(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
                     String category_name = data.getString(categoryIndex);
-                    System.out.println("SelectLinksFragment / _onLoadFinished / category_name = " + category_name);
+                    System.out.println("SelectCategoryFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
                     data.moveToNext();
                 }
@@ -189,7 +189,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
 
             }
         } else {
-	        System.out.println("SelectLinksFragment / onLoadFinished / start Fetch category service =================================");
+	        System.out.println("SelectCategoryFragment / onLoadFinished / start Fetch category service =================================");
 	        Utils.setPref_focus_category_number(getActivity(),1);
 
 	        //use catalog_url_1 to be default URL
@@ -283,13 +283,13 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
         super.onDestroy();
         localBroadcastMgr.unregisterReceiver(responseReceiver);
         responseReceiver = null;
-        System.out.println("SelectLinksFragment / _onDestroy");
+        System.out.println("SelectCategoryFragment / _onDestroy");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        System.out.println("SelectLinksFragment / _onStop");
+        System.out.println("SelectCategoryFragment / _onStop");
     }
 
     // get resource Identifier
@@ -299,12 +299,12 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
 	    int res_id = getActivity().getResources().getIdentifier(pre_str.concat(bodyStr),
                                                             "string",
                                                                     getActivity().getPackageName());
-	    System.out.println("SelectLinksFragment / _getResourceIdentifier / res_id = " + res_id);
+	    System.out.println("SelectCategoryFragment / _getResourceIdentifier / res_id = " + res_id);
 	    return res_id;
     }
 
     private void loadData() {
-        System.out.println("SelectLinksFragment / _loadData");
+        System.out.println("SelectCategoryFragment / _loadData");
 
         for(int i = 0; i< mCategoryNames.size(); i++) {
             String categoryName = mCategoryNames.get(i);
@@ -314,10 +314,10 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
 
     // start fetch service by URL string
     private void startRenewFetchService(String url) {
-        System.out.println("SelectLinksFragment / _startFetchService");
+        System.out.println("SelectCategoryFragment / _startFetchService");
         // delete database
         try {
-            System.out.println("SelectLinksFragment / _startFetchService / will delete DB");
+            System.out.println("SelectCategoryFragment / _startFetchService / will delete DB");
             getActivity().deleteDatabase(DbHelper_yt.DATABASE_NAME);
 
             ContentResolver resolver = getActivity().getContentResolver();
@@ -343,7 +343,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
         int id = getActivity().getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
         String default_url = getString(id);
 
-        System.out.println("SelectLinksFragment / _startFetchService / will start Fetch category service");
+        System.out.println("SelectCategoryFragment / _startFetchService / will start Fetch category service");
         Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
         serviceIntent.putExtra("FetchUrl", default_url);
         getActivity().startService(serviceIntent);
@@ -365,13 +365,13 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
             {
                 if (context != null) {
 
-                    System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / _onReceive / statusStr1 = " + statusStr1);
+                    System.out.println("SelectCategoryFragment / _FetchServiceResponseReceiver / _onReceive / statusStr1 = " + statusStr1);
 
                     String urlName = "catalog_url_".concat(String.valueOf(1));
                     int id = getActivity().getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
                     String default_url = getString(id);
 
-                    System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / will start Fetch video service");
+                    System.out.println("SelectCategoryFragment / _FetchServiceResponseReceiver / will start Fetch video service");
                     Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
                     serviceIntent.putExtra("FetchUrl", default_url);
                     getActivity().startService(serviceIntent);
@@ -384,7 +384,7 @@ public class SelectLinksFragment extends VerticalGridSupportFragment implements 
             {
                 if (context != null) {
 
-                    System.out.println("SelectLinksFragment / _FetchServiceResponseReceiver / _onReceive / statusStr2 = " + statusStr2);
+                    System.out.println("SelectCategoryFragment / _FetchServiceResponseReceiver / _onReceive / statusStr2 = " + statusStr2);
                     localBroadcastMgr.unregisterReceiver(responseReceiver);
                     responseReceiver = null;
 

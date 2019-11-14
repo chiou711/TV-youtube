@@ -23,14 +23,14 @@ import com.cw.tv_yt.R;
 /*
  * VerticalGridActivity that loads VerticalGridFragment
  */
-public class SelectLinksActivity extends LeanbackActivity {
+public class SelectCategoryActivity extends LeanbackActivity {
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_links_grid);
+        setContentView(R.layout.select_category_grid);
         getWindow().setBackgroundDrawableResource(R.drawable.grid_bg);
     }
 }
