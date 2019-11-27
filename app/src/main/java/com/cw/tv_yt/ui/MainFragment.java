@@ -16,10 +16,12 @@
 
 package com.cw.tv_yt.ui;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
@@ -27,6 +29,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,7 +56,10 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.util.DisplayMetrics;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.BaseInputConnection;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -100,7 +106,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
 	private List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
-
+    final private static int YOUTUBE_LINK_INTENT = 99;
     // Maps a Loader Id to its CursorObjectAdapter.
     private SparseArray<CursorObjectAdapter> mVideoCursorAdapters;
 
@@ -149,6 +155,242 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         rowsLoadedCount = 0;
     }
 
+    AlertDialog.Builder builder;
+    private AlertDialog alertDlg;
+    private Handler handler;
+    private int count;
+    private String countStr;
+    private String nextLinkTitle;
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //
+        System.out.println("MainFragment / _onActivityResult / requestCode = " + requestCode);
+        System.out.println("MainFragment / _onActivityResult / resultCode = " + resultCode);
+        if(requestCode == YOUTUBE_LINK_INTENT) {
+            count = 3; // waiting time to next
+            builder = new AlertDialog.Builder(getContext());
+
+            String link = getYouTubeLink();
+            nextLinkTitle =  Utils.getYouTubeTitle(link);
+
+            countStr = "If not running, please press No within " + count + " seconds.";//TODO lcoale
+            countStr = countStr.replaceFirst("[0-9]",String.valueOf(count));
+            builder.setTitle("Continue running next link?")
+                    .setMessage(nextLinkTitle +"\n\n" + countStr)
+                    .setPositiveButton("No", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog1, int which1)
+                        {
+                            alertDlg.dismiss();
+                            cancelYouTubeHandler();
+                        }
+                    });
+            alertDlg = builder.create();
+
+            // set listener for selection
+            alertDlg.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dlgInterface) {
+                    handler = new Handler();
+                    handler.postDelayed(runCountDown,1000);
+                }
+            });
+            alertDlg.show();
+        }
+    }
+
+    String getYouTubeLink()
+    {
+        int next_pos = getCurrentId();
+        System.out.println("MainFragment / _onActivityResult / next_pos = " + next_pos);
+        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+        int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
+        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+                VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCategoryNumber)),
+                null,//projection,
+                null,//selection,
+                null,//selectionArgs,
+                null,
+                null,
+                null//sortOrder
+        );
+
+        int videoUrl_index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL);
+        cursor.moveToPosition((int) next_pos);
+        String video_url = cursor.getString(videoUrl_index);
+        cursor.close();
+        sqlDb.close();
+
+        return video_url;
+    }
+
+    /**
+     * runnable for counting down
+     */
+    private Runnable runCountDown = new Runnable() {
+        public void run() {
+            // show count down
+            TextView messageView = (TextView) alertDlg.findViewById(android.R.id.message);
+            count--;
+            countStr = "If not running, please press No within " + count + " seconds.";//TODO locale
+            countStr = countStr.replaceFirst("[0-9]",String.valueOf(count));
+            messageView.setText(nextLinkTitle + "\n\n" +countStr);
+
+            if(count>0)
+                handler.postDelayed(runCountDown,1000);
+            else
+            {
+                // launch next intent
+                alertDlg.dismiss();
+                cancelYouTubeHandler();
+                launchNextYouTubeIntent();
+            }
+        }
+    };
+
+    private void cancelYouTubeHandler()
+    {
+        if(handler != null) {
+            handler.removeCallbacks(runCountDown);
+            handler = null;
+        }
+    }
+
+
+    int delay = 10;
+    /**
+     *  launch next YouTube intent
+     */
+    void launchNextYouTubeIntent()
+    {
+        //System.out.println("MainActivity / _launchNextYouTubeIntent / MainFragment.currLinkId = " + MainFragment.currLinkId);
+        //System.out.println("MainActivity / _launchNextYouTubeIntent / MainFragment.getCurrLinksLength() = " + MainFragment.getCurrLinksLength());
+//        if(MainFragment.currLinkId >= MainFragment.getCurrLinksLength())
+        //refer: https://developer.android.com/reference/android/view/KeyEvent.html#KEYCODE_DPAD_DOWN_RIGHT
+
+        //todo temp mark, wait for adding page factor
+        // check if at the end of row
+//        if(MainFragment.currLinkId == 0)
+        if(getCurrentId() == 0)
+        {
+            // from test result current capability is shift left 15 steps only
+//            DPadAsyncTask task = new DPadAsyncTask(MainFragment.getCurrLinksLength());
+//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+        else
+        {
+            // delay
+            try {
+                Thread.sleep(delay*100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            BaseInputConnection mInputConnection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
+            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_RIGHT));
+            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_RIGHT));
+
+            // delay
+            try {
+                Thread.sleep(delay * 100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            //Util.openLink_YouTube(this,getYouTubeLink(),MovieList.REQUEST_CONTINUE_PLAY);
+        }
+
+        String video_url = getYouTubeLink();
+        String idStr = getYoutubeId(video_url);
+        //Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+        Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+        intent.putExtra("force_fullscreen", true);
+        intent.putExtra("finish_on_ended", true);
+        startActivityForResult(intent, YOUTUBE_LINK_INTENT);
+
+        // prepare next Id
+        setCurrentId(getCurrentId() + 1);
+    }
+
+    private class DPadAsyncTask extends AsyncTask<Void, Integer, Void> {
+        int dPadSteps;
+        DPadAsyncTask(int dPadSteps)
+        {
+            this.dPadSteps = dPadSteps;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            BaseInputConnection mInputConnection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
+
+            // point to first item of current row
+            for(int i=0;i<dPadSteps;i++)
+            {
+                mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT));
+                mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT));
+                try {
+                    Thread.sleep(delay);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            // add delay to make sure key event works
+            try {
+                Thread.sleep(delay * 100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // point to first row if meets the end of last row
+            //todo temp mark, wait for adding page factor
+//            if(MainFragment.currPageId == 0)
+            if(getCurrentId() == 0)
+            {
+//                for (int i = (MainFragment.getCurrPagesLength()-1); i >= 1; i--) {
+//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
+//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_UP));
+//                    try {
+//                        Thread.sleep(delay);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+            }
+            else
+            {
+                // point to next row
+                BaseInputConnection connection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
+                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
+                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_DOWN));
+            }
+
+            // add delay for viewer
+            try {
+                Thread.sleep(delay * 100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            //Util.openLink_YouTube(MainActivity.this,getYouTubeLink(),MovieList.REQUEST_CONTINUE_PLAY);
+        }
+    }
 
     @Override
     public void onResume() {
@@ -346,7 +588,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 mCategoryNames = new ArrayList<>();
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
-
                     int categoryIndex = data.getColumnIndex(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
                     String category_name = data.getString(categoryIndex);
                     System.out.println("MainFragment / _onLoadFinished / category_name = " + category_name);
@@ -383,7 +624,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     // Every time we have to re-get the category loader, we must re-create the sidebar.
                     mTitleRowAdapter.clear();
                 }
-
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
@@ -457,9 +697,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
             }
         } else {
-
             // data base is not created yet, call service for the first time
-                // Start an Intent to fetch the categories
+
+            // Start an Intent to fetch the categories
             if ((loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size() == 0)) {
                 Utils.setPref_focus_category_number(getActivity(), INIT_NUMBER);
 
@@ -550,9 +790,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 //todo case: no details
                 String idStr = getYoutubeId(((Video) item).videoUrl );
-                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                startActivity(intent);
+                //Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                intent.putExtra("force_fullscreen", true);
+                intent.putExtra("finish_on_ended", true);
+                startActivityForResult(intent,YOUTUBE_LINK_INTENT);
 
+                System.out.println("MainFragment / onItemClicked / id = "+ ((Video)(item)).id );
+                setCurrentId((int) ((Video)(item)).id );
             } else if (item instanceof String) {
 
                 // category selection click
@@ -604,18 +849,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 			        Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
 			        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
 			        startActivity(intent, bundle);
-                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
-                    Intent intent = new Intent(getActivity(), GuidedStepActivity.class);
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
-                    startActivity(intent, bundle);
-                } else if (((String) item).contains(getString(R.string.error_fragment))) {
-                    BrowseErrorFragment errorFragment = new BrowseErrorFragment();
-                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment).addToBackStack(null).commit();
-                } else if(((String) item).contains(getString(R.string.personal_settings))) {
-                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
-                    startActivity(intent, bundle);
-                } else {
+//                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
+//                    Intent intent = new Intent(getActivity(), GuidedStepActivity.class);
+//                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+//                    startActivity(intent, bundle);
+//                } else if (((String) item).contains(getString(R.string.error_fragment))) {
+//                    BrowseErrorFragment errorFragment = new BrowseErrorFragment();
+//                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment).addToBackStack(null).commit();
+//                } else if(((String) item).contains(getString(R.string.personal_settings))) {
+//                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+//                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+//                    startActivity(intent, bundle);
+//                } else {
                     //Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();
                 }
 
@@ -623,6 +868,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
+    // current id
+    static private int current_id;
+    static void setCurrentId(int id)
+    {
+        current_id = id;
+    }
+
+    static int getCurrentId()
+    {
+        return current_id;
+    }
     // get resource Identifier
     private int getResourceIdentifier(String bodyStr)
     {

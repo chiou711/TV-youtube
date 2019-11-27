@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.media.MediaMetadataRetriever;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -28,7 +29,11 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -167,4 +172,71 @@ public class Utils {
         String keyName = "current_category_number";
         pref.edit().remove(keyName).apply();
     }
+
+    public static boolean isTimeUp;
+    public static Timer longTimer;
+    static JsonAsync jsonAsyncTask;
+    // Get YouTube title
+    public static String getYouTubeTitle(String youtubeUrl)
+    {
+        URL embeddedURL = null;
+        if (youtubeUrl != null)
+        {
+            try {
+                embeddedURL = new URL("http://www.youtube.com/oembed?url=" +
+                        youtubeUrl + "&format=json");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        jsonAsyncTask = new JsonAsync();
+        jsonAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,embeddedURL);
+        isTimeUp = false;
+        setupLongTimeout(1000);
+
+        while(isEmptyString(jsonAsyncTask.title) && !isTimeUp)
+        {
+            //??? add time out?
+//    			System.out.print("?");
+        }
+        isTimeUp = true;
+        return jsonAsyncTask.title;
+    }
+
+    public synchronized static void setupLongTimeout(long timeout)
+    {
+        if(longTimer != null)
+        {
+            longTimer.cancel();
+            longTimer = null;
+        }
+
+        if(longTimer == null)
+        {
+            longTimer = new Timer();
+            longTimer.schedule(new TimerTask()
+            {
+                public void run()
+                {
+                    longTimer.cancel();
+                    longTimer = null;
+                    //do your stuff, i.e. finishing activity etc.
+                    isTimeUp = true;
+                }
+            }, timeout /*in milliseconds*/);
+        }
+    }
+
+    public static boolean isEmptyString(String str)
+    {
+        boolean empty = true;
+        if( str != null )
+        {
+            if(str.length() > 0 )
+                empty = false;
+        }
+        return empty;
+    }
+
 }
