@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 The Android Open Source Project
+ * Copyright (c) 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,21 +165,21 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //
-        System.out.println("MainFragment / _onActivityResult / requestCode = " + requestCode);
-        System.out.println("MainFragment / _onActivityResult / resultCode = " + resultCode);
+
         if(requestCode == YOUTUBE_LINK_INTENT) {
-            count = 3; // waiting time to next
+            count = 3; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
             String link = getYouTubeLink();
-            nextLinkTitle =  Utils.getYouTubeTitle(link);
+            nextLinkTitle =  getYouTubeTitle();//Utils.getYouTubeTitle(link);
 
-            countStr = "If not running, please press No within " + count + " seconds.";//TODO lcoale
+            countStr = getActivity().getString(R.string.play_countdown)+
+                              " " + count + " " +
+                              getActivity().getString(R.string.play_time_unit);
             countStr = countStr.replaceFirst("[0-9]",String.valueOf(count));
-            builder.setTitle("Continue running next link?")
-                    .setMessage(nextLinkTitle +"\n\n" + countStr)
-                    .setPositiveButton("No", new DialogInterface.OnClickListener()
+            builder.setTitle(getActivity().getString(R.string.play_next))
+                    .setMessage(getActivity().getString(R.string.play_4_spaces)+ nextLinkTitle +"\n\n" + countStr)
+                    .setPositiveButton(getActivity().getString(R.string.play_stop), new DialogInterface.OnClickListener()
                     {
                         @Override
                         public void onClick(DialogInterface dialog1, int which1)
@@ -204,12 +204,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     String getYouTubeLink()
     {
-        int next_pos = getCurrentId();
-        System.out.println("MainFragment / _onActivityResult / next_pos = " + next_pos);
-        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
-        SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
-        int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
-        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+         int next_pos = getCurrentId();
+         System.out.println("MainFragment / _getYouTubeLink / next_pos = " + next_pos);
+         DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+         int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
+         Cursor cursor = mOpenHelper.getReadableDatabase().query(
                 VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCategoryNumber)),
                 null,//projection,
                 null,//selection,
@@ -217,15 +217,41 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 null,
                 null,
                 null//sortOrder
-        );
+         );
 
-        int videoUrl_index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL);
-        cursor.moveToPosition((int) next_pos);
-        String video_url = cursor.getString(videoUrl_index);
-        cursor.close();
-        sqlDb.close();
+         int videoUrl_index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL);
+         cursor.moveToPosition((int) next_pos);
+         String video_url = cursor.getString(videoUrl_index);
+         cursor.close();
+         sqlDb.close();
 
-        return video_url;
+         return video_url;
+    }
+
+    String getYouTubeTitle()
+    {
+         int next_pos = getCurrentId();
+         System.out.println("MainFragment / _getYouTubeTitle / next_pos = " + next_pos);
+         DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+         int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
+         Cursor cursor = mOpenHelper.getReadableDatabase().query(
+                VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCategoryNumber)),
+                null,//projection,
+                null,//selection,
+                null,//selectionArgs,
+                null,
+                null,
+                null//sortOrder
+         );
+
+         int index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_NAME);
+         cursor.moveToPosition((int) next_pos);
+         String video_title = cursor.getString(index);
+         cursor.close();
+         sqlDb.close();
+
+         return video_title;
     }
 
     /**
@@ -236,9 +262,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             // show count down
             TextView messageView = (TextView) alertDlg.findViewById(android.R.id.message);
             count--;
-            countStr = "If not running, please press No within " + count + " seconds.";//TODO locale
+            countStr = getActivity().getString(R.string.play_countdown)+
+                                " " + count + " " +
+                              getActivity().getString(R.string.play_time_unit);
             countStr = countStr.replaceFirst("[0-9]",String.valueOf(count));
-            messageView.setText(nextLinkTitle + "\n\n" +countStr);
+            messageView.setText( getActivity().getString(R.string.play_4_spaces)+ nextLinkTitle +"\n\n" +countStr);
 
             if(count>0)
                 handler.postDelayed(runCountDown,1000);
@@ -300,8 +328,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            //Util.openLink_YouTube(this,getYouTubeLink(),MovieList.REQUEST_CONTINUE_PLAY);
         }
 
         String video_url = getYouTubeLink();
@@ -869,16 +895,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // current id
-    static private int current_id;
-    static void setCurrentId(int id)
+    private int current_id;
+    private void setCurrentId(int id)
     {
         current_id = id;
     }
 
-    static int getCurrentId()
+    private int getCurrentId()
     {
         return current_id;
     }
+
     // get resource Identifier
     private int getResourceIdentifier(String bodyStr)
     {

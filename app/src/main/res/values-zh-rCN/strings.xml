@@ -163,9 +163,9 @@
     <string name="pref_title_login">Login</string>
     <string name="playback_tag">PLAYBACK_TAG</string>
     <!-- dialog    -->
-    <string name="play_next">Play next:</string>
-    <string name="play_countdown">Countdown:</string>
-    <string name="play_time_unit">seconds</string>
-    <string name="play_stop">Stop</string>
+    <string name="play_next">接下来播放:</string>
+    <string name="play_countdown">倒数:</string>
+    <string name="play_time_unit">秒</string>
+    <string name="play_stop">停止</string>
     <string name="play_4_spaces">"    "</string>
 </resources>
