@@ -113,7 +113,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     // workaround for keeping 1. cursor position 2. correct rows after Refresh
     private int rowsLoadedCount;
     private FetchServiceResponseReceiver responseReceiver;
-    LocalBroadcastManager localBroadcastMgr;
+    private LocalBroadcastManager localBroadcastMgr;
 
     @Override
     public void onAttach(Context context) {
@@ -153,6 +153,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
+	    mPages = new ArrayList<>();
+
+	    setTotalLinksCount();
     }
 
     AlertDialog.Builder builder;
@@ -166,17 +169,33 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // check pages size, links size and video Id
+//	    int pagesSize = mPages.size();
+//	    System.out.println("pagesSize = " + pagesSize);
+//	    for(int i=0;i<pagesSize;i++)
+//	    {
+//	    	List page = mPages.get(i);
+//	    	int linksSize = page.size();
+//		    System.out.println("linksSize = " +linksSize);
+//	    	for(int j=0;j<linksSize;j++)
+//		    {
+//		    	System.out.println("video id = " + page.get(j));
+//		    }
+//	    }
+
         if(requestCode == YOUTUBE_LINK_INTENT) {
-            count = 3; // countdown time to play next
+            count = 4; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
-            String link = getYouTubeLink();
-            nextLinkTitle =  getYouTubeTitle();//Utils.getYouTubeTitle(link);
+            setPlayId(getNewId());
+
+            nextLinkTitle =  getYouTubeTitle();
 
             countStr = getActivity().getString(R.string.play_countdown)+
                               " " + count + " " +
                               getActivity().getString(R.string.play_time_unit);
             countStr = countStr.replaceFirst("[0-9]",String.valueOf(count));
+
             builder.setTitle(getActivity().getString(R.string.play_next))
                     .setMessage(getActivity().getString(R.string.play_4_spaces)+ nextLinkTitle +"\n\n" + countStr)
                     .setPositiveButton(getActivity().getString(R.string.play_stop), new DialogInterface.OnClickListener()
@@ -202,56 +221,75 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    String getYouTubeLink()
+    private String getYouTubeLink()
     {
-         int next_pos = getCurrentId();
-         System.out.println("MainFragment / _getYouTubeLink / next_pos = " + next_pos);
-         DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
-         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
-         int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
-         Cursor cursor = mOpenHelper.getReadableDatabase().query(
-                VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCategoryNumber)),
-                null,//projection,
-                null,//selection,
-                null,//selectionArgs,
-                null,
-                null,
-                null//sortOrder
-         );
+        int focusCatNum = Utils.getPref_focus_category_number(getActivity());
+        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        String columnName = VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL;
+        int pos = getPlayId()-1;
+        System.out.println("MainFragment / _getYouTubeLink / pos = " + pos);
 
-         int videoUrl_index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL);
-         cursor.moveToPosition((int) next_pos);
-         String video_url = cursor.getString(videoUrl_index);
-         cursor.close();
-         sqlDb.close();
-
-         return video_url;
+        return getDB_data(table,columnName,pos);
     }
 
-    String getYouTubeTitle()
+    private String getYouTubeTitle()
     {
-         int next_pos = getCurrentId();
-         System.out.println("MainFragment / _getYouTubeTitle / next_pos = " + next_pos);
-         DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
-         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
-         int focusCategoryNumber = Utils.getPref_focus_category_number(getActivity());
-         Cursor cursor = mOpenHelper.getReadableDatabase().query(
-                VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCategoryNumber)),
+        int focusCatNum = Utils.getPref_focus_category_number(getActivity());
+        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        String columnName = VideoContract_yt.VideoEntry.COLUMN_NAME;
+        int pos = getPlayId()-1;
+        System.out.println("MainFragment / _getYouTubeTitle / pos = " + pos);
+
+        return getDB_data(table,columnName,pos);
+    }
+
+    private String getDB_data(String table,String columnName,int pos)
+    {
+        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+                table,
                 null,//projection,
                 null,//selection,
                 null,//selectionArgs,
                 null,
                 null,
                 null//sortOrder
-         );
+        );
 
-         int index = cursor.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_NAME);
-         cursor.moveToPosition((int) next_pos);
-         String video_title = cursor.getString(index);
-         cursor.close();
-         sqlDb.close();
+        int index = cursor.getColumnIndex(columnName);
+        cursor.moveToPosition((int) pos);
+        String retData = cursor.getString(index);
+        cursor.close();
+        sqlDb.close();
 
-         return video_title;
+        return retData;
+    }
+
+    private int totalLinksCount;
+    void setTotalLinksCount()
+    {
+        int focusCatNum = Utils.getPref_focus_category_number(getActivity());
+        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+
+        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+                table,
+                null,//projection,
+                null,//selection,
+                null,//selectionArgs,
+                null,
+                null,
+                null//sortOrder
+        );
+
+        totalLinksCount = cursor.getCount();
+    }
+
+    int getTotalLinksCount()
+    {
+        return totalLinksCount;
     }
 
     /**
@@ -275,7 +313,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 // launch next intent
                 alertDlg.dismiss();
                 cancelYouTubeHandler();
-                launchNextYouTubeIntent();
+                launchYouTubeIntent();
+
+                // prepare next Id
+                setNewId(getPlayId() + 1);
             }
         }
     };
@@ -293,21 +334,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     /**
      *  launch next YouTube intent
      */
-    void launchNextYouTubeIntent()
+    private void launchYouTubeIntent()
     {
-        //System.out.println("MainActivity / _launchNextYouTubeIntent / MainFragment.currLinkId = " + MainFragment.currLinkId);
-        //System.out.println("MainActivity / _launchNextYouTubeIntent / MainFragment.getCurrLinksLength() = " + MainFragment.getCurrLinksLength());
 //        if(MainFragment.currLinkId >= MainFragment.getCurrLinksLength())
         //refer: https://developer.android.com/reference/android/view/KeyEvent.html#KEYCODE_DPAD_DOWN_RIGHT
 
         //todo temp mark, wait for adding page factor
         // check if at the end of row
-//        if(MainFragment.currLinkId == 0)
-        if(getCurrentId() == 0)
+        if(isRowEnd())
         {
             // from test result current capability is shift left 15 steps only
-//            DPadAsyncTask task = new DPadAsyncTask(MainFragment.getCurrLinksLength());
-//            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            DPadAsyncTask task = new DPadAsyncTask(backSteps);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
         else
         {
@@ -328,18 +366,21 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            String video_url = getYouTubeLink();
+
+            startYouTubeIntent(video_url);
         }
 
-        String video_url = getYouTubeLink();
-        String idStr = getYoutubeId(video_url);
+    }
+
+    private void startYouTubeIntent(String url)
+    {
+        String idStr = getYoutubeId(url);
         //Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
         Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
         intent.putExtra("force_fullscreen", true);
         intent.putExtra("finish_on_ended", true);
         startActivityForResult(intent, YOUTUBE_LINK_INTENT);
-
-        // prepare next Id
-        setCurrentId(getCurrentId() + 1);
     }
 
     private class DPadAsyncTask extends AsyncTask<Void, Integer, Void> {
@@ -362,6 +403,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             // point to first item of current row
             for(int i=0;i<dPadSteps;i++)
             {
+                System.out.println("MainFragment / DPadAsyncTask / back i = " + i);
                 mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT));
                 mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT));
                 try {
@@ -381,7 +423,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             // point to first row if meets the end of last row
             //todo temp mark, wait for adding page factor
 //            if(MainFragment.currPageId == 0)
-            if(getCurrentId() == 0)
+            if(getPlayId() == 0)
             {
 //                for (int i = (MainFragment.getCurrPagesLength()-1); i >= 1; i--) {
 //                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
@@ -415,8 +457,38 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
             //Util.openLink_YouTube(MainActivity.this,getYouTubeLink(),MovieList.REQUEST_CONTINUE_PLAY);
+            String video_url = getYouTubeLink();
+            String idStr = getYoutubeId(video_url);
+            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+            intent.putExtra("force_fullscreen", true);
+            intent.putExtra("finish_on_ended", true);
+            startActivityForResult(intent, YOUTUBE_LINK_INTENT);
         }
     }
+
+    int backSteps;
+
+    boolean isRowEnd()
+    {
+        boolean isEnd = false;
+        System.out.println("isRowEnd / getNewId() = " + getNewId());
+        backSteps = 0;
+
+        for(int i=0;i<mPages.size();i++) {
+            List<Integer> page = mPages.get(i);
+            int firstIdOfRow = page.get(0);
+            System.out.println("isRowEnd / firstIdOfRow = " + firstIdOfRow);
+
+            if(firstIdOfRow == getNewId()) {
+                isEnd = true;
+                backSteps = mPages.get(i).size();
+                break;
+            }
+        }
+        System.out.println("isRowEnd / backSteps = " + backSteps);
+        return isEnd;
+    }
+
 
     @Override
     public void onResume() {
@@ -579,7 +651,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         } else {
             // Assume it is for a video.
             String title = args.getString(VideoContract_yt.VideoEntry.COLUMN_TITLE);
-
+            System.out.println("MainFragment / _onCreateLoader / title = "+ title);
             // This just creates a CursorLoader that gets all videos.
             return new CursorLoader(
                     getContext(),
@@ -592,6 +664,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
+    List<List> mPages;
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         System.out.println("MainFragment / _onLoadFinished");
@@ -653,13 +726,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
-
                     int titleIndex = data.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_TITLE);
                     String title = data.getString(titleIndex);
+                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
                     // Create header for this category.
                     HeaderItem header = new HeaderItem(title);
-                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
                     int videoLoaderId = title.hashCode(); // Create unique int from title.
                     CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);
@@ -717,6 +789,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
+
+                int columnIndex = data.getColumnIndex(VideoContract_yt.VideoEntry._ID);
+                int video_id = data.getInt(columnIndex);
+                System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
+                int sizeOfRowLinks = data.getCount();
+	            System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
+
+	            List<Integer> page = new ArrayList<>();
+	            for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)
+	                page.add(i);
+
+	            mPages.add(page);
 
                 // one row added
                 rowsLoadedCount++;
@@ -815,15 +899,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                getActivity().startActivity(intent, bundle);
 
                 //todo case: no details
-                String idStr = getYoutubeId(((Video) item).videoUrl );
-                //Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-                intent.putExtra("force_fullscreen", true);
-                intent.putExtra("finish_on_ended", true);
-                startActivityForResult(intent,YOUTUBE_LINK_INTENT);
+                setPlayId((int) ((Video)(item)).id );
+
+                startYouTubeIntent(((Video) item).videoUrl );
 
                 System.out.println("MainFragment / onItemClicked / id = "+ ((Video)(item)).id );
-                setCurrentId((int) ((Video)(item)).id );
+                setNewId(getPlayId()+1);
             } else if (item instanceof String) {
 
                 // category selection click
@@ -894,16 +975,32 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    // current id
-    private int current_id;
-    private void setCurrentId(int id)
+    // play id
+    private int play_id;
+    private void setPlayId(int id)
     {
-        current_id = id;
+        play_id = id;
     }
 
-    private int getCurrentId()
+    private int getPlayId()
     {
-        return current_id;
+        return play_id;
+    }
+
+
+    // new id
+    private int new_id;
+    private void setNewId(int id)
+    {
+        if(id > getTotalLinksCount())
+            new_id = 1;
+        else
+            new_id = id;
+    }
+
+    private int getNewId()
+    {
+        return new_id;
     }
 
     // get resource Identifier
