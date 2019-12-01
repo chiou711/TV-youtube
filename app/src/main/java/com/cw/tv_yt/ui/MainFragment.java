@@ -370,7 +370,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             startYouTubeIntent(video_url);
         }
-
     }
 
     private void startYouTubeIntent(String url)
@@ -422,18 +421,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             // point to first row if meets the end of last row
             //todo temp mark, wait for adding page factor
-//            if(MainFragment.currPageId == 0)
-            if(getPlayId() == 0)
+            if(getPlayId() == 1)
             {
-//                for (int i = (MainFragment.getCurrPagesLength()-1); i >= 1; i--) {
-//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
-//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_UP));
-//                    try {
-//                        Thread.sleep(delay);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                  for (int i = (mPages.size()-1); i >= 1; i--) {
+                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
+                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_UP));
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             else
             {
@@ -478,10 +476,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             List<Integer> page = mPages.get(i);
             int firstIdOfRow = page.get(0);
             System.out.println("isRowEnd / firstIdOfRow = " + firstIdOfRow);
+            System.out.println("isRowEnd / getNewId() = " + getNewId());
 
             if(firstIdOfRow == getNewId()) {
                 isEnd = true;
-                backSteps = mPages.get(i).size();
+                if(getNewId() == 1)
+                    backSteps = mPages.get(mPages.size()-1).size();
+                else
+                    backSteps = mPages.get(i-1).size();
+
                 break;
             }
         }
