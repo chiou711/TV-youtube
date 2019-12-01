@@ -184,7 +184,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //	    }
 
         if(requestCode == YOUTUBE_LINK_INTENT) {
-            count = 4; // countdown time to play next
+            count = 3; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
             setPlayId(getNewId());
@@ -267,7 +267,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     private int totalLinksCount;
-    void setTotalLinksCount()
+    private void setTotalLinksCount()
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
         String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
@@ -287,7 +287,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         totalLinksCount = cursor.getCount();
     }
 
-    int getTotalLinksCount()
+    private int getTotalLinksCount()
     {
         return totalLinksCount;
     }
@@ -366,8 +366,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            String video_url = getYouTubeLink();
 
+            String video_url = getYouTubeLink();
             startYouTubeIntent(video_url);
         }
     }
@@ -454,19 +454,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         @Override
         protected void onPostExecute(Void result) {
             super.onPostExecute(result);
-            //Util.openLink_YouTube(MainActivity.this,getYouTubeLink(),MovieList.REQUEST_CONTINUE_PLAY);
+
             String video_url = getYouTubeLink();
-            String idStr = getYoutubeId(video_url);
-            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-            intent.putExtra("force_fullscreen", true);
-            intent.putExtra("finish_on_ended", true);
-            startActivityForResult(intent, YOUTUBE_LINK_INTENT);
+            startYouTubeIntent(video_url);
         }
     }
 
-    int backSteps;
+    private int backSteps;
 
-    boolean isRowEnd()
+    private boolean isRowEnd()
     {
         boolean isEnd = false;
         System.out.println("isRowEnd / getNewId() = " + getNewId());
@@ -475,15 +471,20 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         for(int i=0;i<mPages.size();i++) {
             List<Integer> page = mPages.get(i);
             int firstIdOfRow = page.get(0);
+            System.out.println("isRowEnd / i = " + i);
             System.out.println("isRowEnd / firstIdOfRow = " + firstIdOfRow);
             System.out.println("isRowEnd / getNewId() = " + getNewId());
 
             if(firstIdOfRow == getNewId()) {
                 isEnd = true;
-                if(getNewId() == 1)
-                    backSteps = mPages.get(mPages.size()-1).size();
-                else
-                    backSteps = mPages.get(i-1).size();
+                if(getNewId() == 1) {
+                    // back steps for last row or 1st row
+                    backSteps = mPages.get(mPages.size() - 1).size() - 1;
+                }
+                else if(i != 0) {
+                    // back steps for other row
+                    backSteps = mPages.get(i - 1).size() - 1;
+                }
 
                 break;
             }
