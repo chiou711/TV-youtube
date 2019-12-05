@@ -47,6 +47,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.cw.tv_yt.BuildConfig;
+import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
@@ -221,20 +222,22 @@ public class SearchFragment extends SearchSupportFragment
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-//                Video video = (Video) item;
-//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
-//
-//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                        getActivity(),
-//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-//                getActivity().startActivity(intent, bundle);
+                Video video = (Video) item;
 
-                //todo case: no details
-                String idStr = getYoutubeId(((Video) item).videoUrl );
-                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                startActivity(intent);
+                if(Define.hasDetails) {
+                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
+
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            getActivity(),
+                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                            VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                    getActivity().startActivity(intent, bundle);
+                } else {
+                    String idStr = getYoutubeId(video.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                    startActivity(intent);
+                }
 
             } else {
                 Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();

@@ -39,6 +39,7 @@ import androidx.leanback.app.BrowseSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.CursorObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
+import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
@@ -66,6 +67,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data_yt.DbHelper_yt;
@@ -897,24 +899,24 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-                //todo case: with details
-//                Video video = (Video) item;
-//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
-//
-//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                        getActivity(),
-//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-//                getActivity().startActivity(intent, bundle);
+                Video video = (Video) item;
+                System.out.println("MainFragment / onItemClicked / id = "+ video.id );
 
-                //todo case: no details
-                setPlayId((int) ((Video)(item)).id );
+                if(Define.hasDetails) {
+                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
 
-                startYouTubeIntent(((Video) item).videoUrl );
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            getActivity(),
+                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                            VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                    getActivity().startActivity(intent, bundle);
+                } else {
+                    setPlayId((int) ((Video)(item)).id );
+                    startYouTubeIntent(((Video) item).videoUrl );
+                    setNewId(getPlayId()+1);
+                }
 
-                System.out.println("MainFragment / onItemClicked / id = "+ ((Video)(item)).id );
-                setNewId(getPlayId()+1);
             } else if (item instanceof String) {
 
                 // category selection click

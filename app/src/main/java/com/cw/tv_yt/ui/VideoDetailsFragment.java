@@ -61,12 +61,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.presenter.DetailsDescriptionPresenter;
+import com.cw.tv_yt.data_yt.VideoContract_yt;
 import com.google.android.youtube.player.YouTubeIntents;
 
 import static com.cw.tv_yt.Utils.getYoutubeId;
@@ -150,7 +152,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
             String videoId = intentData.getLastPathSegment();
 
             Bundle args = new Bundle();
-            args.putString(VideoContract.VideoEntry._ID, videoId);
+            args.putString(VideoContract_yt.VideoEntry._ID, videoId);
             getLoaderManager().initLoader(mGlobalSearchVideoId++, args, this);
             return true;
         }
@@ -231,24 +233,27 @@ public class VideoDetailsFragment extends DetailsSupportFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case RELATED_VIDEO_LOADER: {
-                String category = args.getString(VideoContract.VideoEntry.COLUMN_CATEGORY);
+                String category = args.getString(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
+                System.out.println("VideoDetailsFragment / _onCreateLoader / category = " + category);
                 return new CursorLoader(
                         getActivity(),
                         VideoContract.VideoEntry.CONTENT_URI,
                         null,
-                        VideoContract.VideoEntry.COLUMN_CATEGORY + " = ?",
+                        VideoContract_yt.VideoEntry.COLUMN_TITLE + " = ?",
                         new String[]{category},
                         null
                 );
+
             }
             default: {
                 // Loading video from global search.
-                String videoId = args.getString(VideoContract.VideoEntry._ID);
+                String videoId = args.getString(VideoContract_yt.VideoEntry._ID);
+                System.out.println("VideoDetailsFragment / _onCreateLoader / videoId = " + videoId);
                 return new CursorLoader(
                         getActivity(),
-                        VideoContract.VideoEntry.CONTENT_URI,
+                        VideoContract_yt.VideoEntry.CONTENT_URI,
                         null,
-                        VideoContract.VideoEntry._ID + " = ?",
+                        VideoContract_yt.VideoEntry._ID + " = ?",
                         new String[]{videoId},
                         null
                 );
@@ -371,7 +376,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         String category = mSelectedVideo.category;
 
         Bundle args = new Bundle();
-        args.putString(VideoContract.VideoEntry.COLUMN_CATEGORY, category);
+        args.putString(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME, category);
         getLoaderManager().initLoader(RELATED_VIDEO_LOADER, args, this);
 
         HeaderItem header = new HeaderItem(0, subcategories[0]);
@@ -384,20 +389,21 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
-//                Video video = (Video) item;
-//                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-//                intent.putExtra(VideoDetailsActivity.VIDEO, video);
-//
-//                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                        getActivity(),
-//                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-//                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-//                getActivity().startActivity(intent, bundle);
+                Video video = (Video) item;
+                if(Define.hasDetails) {
+                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
 
-                //todo run YouTube
-                String idStr = getYoutubeId(((Video) item).videoUrl );
-                Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                startActivity(intent);
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            getActivity(),
+                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                            VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                    getActivity().startActivity(intent, bundle);
+                } else {
+                    String idStr = getYoutubeId(video.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                    startActivity(intent);
+                }
             }
         }
     }

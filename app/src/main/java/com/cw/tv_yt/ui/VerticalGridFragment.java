@@ -35,11 +35,15 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import android.view.View;
 
+import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
+import com.google.android.youtube.player.YouTubeIntents;
+
+import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
 
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
@@ -123,16 +127,25 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
 
             if (item instanceof Video) {
+                System.out.println("VerticalGridFragment /  _onItemClicked");
                 Video video = (Video) item;
 
-                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+                if(Define.hasDetails) {
+                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                            getActivity(),
+                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                            VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                    getActivity().startActivity(intent, bundle);
+                } else {
+                    String idStr = getYoutubeId(video.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                    intent.putExtra("force_fullscreen", true);
+                    intent.putExtra("finish_on_ended", true);
+                    startActivity(intent);
+                }
 
-                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
-                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                getActivity().startActivity(intent, bundle);
             }
         }
     }
