@@ -66,7 +66,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
  */
 public class SelectCategoryFragment extends VerticalGridSupportFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    private static final String TAG = "Select links";
+    private static final String TAG = "Select category";
     private static final int NUM_COLUMNS = 5;
 
     private static class Adapter extends ArrayObjectAdapter {

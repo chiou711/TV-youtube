@@ -76,7 +76,8 @@ public class SplashScreen extends Activity {
 
 			// HTTPS POST
 			String project = "LiteNote";
-			String urlStr =  "https://" + project + ".ddns.net:8443/"+ project +"Web/client/viewNote_json.jsp";
+//			String urlStr =  "https://" + project + ".ddns.net:8443/"+ project +"Web/client/viewNote_json.jsp";
+			String urlStr =  "https://www.google.com";
 
 			try {
 				URL url = new URL(urlStr);

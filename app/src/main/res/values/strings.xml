@@ -168,4 +168,6 @@
     <string name="play_time_unit">seconds</string>
     <string name="play_stop">Stop</string>
     <string name="play_4_spaces">"    "</string>
+    <!-- update -->
+    <string name="database_update">Update database</string>
 </resources>

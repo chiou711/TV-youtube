@@ -168,4 +168,6 @@
     <string name="play_time_unit">秒</string>
     <string name="play_stop">停止</string>
     <string name="play_4_spaces">"    "</string>
+    <!-- update -->
+    <string name="database_update">更新數據庫</string>
 </resources>

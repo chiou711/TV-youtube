@@ -60,6 +60,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -668,7 +669,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    List<List> mPages;
+    private List<List> mPages;
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         System.out.println("MainFragment / _onLoadFinished");
@@ -811,7 +812,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
             }
         } else {
-            // data base is not created yet, call service for the first time
+            /***
+             *  call fetch service to load or update data base
+             */
+
+            // show toast
+            Toast.makeText(getActivity(),getString(R.string.database_update),Toast.LENGTH_LONG).show();
 
             // Start an Intent to fetch the categories
             if ((loader.getId() == CATEGORY_LOADER) && (mCategoryNames.size() == 0)) {
