@@ -42,42 +42,9 @@
     <string name="no_search_results">No search results found for \'%1$s\'</string>
 
     <string name="catalog_url_1">
-        <!--https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/9eacbb889060c31741b45b5c21f47f2899d6e467/youtube_list_1.json-->
-        <!--https://gist.githubusercontent.com/chiou711/b03f0234f33db82bc9b3f9bacfee81de/raw/a6960c6e8d6fb697996e3d3af82ba79e41cb3369/youtube_list_1.json-->
-        <!--https://my.pcloud.com/publink/show?code=XZtjxI7ZGn1qVLT6EpmF3fMOjcBh3yFatTEy-->
-        <!--https://filedn.com/lq5OTNf0dGLJYNRmXvMCsIh/files/youtube_list_1.json-->
-        <!--https://drive.google.com/open?id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F- -->
-        <!--https://drive.google.com/file/d/1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F- -->
         https://drive.google.com/uc?export=download&amp;id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F-
     </string>
 
-    <string name="catalog_url_2">
-        https://drive.google.com/uc?export=download&amp;id=1f2lrfddu7IlZw60vbSlkvm0ZGYDCPVVc
-    </string>
-
-    <string name="catalog_url_3">
-        https://drive.google.com/uc?export=download&amp;id=1Cy_GhptCs1PA2nduwDLRK2S8tMszKqc8
-    </string>
-
-    <string name="catalog_url_4">
-        https://drive.google.com/uc?export=download&amp;id=1_RhQfJgkF_AlD3sUEMJ0nih-m-bGQLzH
-    </string>
-
-    <string name="catalog_url_5">
-        https://drive.google.com/uc?export=download&amp;id=1XyPVZDU3jzLQ4_IvfjGrDhyZTA7ow6xp
-    </string>
-
-    <string name="catalog_url_6">
-        https://drive.google.com/uc?export=download&amp;id=1XhjEiByWTzWrzYs9ouAVKaJnZbS19Vr1
-    </string>
-
-    <string name="catalog_url_7">
-        https://drive.google.com/uc?export=download&amp;id=1Hm3-8lk6IuM7LESOrAhRoVGlLAHF1q7G
-    </string>
-
-    <string name="catalog_url_8">
-        https://drive.google.com/uc?export=download&amp;id=1jWESR4LEzoXKRpDR47Q94FDLLZaeaEtO
-    </string>
     <!-- Error messages -->
 
     <string name="videos_loading_error">Failed to load videos. Please check your network connection.</string>

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.data_yt;
+package com.cw.tv_yt.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.cw.tv_yt.data_yt.VideoContract_yt.VideoEntry;
+import com.cw.tv_yt.data.VideoContract.VideoEntry;
 
 /**
  * VideoDbHelper manages the creation and upgrade of the database used in this sample.
  */
-public class DbHelper_yt extends SQLiteOpenHelper {
+public class DbHelper extends SQLiteOpenHelper {
 
     // Change this when you change the database schema.
     private static final int DATABASE_VERSION = 4;
@@ -33,14 +33,14 @@ public class DbHelper_yt extends SQLiteOpenHelper {
     // The name of our database.
     public static final String DATABASE_NAME = "tv_yt.db";
 
-    public DbHelper_yt(Context context) {
+    public DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        System.out.println("DbHelper_yt / constructor");
+        System.out.println("DbHelper / constructor");
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        System.out.println("DbHelper_yt / _onCreate (will create video1 table)");
+        System.out.println("DbHelper / _onCreate (will create video1 table)");
 
         //todo temp
         // Create a table to hold videos.
@@ -70,8 +70,8 @@ public class DbHelper_yt extends SQLiteOpenHelper {
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_VIDEO_TABLE);
 
-        System.out.println("DbHelper_yt / _onCreate (will create category table)");
-        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract_yt.CategoryEntry.TABLE_NAME + " (" +
+        System.out.println("DbHelper / _onCreate (will create category table)");
+        final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.CategoryEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 "category_name" + " TEXT NOT NULL " +
                 " );";

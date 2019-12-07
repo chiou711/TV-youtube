@@ -34,11 +34,11 @@ import android.widget.TextView;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data_yt.DbHelper_yt;
-import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
-import com.cw.tv_yt.data_yt.FetchVideoService_yt;
-import com.cw.tv_yt.data_yt.VideoContract_yt;
-import com.cw.tv_yt.data_yt.VideoProvider_yt;
+import com.cw.tv_yt.data.DbHelper;
+import com.cw.tv_yt.data.FetchCategoryService;
+import com.cw.tv_yt.data.FetchVideoService;
+import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.data.VideoProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +97,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
 	    mLoaderManager.initLoader(CATEGORY_LOADER, null, this);
 
 	    // receiver for fetch category service
-	    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService_yt.Constants.BROADCAST_ACTION);
+	    IntentFilter statusIntentFilter = new IntentFilter(FetchCategoryService.Constants.BROADCAST_ACTION);
 	    responseReceiver = new FetchServiceResponseReceiver();
 
 	    // Registers the FetchCategoryResponseReceiver and its intent filters
@@ -129,7 +129,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
         setupFragment();
 
         // get video tables count
-        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        DbHelper mOpenHelper = new DbHelper(getActivity());
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
         String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
@@ -145,13 +145,13 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
 
-        System.out.println("SelectCategoryFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract_yt.CategoryEntry.CONTENT_URI);
+        System.out.println("SelectCategoryFragment / _onCreateLoader / id == CATEGORY_LOADER / CategoryContract.CategoryEntry.CONTENT_URI =" + VideoContract.CategoryEntry.CONTENT_URI);
 
         // id = CATEGORY_LOADER
         return new CursorLoader(
 		        getContext(),
-		        VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
-		        new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+		        VideoContract.CategoryEntry.CONTENT_URI, // Table to query
+		        new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
 		        // Only categories
 		        null, // No selection clause
 		        null, // No selection arguments
@@ -174,7 +174,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
 
-                    int categoryIndex = data.getColumnIndex(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
+                    int categoryIndex = data.getColumnIndex(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME);
                     String category_name = data.getString(categoryIndex);
                     System.out.println("SelectCategoryFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
@@ -197,7 +197,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
 	        int id = getActivity().getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
 	        String default_url = getString(id);
 
-            Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+            Intent serviceIntent = new Intent(getActivity(), FetchCategoryService.class);
             serviceIntent.putExtra("FetchUrl", default_url);
             getActivity().startService(serviceIntent);
         }
@@ -318,16 +318,16 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
         // delete database
         try {
             System.out.println("SelectCategoryFragment / _startFetchService / will delete DB");
-            getActivity().deleteDatabase(DbHelper_yt.DATABASE_NAME);
+            getActivity().deleteDatabase(DbHelper.DATABASE_NAME);
 
             ContentResolver resolver = getActivity().getContentResolver();
-            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
-            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
+            VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
 
             provider.mContentResolver = resolver;
             provider.mOpenHelper.close();
 
-            provider.mOpenHelper = new DbHelper_yt(getActivity());
+            provider.mOpenHelper = new DbHelper(getActivity());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();
@@ -344,7 +344,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
         String default_url = getString(id);
 
         System.out.println("SelectCategoryFragment / _startFetchService / will start Fetch category service");
-        Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+        Intent serviceIntent = new Intent(getActivity(), FetchCategoryService.class);
         serviceIntent.putExtra("FetchUrl", default_url);
         getActivity().startService(serviceIntent);
 
@@ -360,7 +360,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
              */
 
             // for fetch category
-            String statusStr1 = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            String statusStr1 = intent.getExtras().getString(FetchCategoryService.Constants.EXTENDED_DATA_STATUS);
             if((statusStr1 != null) && statusStr1.equalsIgnoreCase("FetchCategoryServiceIsDone"))
             {
                 if (context != null) {
@@ -372,14 +372,14 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
                     String default_url = getString(id);
 
                     System.out.println("SelectCategoryFragment / _FetchServiceResponseReceiver / will start Fetch video service");
-                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+                    Intent serviceIntent = new Intent(getActivity(), FetchVideoService.class);
                     serviceIntent.putExtra("FetchUrl", default_url);
                     getActivity().startService(serviceIntent);
                 }
             }
 
             // for fetch video service
-            String statusStr2 = intent.getExtras().getString(FetchVideoService_yt.Constants.EXTENDED_DATA_STATUS);
+            String statusStr2 = intent.getExtras().getString(FetchVideoService.Constants.EXTENDED_DATA_STATUS);
             if((statusStr2 != null ) && statusStr2.equalsIgnoreCase("FetchVideoServiceIsDone"))
             {
                 if (context != null) {

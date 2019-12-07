@@ -70,11 +70,11 @@ import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data_yt.DbHelper_yt;
-import com.cw.tv_yt.data_yt.FetchCategoryService_yt;
-import com.cw.tv_yt.data_yt.FetchVideoService_yt;
-import com.cw.tv_yt.data_yt.VideoContract_yt;
-import com.cw.tv_yt.data_yt.VideoProvider_yt;
+import com.cw.tv_yt.data.DbHelper;
+import com.cw.tv_yt.data.FetchCategoryService;
+import com.cw.tv_yt.data.FetchVideoService;
+import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -227,8 +227,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private String getYouTubeLink()
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
-        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
-        String columnName = VideoContract_yt.VideoEntry.COLUMN_VIDEO_URL;
+        String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        String columnName = VideoContract.VideoEntry.COLUMN_VIDEO_URL;
         int pos = getPlayId()-1;
         System.out.println("MainFragment / _getYouTubeLink / pos = " + pos);
 
@@ -238,8 +238,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private String getYouTubeTitle()
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
-        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
-        String columnName = VideoContract_yt.VideoEntry.COLUMN_NAME;
+        String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        String columnName = VideoContract.VideoEntry.COLUMN_NAME;
         int pos = getPlayId()-1;
         System.out.println("MainFragment / _getYouTubeTitle / pos = " + pos);
 
@@ -248,7 +248,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     private String getDB_data(String table,String columnName,int pos)
     {
-        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        DbHelper mOpenHelper = new DbHelper(getActivity());
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
         Cursor cursor = mOpenHelper.getReadableDatabase().query(
                 table,
@@ -273,8 +273,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private void setTotalLinksCount()
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
-        String table = VideoContract_yt.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
-        DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+        String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
+        DbHelper mOpenHelper = new DbHelper(getActivity());
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
         Cursor cursor = mOpenHelper.getReadableDatabase().query(
@@ -504,7 +504,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         System.out.println("MainFragment / _onResume");
 
         // receiver for fetch video service
-        IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService_yt.Constants.BROADCAST_ACTION);
+        IntentFilter statusIntentFilter = new IntentFilter(FetchVideoService.Constants.BROADCAST_ACTION);
         responseReceiver = new FetchServiceResponseReceiver();
 
         // Registers the FetchServiceResponseReceiver and its intent filters
@@ -635,8 +635,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         if (id == CATEGORY_LOADER) {
             return new CursorLoader(
                     getContext(),
-                    VideoContract_yt.CategoryEntry.CONTENT_URI, // Table to query
-                    new String[]{"DISTINCT " + VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME},
+                    VideoContract.CategoryEntry.CONTENT_URI, // Table to query
+                    new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
@@ -647,8 +647,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         else if (id == TITLE_LOADER) {
             return new CursorLoader(
                     getContext(),
-                    VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
-                    new String[]{"DISTINCT " + VideoContract_yt.VideoEntry.COLUMN_TITLE},
+                    VideoContract.VideoEntry.CONTENT_URI, // Table to query
+                    new String[]{"DISTINCT " + VideoContract.VideoEntry.COLUMN_TITLE},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
@@ -657,14 +657,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         } else {
             // Assume it is for a video.
-            String title = args.getString(VideoContract_yt.VideoEntry.COLUMN_TITLE);
+            String title = args.getString(VideoContract.VideoEntry.COLUMN_TITLE);
             System.out.println("MainFragment / _onCreateLoader / title = "+ title);
             // This just creates a CursorLoader that gets all videos.
             return new CursorLoader(
                     getContext(),
-                    VideoContract_yt.VideoEntry.CONTENT_URI, // Table to query
+                    VideoContract.VideoEntry.CONTENT_URI, // Table to query
                     null, // Projection to return - null means return all fields
-                    VideoContract_yt.VideoEntry.COLUMN_TITLE + " = ?", // Selection clause
+                    VideoContract.VideoEntry.COLUMN_TITLE + " = ?", // Selection clause
                     new String[]{title},  // Select based on the category id.
                     null // Default sort order
             );
@@ -694,7 +694,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 mCategoryNames = new ArrayList<>();
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
-                    int categoryIndex = data.getColumnIndex(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
+                    int categoryIndex = data.getColumnIndex(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME);
                     String category_name = data.getString(categoryIndex);
                     System.out.println("MainFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
@@ -733,7 +733,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
-                    int titleIndex = data.getColumnIndex(VideoContract_yt.VideoEntry.COLUMN_TITLE);
+                    int titleIndex = data.getColumnIndex(VideoContract.VideoEntry.COLUMN_TITLE);
                     String title = data.getString(titleIndex);
                     System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
@@ -757,7 +757,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
-                        args.putString(VideoContract_yt.VideoEntry.COLUMN_TITLE, title);
+                        args.putString(VideoContract.VideoEntry.COLUMN_TITLE, title);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
                     } else {
                         //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");
@@ -797,7 +797,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 // The CursorAdapter contains a Cursor pointing to all videos.
                 mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
-                int columnIndex = data.getColumnIndex(VideoContract_yt.VideoEntry._ID);
+                int columnIndex = data.getColumnIndex(VideoContract.VideoEntry._ID);
                 int video_id = data.getInt(columnIndex);
                 System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
                 int sizeOfRowLinks = data.getCount();
@@ -826,7 +826,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 Utils.setPref_focus_category_number(getActivity(), INIT_NUMBER);
 
                 System.out.println("MainFragment / onLoadFinished / start Fetch category service =================================");
-                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService_yt.class);
+                Intent serviceIntent = new Intent(getActivity(), FetchCategoryService.class);
                 serviceIntent.putExtra("FetchUrl", getDefaultUrl());
                 getActivity().startService(serviceIntent);
             }
@@ -837,7 +837,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 // avoid endless loop due to empty category selection
                 Utils.setPref_focus_category_number(getContext(),1);
 
-                Intent serviceIntent = new Intent(getActivity(), FetchVideoService_yt.class);
+                Intent serviceIntent = new Intent(getActivity(), FetchVideoService.class);
                 serviceIntent.putExtra("FetchUrl", getDefaultUrl());
                 getActivity().startService(serviceIntent);
             }
@@ -942,7 +942,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     Utils.removePref_focus_category_number(getActivity());
 
                     // get video tables count (same as categories count)
-                    DbHelper_yt mOpenHelper = new DbHelper_yt(getActivity());
+                    DbHelper mOpenHelper = new DbHelper(getActivity());
                     SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
                     String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
@@ -1033,16 +1033,16 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         // delete database
         try {
             System.out.println("MainFragment / _startFetchService / will delete DB");
-            getActivity().deleteDatabase(DbHelper_yt.DATABASE_NAME);
+            getActivity().deleteDatabase(DbHelper.DATABASE_NAME);
 
             ContentResolver resolver = getActivity().getContentResolver();
-            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract_yt.CONTENT_AUTHORITY);
-            VideoProvider_yt provider = (VideoProvider_yt) client.getLocalContentProvider();
+            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
+            VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
 
             provider.mContentResolver = resolver;
             provider.mOpenHelper.close();
 
-            provider.mOpenHelper = new DbHelper_yt(getActivity());
+            provider.mOpenHelper = new DbHelper(getActivity());
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();
@@ -1101,7 +1101,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
              * You get notified here when your IntentService is done
              * obtaining data form the server!
              */
-            String statusStr = intent.getExtras().getString(FetchCategoryService_yt.Constants.EXTENDED_DATA_STATUS);
+            String statusStr = intent.getExtras().getString(FetchCategoryService.Constants.EXTENDED_DATA_STATUS);
             System.out.println("MainFragment / _FetchServiceResponseReceiver / _onReceive / statusStr = " + statusStr);
 
             // for fetch category

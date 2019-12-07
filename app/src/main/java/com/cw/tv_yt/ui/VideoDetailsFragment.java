@@ -63,12 +63,11 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.Define;
 import com.cw.tv_yt.R;
-import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.presenter.DetailsDescriptionPresenter;
-import com.cw.tv_yt.data_yt.VideoContract_yt;
+import com.cw.tv_yt.data.VideoContract;
 import com.google.android.youtube.player.YouTubeIntents;
 
 import static com.cw.tv_yt.Utils.getYoutubeId;
@@ -152,7 +151,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
             String videoId = intentData.getLastPathSegment();
 
             Bundle args = new Bundle();
-            args.putString(VideoContract_yt.VideoEntry._ID, videoId);
+            args.putString(VideoContract.VideoEntry._ID, videoId);
             getLoaderManager().initLoader(mGlobalSearchVideoId++, args, this);
             return true;
         }
@@ -233,13 +232,13 @@ public class VideoDetailsFragment extends DetailsSupportFragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case RELATED_VIDEO_LOADER: {
-                String category = args.getString(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME);
+                String category = args.getString(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME);
                 System.out.println("VideoDetailsFragment / _onCreateLoader / category = " + category);
                 return new CursorLoader(
                         getActivity(),
                         VideoContract.VideoEntry.CONTENT_URI,
                         null,
-                        VideoContract_yt.VideoEntry.COLUMN_TITLE + " = ?",
+                        VideoContract.VideoEntry.COLUMN_TITLE + " = ?",
                         new String[]{category},
                         null
                 );
@@ -247,13 +246,13 @@ public class VideoDetailsFragment extends DetailsSupportFragment
             }
             default: {
                 // Loading video from global search.
-                String videoId = args.getString(VideoContract_yt.VideoEntry._ID);
+                String videoId = args.getString(VideoContract.VideoEntry._ID);
                 System.out.println("VideoDetailsFragment / _onCreateLoader / videoId = " + videoId);
                 return new CursorLoader(
                         getActivity(),
-                        VideoContract_yt.VideoEntry.CONTENT_URI,
+                        VideoContract.VideoEntry.CONTENT_URI,
                         null,
-                        VideoContract_yt.VideoEntry._ID + " = ?",
+                        VideoContract.VideoEntry._ID + " = ?",
                         new String[]{videoId},
                         null
                 );
@@ -376,7 +375,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         String category = mSelectedVideo.category;
 
         Bundle args = new Bundle();
-        args.putString(VideoContract_yt.CategoryEntry.COLUMN_CATEGORY_NAME, category);
+        args.putString(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME, category);
         getLoaderManager().initLoader(RELATED_VIDEO_LOADER, args, this);
 
         HeaderItem header = new HeaderItem(0, subcategories[0]);

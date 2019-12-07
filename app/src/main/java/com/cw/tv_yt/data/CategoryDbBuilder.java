@@ -13,17 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.cw.tv_yt.data_yt;
+package com.cw.tv_yt.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.media.Rating;
-import android.net.Uri;
 import android.util.Log;
-
-import com.cw.tv_yt.R;
-import com.cw.tv_yt.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -104,7 +98,7 @@ public class CategoryDbBuilder {
      * @throws IOException
      */
     private JSONObject fetchJSON(String urlString) throws JSONException, IOException {
-        System.out.println("VideoDbBuilder_yt / fetchJSON / urlString = " + urlString);
+        System.out.println("VideoDbBuilder / fetchJSON / urlString = " + urlString);
 
         BufferedReader reader = null;
         java.net.URL url = new java.net.URL(urlString);

@@ -104,11 +104,11 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity
-            android:name="com.cw.tv_yt.ui.PlaybackActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection"
-            android:launchMode="singleTask"
-            android:resizeableActivity="true" />
+<!--        <activity-->
+<!--            android:name="com.cw.tv_yt.ui.PlaybackActivity"-->
+<!--            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection"-->
+<!--            android:launchMode="singleTask"-->
+<!--            android:resizeableActivity="true" />-->
         <activity
             android:name="com.cw.tv_yt.ui.VerticalGridActivity"
             android:exported="true"
@@ -126,7 +126,7 @@
 
         <!-- Provides search suggestions for keywords against video metadata. -->
         <provider
-            android:name="com.cw.tv_yt.data_yt.VideoProvider_yt"
+            android:name="com.cw.tv_yt.data.VideoProvider"
             android:authorities="${packageName}"
             android:permission="${applicationId}.ACCESS_VIDEO_DATA"
             android:exported="true">
@@ -145,10 +145,10 @@
         </receiver>
 
         <service
-            android:name="com.cw.tv_yt.data_yt.FetchVideoService_yt"
+            android:name="com.cw.tv_yt.data.FetchVideoService"
             android:exported="false" />
         <service
-            android:name="com.cw.tv_yt.data_yt.FetchCategoryService_yt"
+            android:name="com.cw.tv_yt.data.FetchCategoryService"
             android:exported="false" />
         <service
             android:name="com.cw.tv_yt.recommendation.UpdateRecommendationsService"
