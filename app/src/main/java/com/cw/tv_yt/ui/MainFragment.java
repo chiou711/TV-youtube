@@ -228,7 +228,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
-        String columnName = VideoContract.VideoEntry.COLUMN_VIDEO_URL;
+        String columnName = VideoContract.VideoEntry.COLUMN_LINK_URL;
         int pos = getPlayId()-1;
         System.out.println("MainFragment / _getYouTubeLink / pos = " + pos);
 
@@ -239,7 +239,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     {
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
-        String columnName = VideoContract.VideoEntry.COLUMN_NAME;
+        String columnName = VideoContract.VideoEntry.COLUMN_LINK_TITLE;
         int pos = getPlayId()-1;
         System.out.println("MainFragment / _getYouTubeTitle / pos = " + pos);
 
@@ -648,7 +648,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             return new CursorLoader(
                     getContext(),
                     VideoContract.VideoEntry.CONTENT_URI, // Table to query
-                    new String[]{"DISTINCT " + VideoContract.VideoEntry.COLUMN_TITLE},
+                    new String[]{"DISTINCT " + VideoContract.VideoEntry.COLUMN_ROW_TITLE},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
@@ -657,15 +657,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         } else {
             // Assume it is for a video.
-            String title = args.getString(VideoContract.VideoEntry.COLUMN_TITLE);
+            String title = args.getString(VideoContract.VideoEntry.COLUMN_ROW_TITLE);
             System.out.println("MainFragment / _onCreateLoader / title = "+ title);
             // This just creates a CursorLoader that gets all videos.
             return new CursorLoader(
                     getContext(),
                     VideoContract.VideoEntry.CONTENT_URI, // Table to query
                     null, // Projection to return - null means return all fields
-                    VideoContract.VideoEntry.COLUMN_TITLE + " = ?", // Selection clause
-                    new String[]{title},  // Select based on the category id.
+                    VideoContract.VideoEntry.COLUMN_ROW_TITLE + " = ?", // Selection clause
+                    new String[]{title},  // Select based on the rowTitle id.
                     null // Default sort order
             );
         }
@@ -733,7 +733,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // Iterate through each category entry and add it to the ArrayAdapter.
                 while (!data.isAfterLast()) {
-                    int titleIndex = data.getColumnIndex(VideoContract.VideoEntry.COLUMN_TITLE);
+                    int titleIndex = data.getColumnIndex(VideoContract.VideoEntry.COLUMN_ROW_TITLE);
                     String title = data.getString(titleIndex);
                     System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
@@ -757,7 +757,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
-                        args.putString(VideoContract.VideoEntry.COLUMN_TITLE, title);
+                        args.putString(VideoContract.VideoEntry.COLUMN_ROW_TITLE, title);
                         mLoaderManager.initLoader(videoLoaderId, args, this);
                     } else {
                         //System.out.println("MainFragment / _onLoadFinished / existingAdapter is not null ");

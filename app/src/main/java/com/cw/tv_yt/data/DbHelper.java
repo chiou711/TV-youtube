@@ -42,30 +42,15 @@ public class DbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         System.out.println("DbHelper / _onCreate (will create video1 table)");
 
-        //todo temp
         // Create a table to hold videos.
         final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + "video1" + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
-                VideoEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
-                VideoEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_DESC + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_BG_IMAGE_URL + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_STUDIO + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_CARD_IMG + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_CONTENT_TYPE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_IS_LIVE + " INTEGER DEFAULT 0, " +
-                VideoEntry.COLUMN_VIDEO_WIDTH + " INTEGER NOT NULL, " +
-                VideoEntry.COLUMN_VIDEO_HEIGHT + " INTEGER NOT NULL, " +
-                VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_PURCHASE_PRICE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_RENTAL_PRICE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_RATING_STYLE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_RATING_SCORE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_PRODUCTION_YEAR + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_DURATION + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_ACTION + " TEXT NOT NULL " +
-                " );";
+                VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
+                VideoEntry.COLUMN_LINK_TITLE + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_THUMB_URL + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_ACTION + " TEXT NOT NULL" +
+        " );";
 
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_VIDEO_TABLE);

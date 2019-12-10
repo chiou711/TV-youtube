@@ -93,8 +93,8 @@ public class Movie implements Serializable {
 	public String toString() {
 		return "Movie{" +
 				"id=" + id +
-				", title='" + title + '\'' +
-				", videoUrl='" + videoUrl + '\'' +
+				", linkTitle='" + title + '\'' +
+				", linkUrl='" + videoUrl + '\'' +
 				", backgroundImageUrl='" + bgImageUrl + '\'' +
 				", cardImageUrl='" + cardImageUrl + '\'' +
 				'}';

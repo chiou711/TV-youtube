@@ -25,42 +25,34 @@ import android.os.Parcelable;
  */
 public final class Video implements Parcelable {
     public final long id;
-    public final String category;
+    public final String rowTitle;
     public final String title;
-    public final String description;
     public final String bgImageUrl;
     public final String cardImageUrl;
     public final String videoUrl;
-    public final String studio;
 
     private Video(
             final long id,
-            final String category,
+            final String rowTitle,
             final String title,
-            final String desc,
             final String videoUrl,
             final String bgImageUrl,
-            final String cardImageUrl,
-            final String studio) {
+            final String cardImageUrl) {
         this.id = id;
-        this.category = category;
+        this.rowTitle = rowTitle;
         this.title = title;
-        this.description = desc;
         this.videoUrl = videoUrl;
         this.bgImageUrl = bgImageUrl;
         this.cardImageUrl = cardImageUrl;
-        this.studio = studio;
     }
 
     protected Video(Parcel in) {
         id = in.readLong();
-        category = in.readString();
+        rowTitle = in.readString();
         title = in.readString();
-        description = in.readString();
         bgImageUrl = in.readString();
         cardImageUrl = in.readString();
         videoUrl = in.readString();
-        studio = in.readString();
     }
 
     public static final Creator<Video> CREATOR = new Creator<Video>() {
@@ -87,25 +79,22 @@ public final class Video implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(category);
+        dest.writeString(rowTitle);
         dest.writeString(title);
-        dest.writeString(description);
         dest.writeString(bgImageUrl);
         dest.writeString(cardImageUrl);
         dest.writeString(videoUrl);
-        dest.writeString(studio);
     }
 
     @Override
     public String toString() {
         String s = "Video{";
         s += "id=" + id;
-        s += ", category='" + category + "'";
-        s += ", title='" + title + "'";
-        s += ", videoUrl='" + videoUrl + "'";
+        s += ", rowTitle='" + rowTitle + "'";
+        s += ", linkTitle='" + title + "'";
+        s += ", linkUrl='" + videoUrl + "'";
         s += ", bgImageUrl='" + bgImageUrl + "'";
         s += ", cardImageUrl='" + cardImageUrl + "'";
-        s += ", studio='" + cardImageUrl + "'";
         s += "}";
         return s;
     }
@@ -113,35 +102,29 @@ public final class Video implements Parcelable {
     // Builder for Video object.
     public static class VideoBuilder {
         private long id;
-        private String category;
+        private String rowTitle;
         private String title;
-        private String desc;
         private String bgImageUrl;
         private String cardImageUrl;
         private String videoUrl;
-        private String studio;
 
         public VideoBuilder id(long id) {
             this.id = id;
             return this;
         }
 
-        public VideoBuilder category(String category) {
-            this.category = category;
+        public VideoBuilder rowTitle(String row_title) {
+            this.rowTitle = row_title;
             return this;
         }
 
-        public VideoBuilder title(String title) {
+        public VideoBuilder linkTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public VideoBuilder description(String desc) {
-            this.desc = desc;
-            return this;
-        }
 
-        public VideoBuilder videoUrl(String videoUrl) {
+        public VideoBuilder linkUrl(String videoUrl) {
             this.videoUrl = videoUrl;
             return this;
         }
@@ -156,18 +139,11 @@ public final class Video implements Parcelable {
             return this;
         }
 
-        public VideoBuilder studio(String studio) {
-            this.studio = studio;
-            return this;
-        }
-
         public Video buildFromMediaDesc(MediaDescription desc) {
             return new Video(
                     Long.parseLong(desc.getMediaId()),
                     "", // Category - not provided by MediaDescription.
                     String.valueOf(desc.getTitle()),
-                    String.valueOf(desc.getDescription()),
-                    "", // Media URI - not provided by MediaDescription.
                     "", // Background Image URI - not provided by MediaDescription.
                     String.valueOf(desc.getIconUri()),
                     String.valueOf(desc.getSubtitle())
@@ -177,13 +153,11 @@ public final class Video implements Parcelable {
         public Video build() {
             return new Video(
                     id,
-                    category,
+                    rowTitle,
                     title,
-                    desc,
                     videoUrl,
                     bgImageUrl,
-                    cardImageUrl,
-                    studio
+                    cardImageUrl
             );
         }
     }

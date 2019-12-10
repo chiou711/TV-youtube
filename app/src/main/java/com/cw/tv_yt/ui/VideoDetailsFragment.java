@@ -238,7 +238,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                         getActivity(),
                         VideoContract.VideoEntry.CONTENT_URI,
                         null,
-                        VideoContract.VideoEntry.COLUMN_TITLE + " = ?",
+                        VideoContract.VideoEntry.COLUMN_ROW_TITLE + " = ?",
                         new String[]{category},
                         null
                 );
@@ -372,7 +372,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         String subcategories[] = {getString(R.string.related_movies)};
 
         // Generating related video list.
-        String category = mSelectedVideo.category;
+        String category = mSelectedVideo.rowTitle;
 
         Bundle args = new Bundle();
         args.putString(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME, category);

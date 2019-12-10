@@ -52,7 +52,7 @@ public class VideoProvider extends ContentProvider {
     private static String[] sVideosContainingQueryColumns;
     private static final HashMap<String, String> sColumnMap = buildColumnMap();
     public ContentResolver mContentResolver;
-    static public String table_id;
+    public static  String table_id;
     Context context;
 
     @Override
@@ -67,35 +67,7 @@ public class VideoProvider extends ContentProvider {
         table_id = String.valueOf(focusCategoryNumber);
         System.out.println("VideoProvider / _onCreate / table_id = " + table_id);
 
-
-        sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
-        sVideosContainingQueryBuilder.setTables(VideoContract.VideoEntry.TABLE_NAME.concat(table_id));
-        sVideosContainingQueryBuilder.setProjectionMap(sColumnMap);
-        sVideosContainingQueryColumns = new String[]{
-                VideoContract.VideoEntry._ID,
-                VideoContract.VideoEntry.COLUMN_NAME,
-                VideoContract.VideoEntry.COLUMN_TITLE,
-                VideoContract.VideoEntry.COLUMN_DESC,
-                VideoContract.VideoEntry.COLUMN_VIDEO_URL,
-                VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL,
-                VideoContract.VideoEntry.COLUMN_STUDIO,
-                VideoContract.VideoEntry.COLUMN_CARD_IMG,
-                VideoContract.VideoEntry.COLUMN_CONTENT_TYPE,
-                VideoContract.VideoEntry.COLUMN_IS_LIVE,
-                VideoContract.VideoEntry.COLUMN_VIDEO_WIDTH,
-                VideoContract.VideoEntry.COLUMN_VIDEO_HEIGHT,
-                VideoContract.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG,
-                VideoContract.VideoEntry.COLUMN_PURCHASE_PRICE,
-                VideoContract.VideoEntry.COLUMN_RENTAL_PRICE,
-                VideoContract.VideoEntry.COLUMN_RATING_STYLE,
-                VideoContract.VideoEntry.COLUMN_RATING_SCORE,
-                VideoContract.VideoEntry.COLUMN_PRODUCTION_YEAR,
-                VideoContract.VideoEntry.COLUMN_DURATION,
-                VideoContract.VideoEntry.COLUMN_ACTION,
-                SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID
-        };
-
-
+        updateQueryBuilder(table_id);
         return true;
     }
 
@@ -122,9 +94,8 @@ public class VideoProvider extends ContentProvider {
         return sVideosContainingQueryBuilder.query(
                 mOpenHelper.getReadableDatabase(),
                 sVideosContainingQueryColumns,
-                VideoContract.VideoEntry.COLUMN_NAME + " LIKE ? OR " +
-                        VideoContract.VideoEntry.COLUMN_DESC + " LIKE ?",
-                new String[]{"%" + query + "%", "%" + query + "%"},
+                VideoContract.VideoEntry.COLUMN_LINK_TITLE + " LIKE ? ",
+                new String[]{"%" + query + "%"},
                 null,
                 null,
                 null
@@ -134,35 +105,10 @@ public class VideoProvider extends ContentProvider {
     private static HashMap<String, String> buildColumnMap() {
         HashMap<String, String> map = new HashMap<>();
         map.put(VideoContract.VideoEntry._ID, VideoContract.VideoEntry._ID);
-        map.put(VideoContract.VideoEntry.COLUMN_NAME, VideoContract.VideoEntry.COLUMN_NAME);
-        map.put(VideoContract.VideoEntry.COLUMN_DESC, VideoContract.VideoEntry.COLUMN_DESC);
-        map.put(VideoContract.VideoEntry.COLUMN_TITLE, VideoContract.VideoEntry.COLUMN_TITLE);
-        map.put(VideoContract.VideoEntry.COLUMN_VIDEO_URL,
-                VideoContract.VideoEntry.COLUMN_VIDEO_URL);
-        map.put(VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL,
-                VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL);
-        map.put(VideoContract.VideoEntry.COLUMN_CARD_IMG, VideoContract.VideoEntry.COLUMN_CARD_IMG);
-        map.put(VideoContract.VideoEntry.COLUMN_STUDIO, VideoContract.VideoEntry.COLUMN_STUDIO);
-        map.put(VideoContract.VideoEntry.COLUMN_CONTENT_TYPE,
-                VideoContract.VideoEntry.COLUMN_CONTENT_TYPE);
-        map.put(VideoContract.VideoEntry.COLUMN_IS_LIVE, VideoContract.VideoEntry.COLUMN_IS_LIVE);
-        map.put(VideoContract.VideoEntry.COLUMN_VIDEO_WIDTH,
-                VideoContract.VideoEntry.COLUMN_VIDEO_WIDTH);
-        map.put(VideoContract.VideoEntry.COLUMN_VIDEO_HEIGHT,
-                VideoContract.VideoEntry.COLUMN_VIDEO_HEIGHT);
-        map.put(VideoContract.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG,
-                VideoContract.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG);
-        map.put(VideoContract.VideoEntry.COLUMN_PURCHASE_PRICE,
-                VideoContract.VideoEntry.COLUMN_PURCHASE_PRICE);
-        map.put(VideoContract.VideoEntry.COLUMN_RENTAL_PRICE,
-                VideoContract.VideoEntry.COLUMN_RENTAL_PRICE);
-        map.put(VideoContract.VideoEntry.COLUMN_RATING_STYLE,
-                VideoContract.VideoEntry.COLUMN_RATING_STYLE);
-        map.put(VideoContract.VideoEntry.COLUMN_RATING_SCORE,
-                VideoContract.VideoEntry.COLUMN_RATING_SCORE);
-        map.put(VideoContract.VideoEntry.COLUMN_PRODUCTION_YEAR,
-                VideoContract.VideoEntry.COLUMN_PRODUCTION_YEAR);
-        map.put(VideoContract.VideoEntry.COLUMN_DURATION, VideoContract.VideoEntry.COLUMN_DURATION);
+        map.put(VideoContract.VideoEntry.COLUMN_LINK_TITLE, VideoContract.VideoEntry.COLUMN_LINK_TITLE);
+        map.put(VideoContract.VideoEntry.COLUMN_ROW_TITLE, VideoContract.VideoEntry.COLUMN_ROW_TITLE);
+        map.put(VideoContract.VideoEntry.COLUMN_LINK_URL, VideoContract.VideoEntry.COLUMN_LINK_URL);
+        map.put(VideoContract.VideoEntry.COLUMN_THUMB_URL, VideoContract.VideoEntry.COLUMN_THUMB_URL);
         map.put(VideoContract.VideoEntry.COLUMN_ACTION, VideoContract.VideoEntry.COLUMN_ACTION);
         map.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, VideoContract.VideoEntry._ID + " AS " +
                 SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
@@ -171,25 +117,49 @@ public class VideoProvider extends ContentProvider {
         return map;
     }
 
+    void updateQueryBuilder(String tableId)
+    {
+        sVideosContainingQueryBuilder = new SQLiteQueryBuilder();
+        sVideosContainingQueryBuilder.setTables(VideoContract.VideoEntry.TABLE_NAME.concat(tableId));
+        sVideosContainingQueryBuilder.setProjectionMap(sColumnMap);
+        sVideosContainingQueryColumns = new String[]{
+                VideoContract.VideoEntry._ID,
+                VideoContract.VideoEntry.COLUMN_LINK_TITLE,
+                VideoContract.VideoEntry.COLUMN_ROW_TITLE,
+                VideoContract.VideoEntry.COLUMN_LINK_URL,
+                VideoContract.VideoEntry.COLUMN_THUMB_URL,
+                VideoContract.VideoEntry.COLUMN_ACTION,
+                SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID
+        };
+    }
+
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
             String[] selectionArgs, String sortOrder) {
-        System.out.println("----------------VideoProvider / _query/ uri =  " + uri.toString());
+        System.out.println("VideoProvider / _query/ uri =  " + uri.toString());
 
         table_id = String.valueOf(Utils.getPref_focus_category_number(context));
-        System.out.println("----------------VideoProvider / _query/ table_id =  " + table_id);
+        System.out.println("VideoProvider / _query/ table_id =  " + table_id);
 
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case SEARCH_SUGGEST: {
+                System.out.println("VideoProvider / _query/ case SEARCH_SUGGEST  " );
+                updateQueryBuilder(table_id);
                 String rawQuery = "";
                 if (selectionArgs != null && selectionArgs.length > 0) {
                     rawQuery = selectionArgs[0];
                 }
                 retCursor = getSuggestions(rawQuery);
+
+                if(retCursor == null)
+                    System.out.println("VideoProvider / _query/  retCursor is null");
+                else
+                    System.out.println("VideoProvider / _query/  retCursor is NOT null");
                 break;
             }
             case VIDEO: {
+                System.out.println("VideoProvider / _query/ case VIDEO  " );
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         VideoContract.VideoEntry.TABLE_NAME.concat(table_id),//todo temp
                         projection,
@@ -202,6 +172,7 @@ public class VideoProvider extends ContentProvider {
                 break;
             }
             case CATEGORY: {
+                System.out.println("VideoProvider / _query/ case CATEGORY  " );
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         VideoContract.CategoryEntry.TABLE_NAME,//todo temp
                         projection,

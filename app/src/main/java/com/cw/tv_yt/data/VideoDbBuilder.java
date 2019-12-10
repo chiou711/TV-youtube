@@ -18,8 +18,6 @@ package com.cw.tv_yt.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.media.Rating;
-import android.net.Uri;
 import android.util.Log;
 
 import com.cw.tv_yt.R;
@@ -98,9 +96,9 @@ public class VideoDbBuilder {
                 JSONArray linksArray;
 
                 JSONObject page = pageArray.getJSONObject(i);
-                String pageTitle = page.getString(TAG_TITLE);
+                String rowTitle = page.getString(TAG_TITLE);
 
-                System.out.println("VideoDbBuilder / _buildMedia / pageTitle = " + pageTitle);
+                System.out.println("VideoDbBuilder / _buildMedia / pageTitle = " + rowTitle);
 
                 linksArray = page.getJSONArray(TAG_MEDIA);
 
@@ -111,46 +109,20 @@ public class VideoDbBuilder {
                     String linkTitle = link.optString("note_title");
                     System.out.println("VideoDbBuilder / _buildMedia / linkTitle = " + linkTitle);
 
-                    String description = "DESCRIPTION";
-
                     String linkUrl = (String) link.opt("note_link_uri"); // Get the first link only.
-
-                    Uri myURI = Uri.parse("android.resource://com.cw.tv_yt/" + R.drawable.image);
-                    String bgImageUrl = myURI.toString();
 
                     String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
 
-                    String studio = "STUDIO";
-
                     ContentValues videoValues = new ContentValues();
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_TITLE, pageTitle);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_NAME, linkTitle);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_DESC, description);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_VIDEO_URL, linkUrl);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_CARD_IMG, cardImageUrl);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL, bgImageUrl);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_STUDIO, studio);
+                    videoValues.put(VideoContract.VideoEntry.COLUMN_ROW_TITLE, rowTitle);
+                    videoValues.put(VideoContract.VideoEntry.COLUMN_LINK_TITLE, linkTitle);
+                    videoValues.put(VideoContract.VideoEntry.COLUMN_LINK_URL, linkUrl);
+                    videoValues.put(VideoContract.VideoEntry.COLUMN_THUMB_URL, cardImageUrl);
 
-                    // Fixed defaults.
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_CONTENT_TYPE, "video/mp4");
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_IS_LIVE, false);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG, "2.0");
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_PRODUCTION_YEAR, 2014);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_DURATION, 0);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_RATING_STYLE, Rating.RATING_5_STARS);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_RATING_SCORE, 3.5f);
                     if (mContext != null) {
-                        videoValues.put(VideoContract.VideoEntry.COLUMN_PURCHASE_PRICE,
-                                mContext.getResources().getString(R.string.buy_2));
-                        videoValues.put(VideoContract.VideoEntry.COLUMN_RENTAL_PRICE,
-                                mContext.getResources().getString(R.string.rent_2));
                         videoValues.put(VideoContract.VideoEntry.COLUMN_ACTION,
                                 mContext.getResources().getString(R.string.global_search));
                     }
-
-                    // TODO: Get these dimensions.
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_VIDEO_WIDTH, 1280);
-                    videoValues.put(VideoContract.VideoEntry.COLUMN_VIDEO_HEIGHT, 720);
 
                     videosToInsert.add(videoValues);
                 }
@@ -166,24 +138,10 @@ public class VideoDbBuilder {
             // Create a table to hold videos.
             final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.VideoEntry.TABLE_NAME.concat(tableId) + " (" +
                     VideoContract.VideoEntry._ID + " INTEGER PRIMARY KEY," +
-                    VideoContract.VideoEntry.COLUMN_TITLE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_VIDEO_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
-                    VideoContract.VideoEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_DESC + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_BG_IMAGE_URL + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_STUDIO + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_CARD_IMG + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_CONTENT_TYPE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_IS_LIVE + " INTEGER DEFAULT 0, " +
-                    VideoContract.VideoEntry.COLUMN_VIDEO_WIDTH + " INTEGER NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_VIDEO_HEIGHT + " INTEGER NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_AUDIO_CHANNEL_CONFIG + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_PURCHASE_PRICE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_RENTAL_PRICE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_RATING_STYLE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_RATING_SCORE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_PRODUCTION_YEAR + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_DURATION + " TEXT NOT NULL, " +
+                    VideoContract.VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
+                    VideoContract.VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
+                    VideoContract.VideoEntry.COLUMN_LINK_TITLE + " TEXT NOT NULL, " +
+                    VideoContract.VideoEntry.COLUMN_THUMB_URL + " TEXT NOT NULL, " +
                     VideoContract.VideoEntry.COLUMN_ACTION + " TEXT NOT NULL " +
                     " );";
 
