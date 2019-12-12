@@ -3,6 +3,10 @@
     <PreferenceCategory
         android:title="@string/pref_title_settings">
         <SwitchPreference
+            android:title="@string/pref_title_auto_play"
+            android:defaultValue="true"
+            android:key="@string/pref_key_auto_play" />
+        <SwitchPreference
             android:title="@string/pref_title_recommendations"
             android:defaultValue="true"
             android:key="@string/pref_key_recommendations" />

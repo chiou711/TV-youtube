@@ -42,12 +42,13 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.cw.tv_yt.BuildConfig;
-import com.cw.tv_yt.Define;
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
@@ -223,7 +224,7 @@ public class SearchFragment extends SearchSupportFragment
             if (item instanceof Video) {
                 Video video = (Video) item;
 
-                if(Define.hasDetails) {
+                if(!Pref.isAutoPlay(getActivity())) {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);
 

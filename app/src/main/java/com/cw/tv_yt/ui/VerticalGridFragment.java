@@ -35,7 +35,7 @@ import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 import android.view.View;
 
-import com.cw.tv_yt.Define;
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
@@ -130,7 +130,7 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
                 System.out.println("VerticalGridFragment /  _onItemClicked");
                 Video video = (Video) item;
 
-                if(Define.hasDetails) {
+                if(!Pref.isAutoPlay(getActivity())) {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(

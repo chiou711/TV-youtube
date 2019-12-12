@@ -67,7 +67,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.cw.tv_yt.Define;
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.DbHelper;
@@ -779,7 +779,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	            gridRowAdapter.add(getString(R.string.grid_view));
 //                gridRowAdapter.add(getString(R.string.guidedstep_first_title));
 //                gridRowAdapter.add(getString(R.string.error_fragment));
-//                gridRowAdapter.add(getString(R.string.personal_settings));
+                gridRowAdapter.add(getString(R.string.personal_settings));
                 ListRow row = new ListRow(gridHeader, gridRowAdapter);
                 row_id++;
                 row.setId(row_id);
@@ -902,7 +902,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 Video video = (Video) item;
                 System.out.println("MainFragment / onItemClicked / id = "+ video.id );
 
-                if(Define.hasDetails) {
+                if(!Pref.isAutoPlay(getActivity())) {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);
 
@@ -975,10 +975,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                } else if (((String) item).contains(getString(R.string.error_fragment))) {
 //                    BrowseErrorFragment errorFragment = new BrowseErrorFragment();
 //                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment).addToBackStack(null).commit();
-//                } else if(((String) item).contains(getString(R.string.personal_settings))) {
-//                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
-//                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
-//                    startActivity(intent, bundle);
+                } else if(((String) item).contains(getString(R.string.personal_settings))) {
+                    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+                    startActivity(intent, bundle);
 //                } else {
                     //Toast.makeText(getActivity(), ((String) item), Toast.LENGTH_SHORT).show();
                 }
