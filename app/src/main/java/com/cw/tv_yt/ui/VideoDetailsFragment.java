@@ -16,7 +16,9 @@
 
 package com.cw.tv_yt.ui;
 
+import android.app.Activity;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -64,6 +66,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
@@ -81,9 +85,8 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int NO_NOTIFICATION = -1;
-    private static final int ACTION_WATCH_TRAILER = 1;
-    private static final int ACTION_RENT = 2;
-    private static final int ACTION_BUY = 3;
+    private static final int ACTION_PLAY = 1;
+    private static final int ACTION_DELETE = 2;
 
     // ID for loader that loads related videos.
     private static final int RELATED_VIDEO_LOADER = 1;
@@ -207,15 +210,26 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         detailsPresenter.setOnActionClickedListener(new OnActionClickedListener() {
             @Override
             public void onActionClicked(Action action) {
-                if (action.getId() == ACTION_WATCH_TRAILER) {
+                if (action.getId() == ACTION_PLAY) {
 //                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
 //                    intent.putExtra(VideoDetailsActivity.VIDEO, mSelectedVideo);
 //                    startActivity(intent);
 
-                    //todo run YouTube
+                    //run YouTube
                     String idStr = getYoutubeId(mSelectedVideo.videoUrl);
                     Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
                     startActivity(intent);
+                } else if(action.getId() == ACTION_DELETE){
+                    // delete current item
+                    ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
+                    VideoProvider.tableId = String.valueOf(Utils.getPref_focus_category_number(getActivity()));
+                    contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + mSelectedVideo.id,null);
+
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
+                    getActivity().setResult( Activity.RESULT_OK, returnIntent);
+
+                    getActivity().finish();
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -267,6 +281,8 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         if (cursor != null && cursor.moveToNext()) {
             switch (loader.getId()) {
                 case RELATED_VIDEO_LOADER: {
+                    int count = cursor.getCount();
+                    System.out.println("VideoDetailsFragment / _onLoadFinished / RELATED_VIDEO_LOADER / count = " + count);
                     mVideoCursorAdapter.changeCursor(cursor);
                     break;
                 }
@@ -309,6 +325,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
         @Override
         public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
+            System.out.println("VideoDetailsFragment / _onCreateViewHolder");
             ImageView imageView = (ImageView) LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.lb_fullwidth_details_overview_logo, parent, false);
 
@@ -323,6 +340,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
         @Override
         public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+            System.out.println("VideoDetailsFragment / _onBindViewHolder");
             DetailsOverviewRow row = (DetailsOverviewRow) item;
             ImageView imageView = ((ImageView) viewHolder.view);
             imageView.setImageDrawable(row.getImageDrawable());
@@ -335,6 +353,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
     }
 
     private void setupDetailsOverviewRow() {
+        System.out.println("VideoDetailsFragment / _setupDetailsOverviewRow");
         final DetailsOverviewRow row = new DetailsOverviewRow(mSelectedVideo);
 
         RequestOptions options = new RequestOptions()
@@ -357,19 +376,19 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
         SparseArrayObjectAdapter adapter = new SparseArrayObjectAdapter();
 
-        adapter.set(ACTION_WATCH_TRAILER, new Action(ACTION_WATCH_TRAILER, getResources()
-                .getString(R.string.watch_trailer_1),
-                getResources().getString(R.string.watch_trailer_2)));
-        adapter.set(ACTION_RENT, new Action(ACTION_RENT, getResources().getString(R.string.rent_1),
-                getResources().getString(R.string.rent_2)));
-        adapter.set(ACTION_BUY, new Action(ACTION_BUY, getResources().getString(R.string.buy_1),
-                getResources().getString(R.string.buy_2)));
+        adapter.set(ACTION_PLAY, new Action(ACTION_PLAY, getResources()
+                .getString(R.string.play_1),
+                getResources().getString(R.string.play_2)));
+        adapter.set(ACTION_DELETE, new Action(ACTION_DELETE, getResources()
+                .getString(R.string.delete_1),
+                getResources().getString(R.string.delete_2)));
         row.setActionsAdapter(adapter);
 
         mAdapter.add(row);
     }
 
     private void setupMovieListRow() {
+        System.out.println("VideoDetailsFragment / _setupMovieListRow");
         String subcategories[] = {getString(R.string.related_movies)};
 
         // Generating related video list.

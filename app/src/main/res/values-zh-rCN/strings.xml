@@ -30,10 +30,10 @@
     <string name="grid_view">Vertical Grid View</string>
     <string name="error_fragment">Error Fragment</string>
     <string name="personal_settings">Personal Settings</string>
-    <string name="watch_trailer_1">Watch trailer</string>
-    <string name="watch_trailer_2">FREE</string>
-    <string name="rent_1">Rent By Day</string>
-    <string name="rent_2">From $1.99</string>
+    <string name="play_1">播放</string>
+    <string name="play_2">YouTube</string>
+    <string name="delete_1">删除</string>
+    <string name="delete_2">当前项目</string>
     <string name="buy_1">Buy and Own</string>
     <string name="buy_2">AT $9.99</string>
     <string name="queue_name">Play Queue</string>

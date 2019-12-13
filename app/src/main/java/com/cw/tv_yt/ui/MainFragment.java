@@ -110,6 +110,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	private List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
     final private static int YOUTUBE_LINK_INTENT = 99;
+    final static int VIDEO_DETAILS_INTENT = 98;
     // Maps a Loader Id to its CursorObjectAdapter.
     private SparseArray<CursorObjectAdapter> mVideoCursorAdapters;
 
@@ -221,6 +222,23 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 }
             });
             alertDlg.show();
+        }
+        else if(requestCode == VIDEO_DETAILS_INTENT) {
+            if(data != null) {
+                int action = data.getIntExtra("KEY_DELETE",0);
+                if (action == Pref.ACTION_DELETE)
+                {
+                    getActivity().finish();
+                    // start new MainActivity
+                    Intent new_intent = new Intent(getActivity(), MainActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    getActivity().startActivity(new_intent);
+                }
+            } else
+            {
+                //do nothing for non-action case
+            }
         }
     }
 
@@ -910,7 +928,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             getActivity(),
                             ((ImageCardView) itemViewHolder.view).getMainImageView(),
                             VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                    getActivity().startActivity(intent, bundle);
+                    startActivityForResult(intent, VIDEO_DETAILS_INTENT,bundle);
                 } else {
                     setPlayId((int) ((Video)(item)).id );
                     startYouTubeIntent(((Video) item).videoUrl );

@@ -262,7 +262,7 @@ public class VideoProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case VIDEO: {
                 rowsDeleted = mOpenHelper.getWritableDatabase().delete(
-                        VideoContract.VideoEntry.TABLE_NAME, selection, selectionArgs);
+                        VideoContract.VideoEntry.TABLE_NAME.concat(tableId), selection, selectionArgs);
                 break;
             }
             case CATEGORY: {
@@ -310,7 +310,7 @@ public class VideoProvider extends ContentProvider {
         return rowsUpdated;
     }
 
-    static String tableId;
+    public static String tableId;
 
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
