@@ -138,5 +138,7 @@
     <string name="play_stop">停止</string>
     <string name="play_4_spaces">"    "</string>
     <!-- update -->
-    <string name="database_update">更新数据库</string>
+    <string name="database_update">更新资料库</string>
+    <!--  delete  -->
+    <string name="database_delete_item">删除当前项目</string>
 </resources>

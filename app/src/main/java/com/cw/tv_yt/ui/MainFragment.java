@@ -82,6 +82,9 @@ import com.cw.tv_yt.presenter.GridItemPresenter;
 import com.cw.tv_yt.presenter.IconHeaderItemPresenter;
 import com.cw.tv_yt.recommendation.UpdateRecommendationsService;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -920,20 +923,80 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 Video video = (Video) item;
                 System.out.println("MainFragment / onItemClicked / id = "+ video.id );
 
-                if(!Pref.isAutoPlay(getActivity())) {
-                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
+                String urlStr = ((Video) item).videoUrl;
+                String path = "http://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
 
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                            getActivity(),
-                            ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                            VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                    startActivityForResult(intent, VIDEO_DETAILS_INTENT,bundle);
-                } else {
-                    setPlayId((int) ((Video)(item)).id );
-                    startYouTubeIntent(((Video) item).videoUrl );
-                    setNewId(getPlayId()+1);
-                }
+                new Thread(new Runnable(){
+                    @Override
+                    public void run() {
+                        /**
+                         *  check connection response
+                         *  404: not found, 200: OK
+                         */
+                        int responseCode = -1;
+                        HttpURLConnection urlConnection = null;
+                        try {
+                            URL url = new URL(path);
+                            urlConnection = (HttpURLConnection) url.openConnection();
+                            urlConnection.setRequestMethod("GET");
+                            urlConnection.connect();
+                            responseCode = urlConnection.getResponseCode();
+                            System.out.println("MainFragment / _onItemClicked / responseCode = " + responseCode);
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                            return;
+                        }
+                        urlConnection.disconnect();
+
+                        /**
+                         *  normal response: launch VideoDetailsActivity
+                         */
+                        if(responseCode == 200) {
+                            if (Pref.isAutoPlay(getActivity())) {
+                                setPlayId((int) ((Video) (item)).id);
+                                startYouTubeIntent(((Video) item).videoUrl);
+                                setNewId(getPlayId() + 1);
+                            } else {
+                                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                                getActivity(),
+                                                ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                                                VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
+                                    }
+                                });
+                            }
+                        } else {
+                            /**
+                             *  if response is NG: delete current item
+                             */
+                            ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
+                            VideoProvider.tableId = String.valueOf(Utils.getPref_focus_category_number(getActivity()));
+                            contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" +  ((Video) item).id,null);
+
+                            getActivity().finish();
+
+                            // start new MainActivity
+                            Intent new_intent = new Intent(getActivity(), MainActivity.class);
+                            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+                            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                            getActivity().startActivity(new_intent);
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            return;
+                        }
+                    }
+                }).start();
 
             } else if (item instanceof String) {
 

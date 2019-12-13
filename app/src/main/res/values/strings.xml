@@ -139,4 +139,6 @@
     <string name="play_4_spaces">"    "</string>
     <!-- update -->
     <string name="database_update">Update database</string>
+    <!--  delete  -->
+    <string name="database_delete_item">Delete current item</string>
 </resources>
