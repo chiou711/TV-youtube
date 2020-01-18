@@ -17,11 +17,13 @@
 package com.cw.tv_yt.ui;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 /*
  * MainActivity class that loads MainFragment.
@@ -41,5 +43,29 @@ public class MainActivity extends LeanbackActivity {
 //            // This is the first time running the app, let's go to onboarding
 //            startActivity(new Intent(this, OnboardingActivity.class));
 //        }
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        System.out.println("MainActivity / _onActivityResult");
+        if(requestCode == MainFragment.VIDEO_DETAILS_INTENT) {
+            if(data != null) {
+                int action = data.getIntExtra("KEY_DELETE",0);
+                if (action == Pref.ACTION_DELETE)
+                {
+                    finish();
+                    // start new MainActivity
+                    Intent new_intent = new Intent(this, MainActivity.class);
+                    new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(new_intent);
+                }
+            } else
+            {
+                //do nothing for non-action case
+            }
+        }
     }
 }

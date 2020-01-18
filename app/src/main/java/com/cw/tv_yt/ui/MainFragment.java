@@ -113,7 +113,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	private List<String> mCategoryNames = new ArrayList<>();
     private final int INIT_NUMBER = 1;
     final private static int YOUTUBE_LINK_INTENT = 99;
-    final static int VIDEO_DETAILS_INTENT = 98;
+    public final static int VIDEO_DETAILS_INTENT = 98;
     // Maps a Loader Id to its CursorObjectAdapter.
     private SparseArray<CursorObjectAdapter> mVideoCursorAdapters;
 
@@ -767,7 +767,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     if (existingAdapter == null) {
 
                         // Map video results from the database to Video objects.
-                        CursorObjectAdapter videoCursorAdapter = new CursorObjectAdapter(new CardPresenter());
+                        CursorObjectAdapter videoCursorAdapter = new CursorObjectAdapter(new CardPresenter(getActivity()));
                         videoCursorAdapter.setMapper(new VideoCursorMapper());
                         mVideoCursorAdapters.put(videoLoaderId, videoCursorAdapter);
 

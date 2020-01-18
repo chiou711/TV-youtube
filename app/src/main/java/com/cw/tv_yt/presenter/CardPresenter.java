@@ -16,12 +16,18 @@
 
 package com.cw.tv_yt.presenter;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.Presenter;
 import androidx.core.content.ContextCompat;
 
+import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -29,6 +35,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.model.Video;
+import com.cw.tv_yt.ui.MainFragment;
+import com.cw.tv_yt.ui.VideoDetailsActivity;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
@@ -38,6 +46,13 @@ public class CardPresenter extends Presenter {
     private int mSelectedBackgroundColor = -1;
     private int mDefaultBackgroundColor = -1;
     private Drawable mDefaultCardImage;
+    FragmentActivity act;
+
+    public  CardPresenter(){}
+
+    public CardPresenter(FragmentActivity main_act){
+        act = main_act;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -89,6 +104,30 @@ public class CardPresenter extends Presenter {
                     .apply(RequestOptions.errorOf(mDefaultCardImage))
                     .into(cardView.getMainImageView());
         }
+
+        // card view long click listener: launch VideoDetailsActivity
+        cardView.setOnLongClickListener(new View.OnLongClickListener(){
+            @Override
+            public boolean onLongClick(View v) {
+                System.out.println("CardPresenter / onLongClick");
+                if (item instanceof Video) {
+                    Video video = (Video) item;
+                    Intent intent = new Intent(act, VideoDetailsActivity.class);
+                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
+
+                    act.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                    act,
+                                    ((ImageCardView) viewHolder.view).getMainImageView(),
+                                    VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                            act.startActivityForResult(intent, MainFragment.VIDEO_DETAILS_INTENT, bundle);
+                        }
+                    });
+                }
+                return true;
+            }
+        });
     }
 
     @Override
