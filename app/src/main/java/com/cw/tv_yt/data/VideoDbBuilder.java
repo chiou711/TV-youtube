@@ -111,7 +111,13 @@ public class VideoDbBuilder {
 
                     String linkUrl = (String) link.opt("note_link_uri"); // Get the first link only.
 
-                    String cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
+                    // card image Url: YouTube or HTML
+                    String cardImageUrl;
+                    if(linkUrl.contains("youtube") || linkUrl.contains("youtu.be"))
+                        cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
+                    else
+                        cardImageUrl = "https://upload.wikimedia.org/wikipedia/zh/e/ec/The_World_Between_Us_Poster.jpg";
+
 
                     ContentValues videoValues = new ContentValues();
                     videoValues.put(VideoContract.VideoEntry.COLUMN_ROW_TITLE, rowTitle);

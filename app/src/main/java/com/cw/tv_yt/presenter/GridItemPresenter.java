@@ -70,6 +70,12 @@ public class GridItemPresenter extends Presenter {
 //                }else {
 //                    System.out.println("v is not selected");
 //                }
+                if(hasFocus)
+                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),
+                            R.color.selected_background));
+                else
+                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),
+                            R.color.default_background));
             }
         });
 
@@ -85,7 +91,7 @@ public class GridItemPresenter extends Presenter {
             int cate_num = Utils.getPref_focus_category_number(mainFragment.getContext());
             String cate_name = Utils.getPref_category_name(mainFragment.getContext(), cate_num);
             if (item.toString().equalsIgnoreCase(cate_name))
-                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.search_opaque));
+                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.current_preference_background));
             else
                 ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
         } catch(Exception e)

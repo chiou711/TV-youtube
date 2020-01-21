@@ -924,8 +924,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 System.out.println("MainFragment / onItemClicked / id = "+ video.id );
 
                 String urlStr = ((Video) item).videoUrl;
-                String path = "http://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
 
+                String path;
+                // YouTube or HTML
+                if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
+                    path = "http://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
+                else
+                    path = urlStr;
+
+                System.out.println("MainFragment / onItemClicked / path= "+ path);
                 new Thread(new Runnable(){
                     @Override
                     public void run() {
@@ -941,10 +948,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             urlConnection.setRequestMethod("GET");
                             urlConnection.connect();
                             responseCode = urlConnection.getResponseCode();
-                            System.out.println("MainFragment / _onItemClicked / responseCode = " + responseCode);
+                            System.out.println("MainFragment / _onItemClicked / responseCode  OK = " + responseCode);
                         }
                         catch (IOException e)
                         {
+                            System.out.println("MainFragment / _onItemClicked / responseCode NG = "+ responseCode);
                             e.printStackTrace();
                             return;
                         }
@@ -953,31 +961,48 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         /**
                          *  normal response: launch VideoDetailsActivity
                          */
+                        // YouTube or HTML
                         if(responseCode == 200) {
-                            if (Pref.isAutoPlay(getActivity())) {
-                                setPlayId((int) ((Video) (item)).id);
-                                startYouTubeIntent(((Video) item).videoUrl);
-                                setNewId(getPlayId() + 1);
-                            } else {
-                                Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                                intent.putExtra(VideoDetailsActivity.VIDEO, video);
+                            // play YouTube
+                            if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
+                            {
+                                    // auto play
+                                if (Pref.isAutoPlay(getActivity())) {
+                                    setPlayId((int) ((Video) (item)).id);
+                                    startYouTubeIntent(((Video) item).videoUrl);
+                                    setNewId(getPlayId() + 1);
+                                } else {
+                                    // manual play
+                                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+                                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
 
-                                getActivity().runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                                                getActivity(),
-                                                ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                                                VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
-                                    }
-                                });
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        public void run() {
+                                            if (urlStr.contains("youtube") || urlStr.contains("youtu.be")) {
+                                                // play YouTube
+                                                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                                                        getActivity(),
+                                                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+                                                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+                                                startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                            else {
+                                // play HTML
+                                String link = ((Video) item).videoUrl;
+                                Uri uriStr = Uri.parse(link);
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
+                                startActivity(intent);
                             }
                         } else {
                             /**
                              *  if response is NG: delete current item
                              */
                             ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
-                            VideoProvider.tableId = String.valueOf(Utils.getPref_focus_category_number(getActivity()));
+                            VideoProvider.tableId = String.valueOf(getPref_focus_category_number(getActivity()));
                             contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" +  ((Video) item).id,null);
 
                             getActivity().finish();
@@ -1148,6 +1173,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
+            if(itemViewHolder!= null && itemViewHolder.view != null)
+                itemViewHolder.view.setBackgroundColor(getResources().getColor(R.color.selected_background));
 
             if (item instanceof Video) {
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);

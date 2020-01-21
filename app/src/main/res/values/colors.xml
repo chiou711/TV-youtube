@@ -20,6 +20,7 @@
     <color name="fastlane_background">#0096a6</color>
     <color name="search_opaque">#ffaa3f</color>
     <color name="selected_background">#ffaa3f</color>
+    <color name="current_preference_background">#3f3fff</color>
 
     <color name="default_background">#0096a6</color>
     <color name="icon_background">#4A4F51</color>
