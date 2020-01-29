@@ -93,7 +93,8 @@ public class GridItemPresenter extends Presenter {
             if (item.toString().equalsIgnoreCase(cate_name))
                 ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.current_preference_background));
             else
-                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
+//                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
+                ((TextView) viewHolder.view).setTextColor(Color.rgb(0x40,0x40,0x70));
         } catch(Exception e)
         {
             e.printStackTrace();

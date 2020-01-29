@@ -114,7 +114,7 @@ public class VideoDbBuilder {
                     // card image Url: YouTube or HTML
                     String cardImageUrl;
                     if(linkUrl.contains("youtube") || linkUrl.contains("youtu.be"))
-                        cardImageUrl = "http://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
+                        cardImageUrl = "https://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
                     else
                         cardImageUrl = "https://upload.wikimedia.org/wikipedia/zh/e/ec/The_World_Between_Us_Poster.jpg";
 
@@ -136,6 +136,7 @@ public class VideoDbBuilder {
             }
 
             DbHelper mOpenHelper = new DbHelper(mContext);
+            mOpenHelper.setWriteAheadLoggingEnabled(false);
 
             // Will call DbHelper.onCreate()first time when WritableDatabase is not created yet
             SQLiteDatabase sqlDb;

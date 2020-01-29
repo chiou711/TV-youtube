@@ -130,6 +130,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
 
         // get video tables count
         DbHelper mOpenHelper = new DbHelper(getActivity());
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
         String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
@@ -328,6 +329,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
             provider.mOpenHelper.close();
 
             provider.mOpenHelper = new DbHelper(getActivity());
+            provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();

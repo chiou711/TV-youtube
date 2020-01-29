@@ -62,6 +62,7 @@ public class VideoProvider extends ContentProvider {
         mContentResolver = context.getContentResolver();
 
         mOpenHelper = new DbHelper(context);
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
 
         int focusCategoryNumber = Utils.getPref_focus_category_number(context);
         table_id = String.valueOf(focusCategoryNumber);

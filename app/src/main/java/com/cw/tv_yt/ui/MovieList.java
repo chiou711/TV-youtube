@@ -98,7 +98,7 @@ public final class MovieList {
 
 		String bgImageUrl[] = new String[Title.length];
 		for(int i=0;i< Title.length;i++)
-			bgImageUrl[i] =  "http://img.youtube.com/vi/"+getYoutubeId(Uri[i])+"/0.jpg";
+			bgImageUrl[i] =  "https://img.youtube.com/vi/"+getYoutubeId(Uri[i])+"/0.jpg";
 //		String bgImageUrl[] = {
 //				"http://commondatastorage.googleapis.com/android-tv/Sample%20videos/Zeitgeist/Zeitgeist%202010_%20Year%20in%20Review/bg.jpg",
 //				"http://commondatastorage.googleapis.com/android-tv/Sample%20videos/Demo%20Slam/Google%20Demo%20Slam_%2020ft%20Search/bg.jpg",
@@ -109,7 +109,7 @@ public final class MovieList {
 
 		String cardImageUrl[] = new String[Title.length];
 		for(int i=0;i< Title.length;i++)
-			cardImageUrl[i] =  "http://img.youtube.com/vi/"+getYoutubeId(Uri[i])+"/0.jpg";
+			cardImageUrl[i] =  "https://img.youtube.com/vi/"+getYoutubeId(Uri[i])+"/0.jpg";
 
 //		String cardImageUrl[] = {
 //				"http://commondatastorage.googleapis.com/android-tv/Sample%20videos/Zeitgeist/Zeitgeist%202010_%20Year%20in%20Review/card.jpg",

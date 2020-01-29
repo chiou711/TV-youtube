@@ -270,6 +270,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private String getDB_data(String table,String columnName,int pos)
     {
         DbHelper mOpenHelper = new DbHelper(getActivity());
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
         Cursor cursor = mOpenHelper.getReadableDatabase().query(
                 table,
@@ -296,6 +297,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         int focusCatNum = Utils.getPref_focus_category_number(getActivity());
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
         DbHelper mOpenHelper = new DbHelper(getActivity());
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
         Cursor cursor = mOpenHelper.getReadableDatabase().query(
@@ -928,7 +930,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 String path;
                 // YouTube or HTML
                 if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
-                    path = "http://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
+                    path = "https://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
                 else
                     path = urlStr;
 
@@ -1049,6 +1051,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                     // get video tables count (same as categories count)
                     DbHelper mOpenHelper = new DbHelper(getActivity());
+                    mOpenHelper.setWriteAheadLoggingEnabled(false);
                     SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
                     String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
@@ -1149,6 +1152,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             provider.mOpenHelper.close();
 
             provider.mOpenHelper = new DbHelper(getActivity());
+            provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                 client.close();
