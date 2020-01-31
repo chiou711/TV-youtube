@@ -49,7 +49,7 @@ public final class VideoCursorMapper extends CursorMapper {
         String rowTitle = cursor.getString(rowTitleIndex);
         String linkTitle = cursor.getString(linkTitleIndex);
         String linkUrl = cursor.getString(linkUrlIndex);
-        String bgImageUrl = "android.resource://com.cw.tv_yt/2131165290";
+        String bgImageUrl = "android.resource://com.cw.tv_yt/drawable/image";
         String cardImageUrl = cursor.getString(cardImageUrlIndex);
 
         // Build a Video object to be processed.
