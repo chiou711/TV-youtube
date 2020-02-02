@@ -229,6 +229,13 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                     returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
                     getActivity().setResult( Activity.RESULT_OK, returnIntent);
 
+                    // show toast
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
                     getActivity().finish();
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();

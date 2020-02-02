@@ -141,4 +141,6 @@
     <string name="database_update">更新資料庫</string>
     <!--  delete  -->
     <string name="database_delete_item">刪除當前項目</string>
+    <!--  connection error  -->
+    <string name="connection_error">網路連線錯誤</string>
 </resources>

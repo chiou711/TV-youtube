@@ -1001,26 +1001,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             }
                         } else {
                             /**
-                             *  if response is NG: delete current item
+                             *  show connection error toast
                              */
-                            ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
-                            VideoProvider.tableId = String.valueOf(getPref_focus_category_number(getActivity()));
-                            contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" +  ((Video) item).id,null);
-
-                            getActivity().finish();
-
-                            // start new MainActivity
-                            Intent new_intent = new Intent(getActivity(), MainActivity.class);
-                            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-                            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                            getActivity().startActivity(new_intent);
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
-                                }
+                               getActivity().runOnUiThread(new Runnable() {
+                               public void run() {
+                                   Toast.makeText(getActivity(), getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+                               }
                             });
-                            return;
                         }
                     }
                 }).start();

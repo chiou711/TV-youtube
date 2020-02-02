@@ -141,4 +141,6 @@
     <string name="database_update">Update database</string>
     <!--  delete  -->
     <string name="database_delete_item">Delete current item</string>
+    <!--  connection error  -->
+    <string name="connection_error">Network connection error</string>
 </resources>
