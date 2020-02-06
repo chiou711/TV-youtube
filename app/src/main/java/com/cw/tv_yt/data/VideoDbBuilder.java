@@ -113,11 +113,12 @@ public class VideoDbBuilder {
 
                     // card image Url: YouTube or HTML
                     String cardImageUrl;
-                    if(linkUrl.contains("youtube") || linkUrl.contains("youtu.be"))
+                    cardImageUrl = (String) link.opt("note_image_uri");
+                    System.out.println("VideoDbBuilder / _buildMedia / cardImageUrl = " + cardImageUrl);
+                    if(
+                        ( linkUrl.contains("youtube") || linkUrl.contains("youtu.be") ) ) {
                         cardImageUrl = "https://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
-                    else
-                        cardImageUrl = "https://upload.wikimedia.org/wikipedia/zh/e/ec/The_World_Between_Us_Poster.jpg";
-
+                    }
 
                     ContentValues videoValues = new ContentValues();
                     videoValues.put(VideoContract.VideoEntry.COLUMN_ROW_TITLE, rowTitle);
@@ -148,7 +149,7 @@ public class VideoDbBuilder {
                     VideoContract.VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
                     VideoContract.VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
                     VideoContract.VideoEntry.COLUMN_LINK_TITLE + " TEXT NOT NULL, " +
-                    VideoContract.VideoEntry.COLUMN_THUMB_URL + " TEXT NOT NULL, " +
+                    VideoContract.VideoEntry.COLUMN_THUMB_URL + " TEXT, " +
                     VideoContract.VideoEntry.COLUMN_ACTION + " TEXT NOT NULL " +
                     " );";
 

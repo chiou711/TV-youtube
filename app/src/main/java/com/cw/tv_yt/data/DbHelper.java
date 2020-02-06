@@ -48,7 +48,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
                 VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
                 VideoEntry.COLUMN_LINK_TITLE + " TEXT NOT NULL, " +
-                VideoEntry.COLUMN_THUMB_URL + " TEXT NOT NULL, " +
+                VideoEntry.COLUMN_THUMB_URL + " TEXT, " +
                 VideoEntry.COLUMN_ACTION + " TEXT NOT NULL" +
         " );";
 
