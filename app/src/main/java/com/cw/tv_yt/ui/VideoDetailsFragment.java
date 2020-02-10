@@ -215,10 +215,21 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 //                    intent.putExtra(VideoDetailsActivity.VIDEO, mSelectedVideo);
 //                    startActivity(intent);
 
-                    //run YouTube
-                    String idStr = getYoutubeId(mSelectedVideo.videoUrl);
-                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                    startActivity(intent);
+                    // play YouTube
+                    if(mSelectedVideo.videoUrl.contains("youtube") ||
+                        mSelectedVideo.videoUrl.contains("youtu.be") )
+                    {
+                        String idStr = getYoutubeId(mSelectedVideo.videoUrl);
+                        Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                        startActivity(intent);
+                    }
+                    else {
+                        // play HTML
+                        Uri uriStr = Uri.parse(mSelectedVideo.videoUrl);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
+                        startActivity(intent);
+                    }
+
                 } else if(action.getId() == ACTION_DELETE){
                     // delete current item
                     ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
@@ -383,11 +394,11 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
         SparseArrayObjectAdapter adapter = new SparseArrayObjectAdapter();
 
-        adapter.set(ACTION_PLAY, new Action(ACTION_PLAY, getResources()
-                .getString(R.string.play_1),
+        adapter.set(ACTION_PLAY, new Action(ACTION_PLAY,
+                getResources().getString(R.string.play_1),
                 getResources().getString(R.string.play_2)));
-        adapter.set(ACTION_DELETE, new Action(ACTION_DELETE, getResources()
-                .getString(R.string.delete_1),
+        adapter.set(ACTION_DELETE, new Action(ACTION_DELETE,
+                getResources().getString(R.string.delete_1),
                 getResources().getString(R.string.delete_2)));
         row.setActionsAdapter(adapter);
 
