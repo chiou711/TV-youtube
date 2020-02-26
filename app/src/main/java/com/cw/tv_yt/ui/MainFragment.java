@@ -994,10 +994,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             }
                             else {
                                 // play HTML
-                                String link = ((Video) item).videoUrl;
-                                Uri uriStr = Uri.parse(link);
-                                Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
-                                startActivity(intent);
+                                if(urlStr.contains("8maple") || urlStr.contains("google")) {
+                                    String link = ((Video) item).videoUrl;
+                                    Uri uriStr = Uri.parse(link);
+                                    Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
+                                    startActivity(intent);
+                                }
+                                // play video
+                                else {
+                                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
+                                    intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
+                                    startActivity(intent);
+                                }
                             }
                         } else {
                             /**
