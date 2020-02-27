@@ -963,12 +963,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         /**
                          *  normal response: launch VideoDetailsActivity
                          */
-                        // YouTube or HTML
+                        // YouTube  or video or HTML
                         if(responseCode == 200) {
                             // play YouTube
                             if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
                             {
-                                    // auto play
+                                // auto play
                                 if (Pref.isAutoPlay(getActivity())) {
                                     setPlayId((int) ((Video) (item)).id);
                                     startYouTubeIntent(((Video) item).videoUrl);
@@ -993,17 +993,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                                 }
                             }
                             else {
+                                // play video
+                                 if(urlStr.contains("https://drive.google.com/uc?export=view")){
+                                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
+                                    intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
+                                    startActivity(intent);
+                                }
                                 // play HTML
-                                if(urlStr.contains("8maple") || urlStr.contains("google")) {
+                                else {
                                     String link = ((Video) item).videoUrl;
                                     Uri uriStr = Uri.parse(link);
                                     Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
-                                    startActivity(intent);
-                                }
-                                // play video
-                                else {
-                                    Intent intent = new Intent(getActivity(), PlaybackActivity.class);
-                                    intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
                                     startActivity(intent);
                                 }
                             }
