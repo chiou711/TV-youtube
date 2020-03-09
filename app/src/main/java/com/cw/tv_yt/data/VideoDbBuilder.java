@@ -18,6 +18,7 @@ package com.cw.tv_yt.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.util.Log;
 
 import com.cw.tv_yt.R;
@@ -115,9 +116,16 @@ public class VideoDbBuilder {
                     String cardImageUrl;
                     cardImageUrl = (String) link.opt("note_image_uri");
                     System.out.println("VideoDbBuilder / _buildMedia / cardImageUrl = " + cardImageUrl);
-                    if(
-                        ( linkUrl.contains("youtube") || linkUrl.contains("youtu.be") ) ) {
+
+                    // for YouTube link
+                    if(( linkUrl.contains("youtube") || linkUrl.contains("youtu.be") ) ) {
                         cardImageUrl = "https://img.youtube.com/vi/" + Utils.getYoutubeId(linkUrl) + "/0.jpg";
+                    }
+                    // for HTML link
+                    else if(cardImageUrl == null)
+                    {
+                        Uri uri = Uri.parse("android.resource://" + mContext.getResources().getDrawable(R.drawable.movie, null));
+                        cardImageUrl = uri.getPath();
                     }
 
                     ContentValues videoValues = new ContentValues();

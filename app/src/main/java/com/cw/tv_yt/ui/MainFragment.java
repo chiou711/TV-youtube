@@ -975,25 +975,34 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                                     setNewId(getPlayId() + 1);
                                 } else {
                                     // manual play
-                                    Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
-                                    intent.putExtra(VideoDetailsActivity.VIDEO, video);
-
                                     getActivity().runOnUiThread(new Runnable() {
                                         public void run() {
-                                            if (urlStr.contains("youtube") || urlStr.contains("youtu.be")) {
-                                                // play YouTube
-                                                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                                                        getActivity(),
-                                                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-                                                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-                                                startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
-                                            }
+                                            // for VideoDetailsActivity
+//                                            Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
+//                                            intent.putExtra(VideoDetailsActivity.VIDEO, video);
+//                                            if (urlStr.contains("youtube") || urlStr.contains("youtu.be")) {
+//                                                // play YouTube
+//                                                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                                                        getActivity(),
+//                                                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+//                                                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+//                                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
+//                                            }
+
+                                            // for open directly
+                                            setPlayId((int) ((Video) (item)).id);
+                                            String idStr = getYoutubeId(((Video) item).videoUrl);
+                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                                            intent.putExtra("force_fullscreen", true);
+                                            intent.putExtra("finish_on_ended", true);
+                                            startActivity(intent);
                                         }
                                     });
                                 }
                             }
                             else {
                                 // play video
+                                // https://drive.google.com/uc?export=view&id=ID
                                  if(urlStr.contains("https://drive.google.com/uc?export=view")){
                                     Intent intent = new Intent(getActivity(), PlaybackActivity.class);
                                     intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
