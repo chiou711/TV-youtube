@@ -990,12 +990,26 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                                            }
 
                                             // for open directly
-                                            setPlayId((int) ((Video) (item)).id);
-                                            String idStr = getYoutubeId(((Video) item).videoUrl);
-                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-                                            intent.putExtra("force_fullscreen", true);
-                                            intent.putExtra("finish_on_ended", true);
-                                            startActivity(intent);
+//                                            setPlayId((int) ((Video) (item)).id);
+//                                            String idStr = getYoutubeId(((Video) item).videoUrl);
+//                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+//                                            intent.putExtra("force_fullscreen", true);
+//                                            intent.putExtra("finish_on_ended", true);
+//                                            startActivity(intent);
+
+                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
+                                            Intent appIntent = new Intent(Intent.ACTION_VIEW, linkUri);
+
+                                            // case: w/o chooser
+//                                            startActivity(appIntent);
+
+                                            // case: w/ chooser
+                                            String title = "Select an APP";
+                                            Intent chooser = Intent.createChooser(appIntent, title);
+                                            if (appIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                                                startActivity(chooser);
+                                            }
+
                                         }
                                     });
                                 }
