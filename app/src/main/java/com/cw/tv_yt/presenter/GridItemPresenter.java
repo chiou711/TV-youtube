@@ -57,7 +57,7 @@ public class GridItemPresenter extends Presenter {
         view.setFocusableInTouchMode(true);
         view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),
                 R.color.default_background));
-        view.setTextColor(Color.WHITE);
+        view.setTextColor(mainFragment.getResources().getColor(R.color.category_text));
         view.setGravity(Gravity.CENTER);
 
         view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -71,11 +71,9 @@ public class GridItemPresenter extends Presenter {
 //                    System.out.println("v is not selected");
 //                }
                 if(hasFocus)
-                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),
-                            R.color.selected_background));
+                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),R.color.selected_background));
                 else
-                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),
-                            R.color.default_background));
+                    view.setBackgroundColor(ContextCompat.getColor(parent.getContext(),R.color.default_background));
             }
         });
 
@@ -90,11 +88,12 @@ public class GridItemPresenter extends Presenter {
         try {
             int cate_num = Utils.getPref_focus_category_number(mainFragment.getContext());
             String cate_name = Utils.getPref_category_name(mainFragment.getContext(), cate_num);
+
+            // set focus category text color
             if (item.toString().equalsIgnoreCase(cate_name))
-                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.current_preference_background));
+                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
             else
-//                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
-                ((TextView) viewHolder.view).setTextColor(Color.rgb(0x40,0x40,0x70));
+                ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.category_text));
         } catch(Exception e)
         {
             e.printStackTrace();

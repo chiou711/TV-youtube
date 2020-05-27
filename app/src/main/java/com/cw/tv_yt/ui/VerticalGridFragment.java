@@ -130,6 +130,7 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
                 System.out.println("VerticalGridFragment /  _onItemClicked");
                 Video video = (Video) item;
 
+                // if auto play is set then do direct launch
                 if(!Pref.isAutoPlay(getActivity())) {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);

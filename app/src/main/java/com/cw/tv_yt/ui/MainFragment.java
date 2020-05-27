@@ -39,7 +39,6 @@ import androidx.leanback.app.BrowseSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.CursorObjectAdapter;
 import androidx.leanback.widget.HeaderItem;
-import androidx.leanback.widget.ImageCardView;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.OnItemViewClickedListener;
@@ -698,8 +697,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         System.out.println("MainFragment / _onLoadFinished");
+        System.out.println("MainFragment / _onLoadFinished /  start rowsLoadedCount = " + rowsLoadedCount);
+        System.out.println("MainFragment / _onLoadFinished /  mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
+
         // return when load is OK
         if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
+            System.out.println("MainFragment / _onLoadFinished / return");//??? not needed this?
             return;
         }
 
@@ -711,7 +714,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             else if(loaderId == TITLE_LOADER)
                 System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
             else
-                System.out.println("MainFragment / _onLoadFinished / loaderId = " + loaderId);
+                System.out.println("MainFragment / _onLoadFinished / loaderId (video) = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
                 mCategoryNames = new ArrayList<>();
@@ -809,12 +812,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 mTitleRowAdapter.add(row);
 
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
-                // cursors have loaded.
 
-                // set focus category item position
+                // set focus category item position ??? why position error for 1st time launch (run App)
                 int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
                 setSelectedPosition(0);
                 setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(cate_number-1));
+
+                /**
+                 *  end of loading category
+                 * */
+                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
+                System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished category");
+                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
 
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
@@ -824,17 +833,27 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 int video_id = data.getInt(columnIndex);
                 System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
                 int sizeOfRowLinks = data.getCount();
-	            System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
+                System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
 
-	            List<Integer> page = new ArrayList<>();
-	            for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)
-	                page.add(i);
+                List<Integer> page = new ArrayList<>();
+                for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)
+                    page.add(i);
 
-	            mPages.add(page);
+                mPages.add(page);
 
                 // one row added
                 rowsLoadedCount++;
                 System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
+
+                /**
+                 *  end of loading video
+                 * */
+                if(rowsLoadedCount == mVideoCursorAdapters.size() )
+                {
+                    System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
+                    System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished video");
+                    System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
+                }
             }
         } else {
             /***
@@ -877,7 +896,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         } else {
             mTitleRowAdapter.clear();
         }
-
     }
 
     // get default URL
@@ -990,25 +1008,26 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                                            }
 
                                             // for open directly
-//                                            setPlayId((int) ((Video) (item)).id);
-//                                            String idStr = getYoutubeId(((Video) item).videoUrl);
-//                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-//                                            intent.putExtra("force_fullscreen", true);
-//                                            intent.putExtra("finish_on_ended", true);
-//                                            startActivity(intent);
+                                            setPlayId((int) ((Video) (item)).id);
+                                            String idStr = getYoutubeId(((Video) item).videoUrl);
+                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                                            intent.putExtra("force_fullscreen", true);
+                                            intent.putExtra("finish_on_ended", true);
+                                            startActivity(intent);
 
-                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
-                                            Intent appIntent = new Intent(Intent.ACTION_VIEW, linkUri);
+                                            // for testing NewPipe
+//                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
+//                                            Intent appIntent = new Intent(Intent.ACTION_VIEW, linkUri);
 
                                             // case: w/o chooser
 //                                            startActivity(appIntent);
 
                                             // case: w/ chooser
-                                            String title = "Select an APP";
-                                            Intent chooser = Intent.createChooser(appIntent, title);
-                                            if (appIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-                                                startActivity(chooser);
-                                            }
+//                                            String title = "Select an APP";
+//                                            Intent chooser = Intent.createChooser(appIntent, title);
+//                                            if (appIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+//                                                startActivity(chooser);
+//                                            }
 
                                         }
                                     });
@@ -1188,27 +1207,30 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         getActivity().startActivity(new_intent);
     }
 
-
     private static int currentNavPosition;
 
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                 RowPresenter.ViewHolder rowViewHolder, Row row) {
+
             if(itemViewHolder!= null && itemViewHolder.view != null)
                 itemViewHolder.view.setBackgroundColor(getResources().getColor(R.color.selected_background));
 
             if (item instanceof Video) {
+                System.out.println("---------- onItemSelected / video");
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
             }
             else if (item instanceof String) {
+                System.out.println("---------- onItemSelected / category");
                 // category selection header
 //                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.getActivity());
 //                System.out.println("---------- focus cate_number = " + cate_number);
 //                String cate_name = Utils.getPref_category_name(MainFragment.this.getActivity(), cate_number);
 //                System.out.println("---------- focus cate_name = " + cate_name);
 //                System.out.println("---------- itemViewHolder.view.getId() = " + itemViewHolder.view.getId());
+//                System.out.println("---------- mCategoryNames.size() = " + mCategoryNames.size());
 
                 for(int i=0;i<mCategoryNames.size();i++)
                 {
