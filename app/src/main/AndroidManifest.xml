@@ -65,7 +65,7 @@
             android:label="@string/app_name"
             android:logo="@drawable/tt"
             android:screenOrientation="unspecified"
-            android:theme="@style/Theme.Leanback.Browse">
+            android:theme="@style/Theme.Leanback.Browse.New">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

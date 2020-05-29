@@ -7,4 +7,12 @@
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:colorPrimary">@color/fastlane_background</item>
     </style>
+
+    <style name="Theme.Leanback.Browse.New" parent="Theme.Leanback">
+        <item name="searchOrbViewStyle">@style/ReplaceSearchOrbView</item>
+    </style>
+    <style name="ReplaceSearchOrbView" parent="Widget.Leanback.SearchOrbViewStyle">
+        <item name="searchOrbIcon">@drawable/refresh_40</item>
+    </style>
+
 </resources>

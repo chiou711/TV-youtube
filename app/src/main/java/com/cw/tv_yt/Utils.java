@@ -19,9 +19,10 @@ package com.cw.tv_yt;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
 import android.media.MediaMetadataRetriever;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -29,11 +30,9 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.VideoView;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import com.cw.tv_yt.data.DbHelper;
+
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -171,6 +170,22 @@ public class Utils {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "current_category_number";
         pref.edit().remove(keyName).apply();
+    }
+
+    // get video tables count
+    public static int getVideoTablesCount(Context context)
+    {
+        // get video tables count
+        DbHelper mOpenHelper = new DbHelper(context);
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
+        SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+
+        String SQL_GET_ALL_TABLES = "SELECT * FROM sqlite_master WHERE name like 'video%'";
+        Cursor cursor = sqlDb.rawQuery(SQL_GET_ALL_TABLES, null);
+        int countVideoTables = cursor.getCount();
+        cursor.close();
+        sqlDb.close();
+        return countVideoTables;
     }
 
 }
