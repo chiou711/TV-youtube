@@ -41,10 +41,6 @@
     <string name="search_results">Search results for \'%1$s\'</string>
     <string name="no_search_results">No search results found for \'%1$s\'</string>
 
-    <string name="catalog_url_1">
-        https://drive.google.com/uc?export=download&amp;id=1rmE2Vm3F0bBWRWOWy-_HzAE-MAFd88F-
-    </string>
-
     <!-- Error messages -->
 
     <string name="videos_loading_error">Failed to load videos. Please check your network connection.</string>
@@ -143,4 +139,9 @@
     <string name="database_delete_item">刪除當前項目</string>
     <!--  connection error  -->
     <string name="connection_error">網路連線錯誤</string>
+
+    <!-- default URL link  -->
+    <string name="catalog_url_1">
+        https://drive.google.com/uc?export=download&amp;id=1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm
+    </string>
 </resources>
