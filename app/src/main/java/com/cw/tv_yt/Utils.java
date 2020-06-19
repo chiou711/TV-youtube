@@ -188,4 +188,24 @@ public class Utils {
         return countVideoTables;
     }
 
+    // Get YouTube playlist Id
+    public static String getYoutubePlaylistId(String url) {
+
+        String videoId = "";
+
+        if (url != null && url.trim().length() > 0 && url.startsWith("http")) {
+            String expression = "^.*((youtu.be/)|(v/)|(/u/w/)|(embed/)|(playlist\\?))\\??v?=?([^#&?]*).*list?=?([^#&?]*).*";
+            CharSequence input = url;
+            Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+            Matcher matcher = pattern.matcher(input);
+            if (matcher.matches()) {
+                String groupIndex1 = matcher.group(8);
+                if (groupIndex1 != null )
+                    videoId = groupIndex1;
+            }
+        }
+        System.out.println("Util / _getYoutubePlaylistId / playlist_id = " + videoId);
+        return videoId;
+    }
+
 }

@@ -958,7 +958,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 String path;
                 // YouTube or HTML
-                if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
+                if(!urlStr.contains("playlist") && ( urlStr.contains("youtube") || urlStr.contains("youtu.be") ))
                     path = "https://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
                 else
                     path = urlStr;
@@ -1018,13 +1018,23 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
 //                                            }
 
-                                            // for open directly
-                                            setPlayId((int) ((Video) (item)).id);
-                                            String idStr = getYoutubeId(((Video) item).videoUrl);
-                                            Intent intent  = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-                                            intent.putExtra("force_fullscreen", true);
-                                            intent.putExtra("finish_on_ended", true);
-                                            startActivity(intent);
+                                            if(((Video) item).videoUrl.contains("playlist"))
+                                            {
+                                                String playListIdStr = Utils.getYoutubePlaylistId(((Video) item).videoUrl);
+                                                Intent intent = YouTubeIntents.createPlayPlaylistIntent(getActivity(), playListIdStr);
+                                                intent.putExtra("force_fullscreen", true);
+                                                intent.putExtra("finish_on_ended", true);
+                                                startActivity(intent);
+                                            }
+                                            else {
+                                                // for open directly
+                                                setPlayId((int) ((Video) (item)).id);
+                                                String idStr = getYoutubeId(((Video) item).videoUrl);
+                                                Intent intent = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                                                intent.putExtra("force_fullscreen", true);
+                                                intent.putExtra("finish_on_ended", true);
+                                                startActivity(intent);
+                                            }
 
                                             // for testing NewPipe
 //                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
