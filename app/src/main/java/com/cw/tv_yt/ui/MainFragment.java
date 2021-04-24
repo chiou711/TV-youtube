@@ -605,17 +605,23 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // changed to: renew DB
-                startRenewFetchService();
+
+                // case: select link source
+                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
+                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+                startActivity(intent, bundle);
+
+                // case: renew DB
+//                startRenewFetchService();
 
                 // remove reference keys
-                Utils.removePref_focus_category_number(getActivity());
-
-                int countVideoTables = Utils.getVideoTablesCount(getActivity());
-
-                // remove category name key
-                for(int i = 1; i<= countVideoTables; i++)
-                    Utils.removePref_category_name(getActivity(),i);
+//                Utils.removePref_focus_category_number(getActivity());
+//
+//                int countVideoTables = Utils.getVideoTablesCount(getActivity());
+//
+//                // remove category name key
+//                for(int i = 1; i<= countVideoTables; i++)
+//                    Utils.removePref_category_name(getActivity(),i);
             }
         });
 
@@ -881,7 +887,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // data base is not created yet, call service for the first time
                 Intent serviceIntent = new Intent(getActivity(), FetchCategoryService.class);
-                serviceIntent.putExtra("FetchUrl", getDefaultUrl(INIT_NUMBER));
+                int linkSrcNum = Utils.getPref_link_source_number(getActivity());
+                serviceIntent.putExtra("FetchUrl", getDefaultUrl(linkSrcNum) );
                 getActivity().startService(serviceIntent);
             }
             // Start an Intent to fetch the videos
@@ -892,7 +899,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 Utils.setPref_focus_category_number(getContext(),1);
 
                 Intent serviceIntent = new Intent(getActivity(), FetchVideoService.class);
-                serviceIntent.putExtra("FetchUrl", getDefaultUrl(INIT_NUMBER));
+                int linkSrcNum = Utils.getPref_link_source_number(getActivity());
+                serviceIntent.putExtra("FetchUrl", getDefaultUrl(linkSrcNum));
                 getActivity().startService(serviceIntent);
             }
         }
@@ -909,6 +917,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             mTitleRowAdapter.clear();
         }
     }
+
+    public static int getLinkSrcNumber() {
+        return linkSrcNumber;
+    }
+
+    public static void setLinkSrcNumber(int linkSrcNumber) {
+        MainFragment.linkSrcNumber = linkSrcNumber;
+    }
+
+    public static int linkSrcNumber;
+
 
     // get default URL
     private String getDefaultUrl(int init_number)

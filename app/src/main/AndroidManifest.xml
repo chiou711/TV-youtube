@@ -15,7 +15,9 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.cw.tv_yt">
+    package="com.cw.tv_yt"
+    android:versionCode="1"
+    android:versionName="0.00.01">
 
     <permission
         android:name="${applicationId}.ACCESS_VIDEO_DATA"
@@ -117,6 +119,11 @@
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
             android:name="com.cw.tv_yt.ui.SelectCategoryActivity"
+            android:exported="true"
+            android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
+            android:theme="@style/Theme.Leanback.VerticalGrid" />
+        <activity
+            android:name="com.cw.tv_yt.ui.SelectLinkSrcActivity"
             android:exported="true"
             android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />

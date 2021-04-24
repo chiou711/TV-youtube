@@ -122,7 +122,7 @@ public class Utils {
         return videoId;
     }
 
-    // set category name
+    // set category number
     public static void setPref_focus_category_number(Context context, int cateNumber )
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
@@ -130,11 +130,27 @@ public class Utils {
         pref.edit().putInt(keyName, cateNumber).apply();
     }
 
-    // get category name
+    // get category number
     public static int getPref_focus_category_number (Context context)
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "current_category_number";
+        return pref.getInt(keyName, 1); // focus table Id: default is 1
+    }
+
+    // set link source number
+    public static void setPref_link_source_number(Context context, int linkSrcNumber )
+    {
+        SharedPreferences pref = context.getSharedPreferences("link_src", 0);
+        String keyName = "link_source_number";
+        pref.edit().putInt(keyName, linkSrcNumber).apply();
+    }
+
+    // get link source number
+    public static int getPref_link_source_number (Context context)
+    {
+        SharedPreferences pref = context.getSharedPreferences("link_src", 0);
+        String keyName = "link_source_number";
         return pref.getInt(keyName, 1); // focus table Id: default is 1
     }
 

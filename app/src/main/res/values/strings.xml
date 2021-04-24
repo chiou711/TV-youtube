@@ -21,6 +21,7 @@
     <string name="related_movies">Related Videos</string>
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="select_category_title"><![CDATA[Select Category]]></string>
+    <string name="select_link_src_title"><![CDATA[Select Link Source]]></string>
 
     <string name="popular_header">TV YouTube</string>
     <string name="more_samples">More</string>
@@ -142,5 +143,11 @@
     <!-- default URL link  -->
     <string name="catalog_url_1">
         https://drive.google.com/uc?export=download&amp;id=1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm
+    </string>
+    <string name="catalog_url_2">
+        https://drive.google.com/uc?export=download&amp;id=1Cy_GhptCs1PA2nduwDLRK2S8tMszKqc8
+    </string>
+    <string name="catalog_url_3">
+        https://drive.google.com/uc?export=download&amp;id=1mvqjXrAMLbx0TDYLBIb3v5HbQ4c9SrwT
     </string>
 </resources>
