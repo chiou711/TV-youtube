@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!--        https://drive.google.com/uc?export=download&amp;id=1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm-->
+
+    <!-- Default_TV-youtube -->
+    <string name="db_source_id_1" tools:ignore="ExtraTranslation" translatable="false">
+        1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm
+    </string>
+
+    <!-- 英文耐聽 -->
+    <string name="db_source_id_2" tools:ignore="ExtraTranslation" translatable="false">
+        1Cy_GhptCs1PA2nduwDLRK2S8tMszKqc8
+    </string>
+
+    <!-- music -->
+    <string name="db_source_id_3" tools:ignore="ExtraTranslation" translatable="false">
+        1mvqjXrAMLbx0TDYLBIb3v5HbQ4c9SrwT
+    </string>
+
+</resources>

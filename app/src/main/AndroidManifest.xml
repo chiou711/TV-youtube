@@ -50,19 +50,18 @@
 
 
         <activity
-            android:name="com.cw.tv_yt.ui.SplashScreen"
+            android:name=".ui.SplashScreen"
             android:banner="@drawable/tt"
             android:label="@string/app_name"
-            android:logo="@drawable/tt"
-            >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LEANBACK_LAUNCHER" />-->
-            <!--</intent-filter>-->
-        </activity>
+            android:logo="@drawable/tt">
 
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+            <!-- <category android:name="android.intent.category.LEANBACK_LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
         <activity
-            android:name="com.cw.tv_yt.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:icon="@drawable/tt"
             android:label="@string/app_name"
             android:logo="@drawable/tt"
@@ -73,15 +72,14 @@
 
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!--<activity android:name="com.cw.tv_yt.mobile.MobileWelcomeActivity">-->
-        <activity android:name="com.cw.tv_yt.mobile.MobileWelcomeActivity"
-                  android:icon="@drawable/tt"
-                  android:label="@string/app_name"
-                  android:logo="@drawable/tt"
-                  android:screenOrientation="unspecified"
-                  android:theme="@style/Theme.Leanback.Browse">
+        </activity> <!-- <activity android:name="com.cw.tv_yt.mobile.MobileWelcomeActivity"> -->
+        <activity
+            android:name=".mobile.MobileWelcomeActivity"
+            android:icon="@drawable/tt"
+            android:label="@string/app_name"
+            android:logo="@drawable/tt"
+            android:screenOrientation="unspecified"
+            android:theme="@style/Theme.Leanback.Browse">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -89,10 +87,12 @@
             </intent-filter>
         </activity>
 
-        <meta-data android:name="android.app.default_searchable"
+        <meta-data
+            android:name="android.app.default_searchable"
             android:value=".ui.VideoDetailsActivity" />
+
         <activity
-            android:name="com.cw.tv_yt.ui.VideoDetailsActivity"
+            android:name=".ui.VideoDetailsActivity"
             android:exported="true"
             android:theme="@style/Theme.Leanback.Details">
 
@@ -108,43 +108,41 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name="com.cw.tv_yt.ui.PlaybackActivity"
+            android:name=".ui.PlaybackActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|layoutDirection"
             android:launchMode="singleTask"
             android:resizeableActivity="true" />
         <activity
-            android:name="com.cw.tv_yt.ui.VerticalGridActivity"
+            android:name=".ui.VerticalGridActivity"
             android:exported="true"
-            android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name="com.cw.tv_yt.ui.SelectCategoryActivity"
+            android:name=".ui.SelectCategoryActivity"
             android:exported="true"
-            android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name="com.cw.tv_yt.ui.SelectLinkSrcActivity"
+            android:name=".ui.SelectLinkSrcActivity"
             android:exported="true"
-            android:parentActivityName="com.cw.tv_yt.ui.MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
-        <activity android:name="com.cw.tv_yt.ui.SearchActivity" />
+        <activity android:name=".ui.SearchActivity" />
         <activity
-            android:name="com.cw.tv_yt.ui.GuidedStepActivity"
-            android:theme="@style/Theme.Example.Leanback.GuidedStep" />
-
-        <!-- Provides search suggestions for keywords against video metadata. -->
+            android:name=".ui.GuidedStepActivity"
+            android:theme="@style/Theme.Example.Leanback.GuidedStep" /> <!-- Provides search suggestions for keywords against video metadata. -->
         <provider
-            android:name="com.cw.tv_yt.data.VideoProvider"
+            android:name=".data.VideoProvider"
             android:authorities="${packageName}"
-            android:permission="${applicationId}.ACCESS_VIDEO_DATA"
-            android:exported="true">
+            android:exported="true"
+            android:permission="${applicationId}.ACCESS_VIDEO_DATA">
             <path-permission
                 android:pathPrefix="/search"
                 android:readPermission="android.permission.GLOBAL_SEARCH" />
         </provider>
 
         <receiver
-            android:name="com.cw.tv_yt.recommendation.RecommendationReceiver"
+            android:name=".recommendation.RecommendationReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -153,25 +151,26 @@
         </receiver>
 
         <service
-            android:name="com.cw.tv_yt.data.FetchVideoService"
+            android:name=".data.FetchVideoService"
             android:exported="false" />
         <service
-            android:name="com.cw.tv_yt.data.FetchCategoryService"
+            android:name=".data.FetchCategoryService"
             android:exported="false" />
         <service
-            android:name="com.cw.tv_yt.recommendation.UpdateRecommendationsService"
+            android:name=".recommendation.UpdateRecommendationsService"
             android:enabled="true" />
 
-        <activity android:name="com.cw.tv_yt.ui.OnboardingActivity"
+        <activity
+            android:name=".ui.OnboardingActivity"
             android:enabled="true"
             android:exported="true"
             android:theme="@style/Theme.Leanback.Onboarding" />
-        <activity android:name="com.cw.tv_yt.ui.SettingsActivity"
-            android:exported="true"
-            android:theme="@style/LeanbackPreferences"
-            />
         <activity
-            android:name="com.cw.tv_yt.ui.AuthenticationActivity"
+            android:name=".ui.SettingsActivity"
+            android:exported="true"
+            android:theme="@style/LeanbackPreferences" />
+        <activity
+            android:name=".ui.AuthenticationActivity"
             android:theme="@style/Theme.Example.Leanback.GuidedStep" />
     </application>
 

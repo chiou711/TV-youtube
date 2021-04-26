@@ -121,7 +121,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private FetchServiceResponseReceiver responseReceiver;
     private LocalBroadcastManager localBroadcastMgr;
 
-    // initial number of default URL: catalog_url_x
+    // initial number of default URL: db_source_id_x
     private final int INIT_NUMBER = 1;
 
     @Override
@@ -932,10 +932,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     // get default URL
     private String getDefaultUrl(int init_number)
     {
-        String urlName = "catalog_url_".concat(String.valueOf(init_number));
+        String urlId = "db_source_id_".concat(String.valueOf(init_number));
         int id = Objects.requireNonNull(getActivity())
-                .getResources().getIdentifier(urlName,"string",getActivity().getPackageName());
-        return getString(id);
+                .getResources().getIdentifier(urlId,"string",getActivity().getPackageName());
+        // note: AND sign expression
+        //  in XML: &amp;
+        //  in Java: &
+        return "https://drive.google.com/uc?export=download&id=" +  getString(id);
     }
 
     private class UpdateBackgroundTask implements Runnable {

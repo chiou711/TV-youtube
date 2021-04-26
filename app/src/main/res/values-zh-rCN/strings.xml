@@ -141,14 +141,4 @@
     <!--  connection error  -->
     <string name="connection_error">网络连接错误</string>
 
-    <!-- default URL link  -->
-    <string name="catalog_url_1">
-        https://drive.google.com/uc?export=download&amp;id=1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm
-    </string>
-    <string name="catalog_url_2">
-        https://drive.google.com/uc?export=download&amp;id=1Cy_GhptCs1PA2nduwDLRK2S8tMszKqc8
-    </string>
-    <string name="catalog_url_3">
-        https://drive.google.com/uc?export=download&amp;id=1mvqjXrAMLbx0TDYLBIb3v5HbQ4c9SrwT
-    </string>
 </resources>
