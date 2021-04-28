@@ -72,6 +72,7 @@ import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.FetchCategoryService;
 import com.cw.tv_yt.data.FetchVideoService;
+import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
@@ -932,13 +933,19 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     // get default URL
     private String getDefaultUrl(int init_number)
     {
-        String urlId = "db_source_id_".concat(String.valueOf(init_number));
-        int id = Objects.requireNonNull(getActivity())
-                .getResources().getIdentifier(urlId,"string",getActivity().getPackageName());
-        // note: AND sign expression
-        //  in XML: &amp;
-        //  in Java: &
-        return "https://drive.google.com/uc?export=download&id=" +  getString(id);
+        // in res/values
+//        String name = "db_source_id_".concat(String.valueOf(init_number));
+//        int res_id = Objects.requireNonNull(getActivity())
+//                .getResources().getIdentifier(name,"string",getActivity().getPackageName());
+//        return "https://drive.google.com/uc?export=download&id=" +  getString(res_id);
+
+        // in assets
+        List<String> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
+        int index = init_number -1;
+//        // note: AND sign expression
+//        //  in XML: &amp;
+//        //  in Java: &
+        return "https://drive.google.com/uc?export=download&id=" + src_links.get(index);
     }
 
     private class UpdateBackgroundTask implements Runnable {
