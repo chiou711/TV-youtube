@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.DbHelper;
+import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
@@ -204,9 +205,13 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
         System.out.println("SelectLinkSrcFragment / _loadData");
 
         // add source names
-        List<String> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
-        for(int i=1;i<=src_links.size();i++) {
-            mLinkSrcNames.add("Source "+ i);
+        List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
+
+        System.out.println(" SelectLinkSrcFragment / _loadData / src_links.size() = " + src_links.size());
+            for(int i=0;i<src_links.size();i++) {
+                String title = src_links.get(i).getFirst();
+                System.out.println(" SelectLinkSrcFragment / _loadData / title = " + title);
+            mLinkSrcNames.add(src_links.get(i).getFirst());
         }
 
         for(int i = 0; i< mLinkSrcNames.size(); i++) {

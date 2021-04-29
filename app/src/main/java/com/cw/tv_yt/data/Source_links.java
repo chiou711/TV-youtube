@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Source_links {
 
-	public static List<String> getFileIdList(Activity act) {
+	public static List<Pair<String, String>> getFileIdList(Activity act) {
 
 		// in res/raw
 //        Context context = getActivity().getApplicationContext();
@@ -26,7 +26,7 @@ public class Source_links {
 		// in assets
 		AssetManager assetManager = act.getAssets();
 		InputStream in_stream = null;
-		List<String> file_id_list = new ArrayList<>();
+		List<Pair<String, String>> file_id_list = new ArrayList<Pair<String, String>>();
 
 		try {
 			in_stream = assetManager.open("db_src_links.xml");
@@ -39,38 +39,51 @@ public class Source_links {
 
 		try {
 			XmlPullParser xpp = XmlPullParserFactory.newInstance().newPullParser();
+			assert in_stream != null;
 			xpp.setInput(new InputStreamReader(in_stream));
 
 			eventType = xpp.getEventType();
 
+			Pair<String, String> pair = new Pair<>("","");
+			String tag = null;
 			do {
 				switch (eventType) {
-
 					case XmlPullParser.START_TAG:
-						final String tag = xpp.getName();
-						if ("string".equals(tag)) {
+						tag = xpp.getName();
+						//System.out.println("---- tag = " + tag);
+						if ("id".equals(tag)) {
 						}
 						break;
 
 					case XmlPullParser.TEXT:
-						String file_id = xpp.getText();
-						file_id = file_id.trim();
-						if (!file_id.isEmpty()) {
-							System.out.println("--- file ID = " + file_id);
-							file_id_list.add(file_id);
+						String text = xpp.getText();
+						text = text.trim();
+						//System.out.println("---- text  = " + text);
+						if (!text.isEmpty()) {
+							if ("title".equals(tag))
+								pair.setFirst(text);
+							else if ("id".equals(tag))
+								pair.setSecond(text);
 						}
 						break;
+				}
+
+//				System.out.println("---- pair.getFirst()  = " + pair.getFirst());
+//				System.out.println("---- pair.getSecond()  = " + pair.getSecond());
+				if( !(pair.getFirst()).isEmpty() &&
+					!(pair.getSecond()).isEmpty() ) {
+					file_id_list.add(pair);
+					pair = new Pair<>("","");
 				}
 
 			} while ((eventType = xpp.next()) != XmlPullParser.END_DOCUMENT);
 
 		} catch (
-				XmlPullParserException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+				XmlPullParserException | IOException e) {
 			e.printStackTrace();
 		}
 
 		return  file_id_list;
 	}
+
 }

@@ -72,6 +72,7 @@ import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.FetchCategoryService;
 import com.cw.tv_yt.data.FetchVideoService;
+import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
@@ -940,12 +941,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //        return "https://drive.google.com/uc?export=download&id=" +  getString(res_id);
 
         // in assets
-        List<String> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
+        List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
         int index = init_number -1;
 //        // note: AND sign expression
 //        //  in XML: &amp;
 //        //  in Java: &
-        return "https://drive.google.com/uc?export=download&id=" + src_links.get(index);
+        return "https://drive.google.com/uc?export=download&id=" + src_links.get(index).getSecond();
     }
 
     private class UpdateBackgroundTask implements Runnable {
