@@ -166,6 +166,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         rowsLoadedCount = 0;
 	    mPages = new ArrayList<>();
 
+	    // list for Show row number - link number
+        links_count_of_row = new ArrayList<>();
+        start_number_of_row = new ArrayList<>();
+
 	    setTotalLinksCount();
     }
 
@@ -713,6 +717,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     private List<List> mPages;
+    public static List<Integer> links_count_of_row;
+    public static List<Integer> start_number_of_row;
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         System.out.println("MainFragment / _onLoadFinished");
@@ -852,6 +859,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
                 int sizeOfRowLinks = data.getCount();
                 System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
+
+                // start number of a row
+                start_number_of_row.add(video_id);
+                // links count of a row
+                links_count_of_row.add(sizeOfRowLinks);
 
                 List<Integer> page = new ArrayList<>();
                 for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)

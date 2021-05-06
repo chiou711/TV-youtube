@@ -27,6 +27,7 @@ import androidx.leanback.widget.Presenter;
 import androidx.core.content.ContextCompat;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -37,6 +38,8 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.ui.MainFragment;
 import com.cw.tv_yt.ui.VideoDetailsActivity;
+
+import java.util.List;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
@@ -84,13 +87,35 @@ public class CardPresenter extends Presenter {
     }
 
     @Override
-    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object item) {
+    public void onBindViewHolder(ViewHolder viewHolder, Object item) {
         Video video = (Video) item;
 
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         cardView.setTitleText(video.title);
         ((TextView)cardView.findViewById(R.id.title_text)).setLines(3);// setMaxLines(5);
-//        cardView.setContentText(video.studio);
+
+        // set position text view
+        // get row number - link number of the row
+        List<Integer> links_of_row = MainFragment.links_count_of_row;
+        List<Integer> start_of_row = MainFragment.start_number_of_row;
+        int rows_count = links_of_row.size();
+        long link_count = 0;
+        int row_count = 0;
+        for(int i=0;i<rows_count;i++) {
+            if(i == 0 ) {
+                link_count = video.id;
+                row_count = 1;
+            } else if( (start_of_row.get(i) <= video.id) && (video.id <= (start_of_row.get(i) + links_of_row.get(i))) ) {
+                link_count = video.id - start_of_row.get(i) + 1;
+                row_count = i+1;
+            }
+        }
+
+        // show row number - link number of the row
+        cardView.setContentText(row_count + "-" + link_count);
+        TextView positionText = ((TextView)cardView.findViewById(R.id.content_text));
+        positionText.setTextColor(act.getResources().getColor(R.color.category_text));
+        positionText.setGravity(Gravity.RIGHT);
 
         if (video.cardImageUrl != null) {
             // Set card size from dimension resources.
