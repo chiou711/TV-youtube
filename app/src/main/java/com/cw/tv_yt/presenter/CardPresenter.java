@@ -35,11 +35,24 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data.YouTubeDeveloperKey;
+import com.cw.tv_yt.data.YouTubeTimeConvert;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.ui.MainFragment;
 import com.cw.tv_yt.ui.VideoDetailsActivity;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.VideoListResponse;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
@@ -50,11 +63,22 @@ public class CardPresenter extends Presenter {
     private int mDefaultBackgroundColor = -1;
     private Drawable mDefaultCardImage;
     FragmentActivity act;
+    private static YouTube youtube;
+    boolean isGotDuration;
+    String acquiredDuration;
+    String duration;
 
     public  CardPresenter(){}
 
     public CardPresenter(FragmentActivity main_act){
         act = main_act;
+
+        // for Get duration
+        youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
+            public void initialize(HttpRequest request) throws IOException {
+            }
+        }
+        ).setApplicationName("TV-youtube").build();
     }
 
     @Override
@@ -100,19 +124,40 @@ public class CardPresenter extends Presenter {
         List<Integer> start_of_row = MainFragment.start_number_of_row;
         int rows_count = links_of_row.size();
         long link_count = 0;
+        int links_of_current_row = 0;
         int row_count = 0;
         for(int i=0;i<rows_count;i++) {
             if(i == 0 ) {
                 link_count = video.id;
                 row_count = 1;
+                links_of_current_row = links_of_row.get(0);
             } else if( (start_of_row.get(i) <= video.id) && (video.id <= (start_of_row.get(i) + links_of_row.get(i))) ) {
                 link_count = video.id - start_of_row.get(i) + 1;
                 row_count = i+1;
+                links_of_current_row = links_of_row.get(i);
             }
         }
 
+        // get duration
+        isGotDuration = false;
+        getDuration(Utils.getYoutubeId(video.videoUrl));
+        //wait for buffering
+        int time_out_count = 0;
+        while ((!isGotDuration) && time_out_count< 10)
+        {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            time_out_count++;
+        }
+        duration = acquiredDuration;
+
         // show row number - link number of the row
-        cardView.setContentText(row_count + "-" + link_count);
+        cardView.setContentText( duration +
+                "    (" + link_count + "/" + links_of_current_row+")    " +
+                " L" + row_count );
         TextView positionText = ((TextView)cardView.findViewById(R.id.content_text));
         positionText.setTextColor(act.getResources().getColor(R.color.category_text));
         positionText.setGravity(Gravity.RIGHT);
@@ -163,4 +208,43 @@ public class CardPresenter extends Presenter {
         cardView.setBadgeImage(null);
         cardView.setMainImage(null);
     }
+
+    public void getDuration(String youtubeId) {
+
+        // Call the API and print results.
+        Executors.newSingleThreadExecutor().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("part", "contentDetails");
+                    String stringsList = youtubeId;
+
+                    System.out.println("CardPresenter / _getDuration/ run /stringsList = "+ stringsList);
+                    parameters.put("id", stringsList);
+
+                    YouTube.Videos.List videosListMultipleIdsRequest = youtube.videos().list(parameters.get("part").toString());
+                    videosListMultipleIdsRequest.setKey(YouTubeDeveloperKey.DEVELOPER_KEY);
+                    if (parameters.containsKey("id") && parameters.get("id") != "") {
+                        videosListMultipleIdsRequest.setId(parameters.get("id").toString());
+                    }
+
+                    VideoListResponse response = videosListMultipleIdsRequest.execute();
+
+                    String duration = response.getItems().get(0).getContentDetails().getDuration();
+                    acquiredDuration = YouTubeTimeConvert.convertYouTubeDuration(duration);
+                    System.out.println("CardPresenter / _getDurations / runnable / duration" + "(" + 0 + ") = " + duration);
+
+                    isGotDuration = true;
+                } catch (GoogleJsonResponseException e) {
+                    e.printStackTrace();
+                    System.err.println("There was a service error: " + e.getDetails().getCode() + " : " + e.getDetails().getMessage());
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
+
+            }
+        });
+    }
+
 }
