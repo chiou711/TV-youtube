@@ -220,7 +220,7 @@ public class CardPresenter extends Presenter {
                     parameters.put("part", "contentDetails");
                     String stringsList = youtubeId;
 
-                    System.out.println("CardPresenter / _getDuration/ run /stringsList = "+ stringsList);
+//                    System.out.println("CardPresenter / _getDuration/ run /stringsList = "+ stringsList);
                     parameters.put("id", stringsList);
 
                     YouTube.Videos.List videosListMultipleIdsRequest = youtube.videos().list(parameters.get("part").toString());
@@ -233,7 +233,7 @@ public class CardPresenter extends Presenter {
 
                     String duration = response.getItems().get(0).getContentDetails().getDuration();
                     acquiredDuration = YouTubeTimeConvert.convertYouTubeDuration(duration);
-                    System.out.println("CardPresenter / _getDurations / runnable / duration" + "(" + 0 + ") = " + duration);
+//                    System.out.println("CardPresenter / _getDurations / runnable / duration" + "(" + 0 + ") = " + duration);
 
                     isGotDuration = true;
                 } catch (GoogleJsonResponseException e) {

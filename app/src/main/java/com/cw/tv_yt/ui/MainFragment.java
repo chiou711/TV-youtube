@@ -364,7 +364,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
 
-    int delay = 10;
+    int delay100ms = 100;
     /**
      *  launch next YouTube intent
      */
@@ -385,7 +385,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         {
             // delay
             try {
-                Thread.sleep(delay*100);
+                Thread.sleep(delay100ms *10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -396,13 +396,20 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             // delay
             try {
-                Thread.sleep(delay * 100);
+                Thread.sleep(delay100ms * 10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
+            // method 1: by intent
             String video_url = getYouTubeLink();
             startYouTubeIntent(video_url);
+
+            // method 2 : by UI
+//            mInputConnection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
+//            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_CENTER ));
+//            mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_CENTER));
+
         }
     }
 
@@ -440,47 +447,48 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_LEFT));
                 mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_LEFT));
                 try {
-                    Thread.sleep(delay);
+                    Thread.sleep(delay100ms*2);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-            // add delay to make sure key event works
-            try {
-                Thread.sleep(delay * 100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            // point to first row if meets the end of last row
-            //todo temp mark, wait for adding page factor
-            if(getPlayId() == 1)
-            {
-                  for (int i = (mPages.size()-1); i >= 1; i--) {
-                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
-                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_UP));
-                    try {
-                        Thread.sleep(delay);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else
-            {
-                // point to next row
-                BaseInputConnection connection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
-                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
-                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_DOWN));
-            }
-
-            // add delay for viewer
-            try {
-                Thread.sleep(delay * 100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            // for category play only
+//            // add delay to make sure key event works
+//            try {
+//                Thread.sleep(delay100ms * 2);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//
+//            // TBD: change to other row, problem: item selected is not reset to 1st position
+//            // point to first row if meets the end of last row
+//            if(getPlayId() == 1)
+//            {
+//                  for (int i = (mPages.size()-1); i >= 1; i--) {
+//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_UP));
+//                    mInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_UP));
+//                    try {
+//                        Thread.sleep(delay100ms*2);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                // point to next row
+//                BaseInputConnection connection = new BaseInputConnection(getActivity().findViewById(R.id.main_frame), true);
+//                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DPAD_DOWN));
+//                connection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DPAD_DOWN));
+//            }
+//
+//            // add delay for viewer
+//            try {
+//                Thread.sleep(delay100ms * 10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             return null;
         }
@@ -502,33 +510,40 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         System.out.println("isRowEnd / getNewId() = " + getNewId());
         backSteps = 0;
 
-        for(int i=0;i<mPages.size();i++) {
-            List<Integer> page = mPages.get(i);
-            int firstIdOfRow = page.get(0);
-            System.out.println("isRowEnd / i = " + i);
-            System.out.println("isRowEnd / firstIdOfRow = " + firstIdOfRow);
-            System.out.println("isRowEnd / getNewId() = " + getNewId());
+        // for category play
+//        for(int i=0;i<mPages.size();i++) {
+//            List<Integer> page = mPages.get(i);
+//            int firstIdOfRow = page.get(0);
+//            System.out.println("isRowEnd / i = " + i);
+//            System.out.println("isRowEnd / firstIdOfRow = " + firstIdOfRow);
+//            System.out.println("isRowEnd / getNewId() = " + getNewId());
+//
+//            if(firstIdOfRow == getNewId()) {
+//                isEnd = true;
+//                if(getNewId() == 1) {
+//                    // back steps for last row or 1st row
+//                    backSteps = mPages.get(mPages.size() - 1).size() - 1;
+//                }
+//                else if(i != 0) {
+//                    // back steps for other row
+//                    backSteps = mPages.get(i - 1).size() - 1;
+//                }
+//                break;
+//            }
+//        }
 
-            if(firstIdOfRow == getNewId()) {
-                isEnd = true;
-                if(getNewId() == 1) {
-                    // back steps for last row or 1st row
-                    backSteps = mPages.get(mPages.size() - 1).size() - 1;
-                }
-                else if(i != 0) {
-                    // back steps for other row
-                    backSteps = mPages.get(i - 1).size() - 1;
-                }
-
-                break;
-            }
+        // for row play
+        if(getNewId() == currentRow1stId) {
+            backSteps = currentRowSize-1;
+            isEnd = true;
         }
+
+        System.out.println("isRowEnd / isEnd = " + isEnd);
         System.out.println("isRowEnd / backSteps = " + backSteps);
+
         return isEnd;
     }
 
-
-    @Override
     public void onResume() {
         super.onResume();
 
@@ -862,6 +877,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // start number of a row
                 start_number_of_row.add(video_id);
+
                 // links count of a row
                 links_count_of_row.add(sizeOfRowLinks);
 
@@ -987,6 +1003,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
+    int currentRowPos;
+    int currentRow1stId;
+    int currentRowSize;
+    int currentRowLastId;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -995,6 +1015,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             if (item instanceof Video) {
                 Video video = (Video) item;
                 System.out.println("MainFragment / onItemClicked / id = "+ video.id );
+
+                // for row play only
+                // check row position
+                for(int i=0;i<mPages.size();i++){
+                    if(video.id >= (int)mPages.get(i).get(0))
+                        currentRowPos = i;
+                }
+
+                // video ID starts with 1
+                currentRow1stId = (int)mPages.get(currentRowPos).get(0);
+                currentRowSize = mPages.get(currentRowPos).size();
+                currentRowLastId = currentRow1stId + currentRowSize - 1;
 
                 String urlStr = ((Video) item).videoUrl;
 
@@ -1099,7 +1131,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             else {
                                 // play video
                                 // https://drive.google.com/uc?export=view&id=ID
-                                 if(urlStr.contains("https://drive.google.com/uc?export=view")){
+                                if(urlStr.contains("https://drive.google.com/uc?export=view") ||
+                                   urlStr.contains("https://storage.googleapis.com/android-tv") ){
                                     Intent intent = new Intent(getActivity(), PlaybackActivity.class);
                                     intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
                                     startActivity(intent);
@@ -1188,8 +1221,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private int new_id;
     private void setNewId(int id)
     {
-        if(id > getTotalLinksCount())
-            new_id = 1;
+        // for category play
+//        if(id > getTotalLinksCount())
+//            new_id = 1;
+
+        // for row play
+        if(id > currentRowLastId)
+            new_id = currentRow1stId;
         else
             new_id = id;
     }
@@ -1237,6 +1275,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     private static int currentNavPosition;
 
+    // selected is navigated here
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
