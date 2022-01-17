@@ -94,7 +94,7 @@
     <string name="guidedstep_action_title">
         Note that Guided Actions can have titles that are quite long.
     </string>
-    <string name="guidedstep_continue">Continue</string>
+    <string name="guidedstep_continue">继续</string>
     <string name="guidedstep_letsdoit">Let\'s do it</string>
     <string name="guidedstep_nevermind">Never mind</string>
     <string name="guidedstep_cancel">Cancel</string>

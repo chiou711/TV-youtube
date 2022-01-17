@@ -59,6 +59,7 @@ import android.util.SparseArray;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -199,7 +200,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //	    }
 
         if(requestCode == YOUTUBE_LINK_INTENT) {
-            count = 3; // countdown time to play next
+            count = 5; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
             setPlayId(getNewId());
@@ -215,13 +216,40 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     .setMessage(getActivity().getString(R.string.play_4_spaces)+ nextLinkTitle +"\n\n" + countStr)
                     .setPositiveButton(getActivity().getString(R.string.play_stop), new DialogInterface.OnClickListener()
                     {
+                        // stop
                         @Override
                         public void onClick(DialogInterface dialog1, int which1)
                         {
                             alertDlg.dismiss();
                             cancelYouTubeHandler();
                         }
-                    });
+                    })
+                    .setNegativeButton(getActivity().getString(R.string.guidedstep_continue), new DialogInterface.OnClickListener()
+                    {
+                        // continue
+                        @Override
+                        public void onClick(DialogInterface dialog1, int which1)
+                        {
+                            alertDlg.dismiss();
+                            cancelYouTubeHandler();
+
+                            // launch next intent
+                            alertDlg.dismiss();
+                            cancelYouTubeHandler();
+                            launchYouTubeIntent();
+
+                            // prepare next Id
+                            setNewId(getPlayId() + 1);
+                        }
+                    }).
+                    setOnCancelListener(new DialogInterface.OnCancelListener(){
+                        // cancel
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            alertDlg.dismiss();
+                            cancelYouTubeHandler();
+                        }
+                    } );
             alertDlg = builder.create();
 
             // set listener for selection
@@ -230,6 +258,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 public void onShow(DialogInterface dlgInterface) {
                     handler = new Handler();
                     handler.postDelayed(runCountDown,1000);
+
+                    // focus
+                    Button negative = alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE);
+                    negative.setFocusable(true);
+                    negative.setFocusableInTouchMode(true);
+                    negative.requestFocus();
                 }
             });
             alertDlg.show();
