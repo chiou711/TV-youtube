@@ -157,9 +157,9 @@ public class CardPresenter extends Presenter {
         // show row number - link number of the row
         cardView.setContentText( duration +
                 "    (" + link_count + "/" + links_of_current_row+")    " +
-                " L" + row_count );
+                act.getResources().getString(R.string.current_list_title) + row_count );
         TextView positionText = ((TextView)cardView.findViewById(R.id.content_text));
-        positionText.setTextColor(act.getResources().getColor(R.color.category_text));
+        positionText.setTextColor(cardView.getContext().getResources().getColor(R.color.category_text));
         positionText.setGravity(Gravity.RIGHT);
 
         if (video.cardImageUrl != null) {

@@ -15,4 +15,13 @@
         <item name="searchOrbIcon">@drawable/refresh_40</item>
     </style>
 
+    <!--search orb location-->
+<!--    <style name="Widget.Leanback.SearchOrbViewStyle">-->
+<!--        <item name="android:paddingLeft">400dp</item>-->
+<!--        <item name="searchOrbIcon">?attr/defaultSearchIcon</item>-->
+<!--        <item name="searchOrbColor">?attr/defaultSearchColor</item>-->
+<!--        <item name="searchOrbIconColor">?attr/defaultSearchIconColor</item>-->
+<!--        <item name="searchOrbBrightColor">?attr/defaultSearchBrightColor</item>-->
+<!--    </style>-->
+
 </resources>

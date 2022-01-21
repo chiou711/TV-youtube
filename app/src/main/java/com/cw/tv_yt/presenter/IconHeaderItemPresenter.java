@@ -33,6 +33,11 @@ import com.cw.tv_yt.R;
 public class IconHeaderItemPresenter extends RowHeaderPresenter {
 
     private float mUnselectedAlpha;
+    int rowsCount;
+
+    public IconHeaderItemPresenter(int _rowsCount){
+        rowsCount = _rowsCount;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup) {
@@ -53,9 +58,13 @@ public class IconHeaderItemPresenter extends RowHeaderPresenter {
         View rootView = viewHolder.view;
         rootView.setFocusable(true);
 
-        ImageView iconView = (ImageView) rootView.findViewById(R.id.header_icon);
-        Drawable icon = rootView.getResources().getDrawable(R.drawable.android_header, null);
-        iconView.setImageDrawable(icon);
+        // set icon for list row
+        if( (((ListRow) item).getId() != 0) &&
+            (((ListRow) item).getId() <= rowsCount) )  {
+            ImageView iconView = (ImageView) rootView.findViewById(R.id.header_icon);
+            Drawable icon = rootView.getResources().getDrawable(R.drawable.lb_ic_actions_right_arrow, null);
+            iconView.setImageDrawable(icon);
+        }
 
         TextView label = (TextView) rootView.findViewById(R.id.header_label);
         label.setText(headerItem.getName());

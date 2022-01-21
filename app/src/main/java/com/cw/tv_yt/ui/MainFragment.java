@@ -629,15 +629,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private void setupUIElements() {
 
         // option: drawable
-//        setBadgeDrawable(getActivity().getResources().getDrawable(R.drawable.tt, null));
+        setBadgeDrawable(getActivity().getResources().getDrawable(R.drawable.tt, null));
 
+        // Badge, when set, takes precedent over title
         // option: title
-        int focusNumber = getPref_focus_category_number(getActivity());
-        String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
-
-        //setTitle(getString(R.string.browse_title)); // Badge, when set, takes precedent over title
-        if(!categoryName.equalsIgnoreCase(String.valueOf(focusNumber)))
-            setTitle(categoryName);
+//        int focusNumber = getPref_focus_category_number(getActivity());
+//        String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
+        //setTitle(getString(R.string.browse_title));
+//        if(!categoryName.equalsIgnoreCase(String.valueOf(focusNumber)))
+//            setTitle(categoryName);
 
         setHeadersState(HEADERS_ENABLED);
 	    setHeadersTransitionOnBackEnabled(true); //true: focus will return to header, false: will close App
@@ -651,7 +651,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         setHeaderPresenterSelector(new PresenterSelector() {
             @Override
             public Presenter getPresenter(Object o) {
-                return new IconHeaderItemPresenter();
+                return new IconHeaderItemPresenter(rowsLoadedCount);
             }
         });
     }
@@ -810,7 +810,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             } else if (loaderId == TITLE_LOADER) {
 
 	            // Create a row for category selections at top
-	            HeaderItem gridHeaderCategory = new HeaderItem("Categories");
+                int focusNumber = getPref_focus_category_number(getActivity());
+                String categoryName = Utils.getPref_category_name(getActivity(),focusNumber);
+
+                String currCatName = getActivity().getResources().getString(R.string.current_category_title).
+                        concat(" : ").
+                        concat(categoryName);
+
+	            HeaderItem gridHeaderCategory = new HeaderItem(currCatName);
 	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
 	            ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
 

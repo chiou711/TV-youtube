@@ -140,5 +140,8 @@
     <string name="database_delete_item">刪除當前項目</string>
     <!--  connection error  -->
     <string name="connection_error">網路連線錯誤</string>
+    <!-- title-->
+    <string name="current_category_title">現在使用</string>
+    <string name="current_list_title">列表</string>
 
 </resources>
