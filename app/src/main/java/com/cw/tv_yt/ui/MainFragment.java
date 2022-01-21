@@ -879,7 +879,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 }
 
                 // Create a row for this special case with more samples.
-                HeaderItem gridHeader = new HeaderItem(getString(R.string.more_samples));
+                HeaderItem gridHeader = new HeaderItem(getString(R.string.options));
                 GridItemPresenter gridPresenter = new GridItemPresenter(this);
                 ArrayObjectAdapter gridRowAdapter = new ArrayObjectAdapter(gridPresenter);
                 gridRowAdapter.add(getString(R.string.select_category));
