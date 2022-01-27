@@ -23,6 +23,7 @@
     <string name="select_category_title"><![CDATA[Select Category]]></string>
     <string name="select_link_src_title"><![CDATA[Select Link Source]]></string>
 
+    <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">选项</string>
     <string name="renew">Renew</string>

@@ -78,6 +78,7 @@ import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
+import com.cw.tv_yt.operation.Import_fileListAct;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.GridItemPresenter;
@@ -662,7 +663,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             public void onClick(View view) {
 
                 // case: select link source
-                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
+//                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
+
+                //todo test new
+                Intent intent = new Intent(getActivity(), Import_fileListAct.class);
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                 startActivity(intent, bundle);
 

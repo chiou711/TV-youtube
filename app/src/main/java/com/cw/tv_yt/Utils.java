@@ -19,6 +19,8 @@ package com.cw.tv_yt;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
@@ -33,6 +35,7 @@ import android.widget.VideoView;
 import com.cw.tv_yt.data.DbHelper;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -222,6 +225,26 @@ public class Utils {
         }
         System.out.println("Util / _getYoutubePlaylistId / playlist_id = " + videoId);
         return videoId;
+    }
+
+    // get App default storage directory name
+    static public String getStorageDirName(Context context)
+    {
+        Resources currentResources = context.getResources();
+        Configuration conf = new Configuration(currentResources.getConfiguration());
+        conf.locale = Locale.ENGLISH; // apply English to avoid reading directory error
+        Resources newResources = new Resources(context.getAssets(),
+                currentResources.getDisplayMetrics(),
+                conf);
+        String dirName = newResources.getString(R.string.dir_name);
+
+        // restore locale
+        new Resources(context.getAssets(),
+                currentResources.getDisplayMetrics(),
+                currentResources.getConfiguration());
+
+        System.out.println("Utils / _getStorageDirName / dirName = " + dirName);
+        return dirName;
     }
 
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:id="@+id/text1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:paddingLeft="3dp"
+    android:paddingRight="3dp"
+    android:lineSpacingMultiplier="0.9"
+    android:textColor="#ffffff"
+    android:textSize="17sp"
+    android:background="@drawable/button_nav"
+    android:nextFocusRight="@+id/view_back"
+    />

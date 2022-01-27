@@ -26,4 +26,16 @@
     <color name="default_background">#0096a6</color>
     <color name="icon_background">#4A4F51</color>
     <color name="icon_alt_background">#2A2F51</color>
+
+    <!-- set 1 -->
+    <color name="bar_color">#ff185060</color>
+    <color name="button_color">#ff3070A0</color>
+    <color name="highlight_color">#ffff8000</color>
+
+    <!-- set 2 -->
+    <!--<color name="bar_color">#ff985060</color>-->
+    <!--<color name="button_color">#ffA09070</color>-->
+    <!--<color name="highlight_color">#ff0080ff</color>-->
+
+    <color name="pause_color">#ff404040</color>
 </resources>

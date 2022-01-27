@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+<LinearLayout 
+    android:id="@+id/view_file"
+    android:orientation="vertical"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+   	<TextView 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textSize="22sp" android:textStyle="bold"
+		android:paddingLeft="3dp"
+		android:text="File content confirmation" />
+	<View android:layout_width="match_parent" android:layout_height="1dp" android:background="#4f4f4f" />	
+		
+	<TextView 
+	    android:layout_width="match_parent"
+		android:layout_height="wrap_content" 
+		android:textSize="20sp" android:textStyle="italic"
+		android:paddingLeft="3dp"
+		android:text="Filename:" />
+
+	<TextView android:id="@+id/view_title" 
+		  	android:layout_width="match_parent"
+			android:layout_height="wrap_content" 
+			android:paddingLeft="3dp"
+		    android:textSize="20sp"
+		    android:minLines="1"
+			/>
+	<View android:layout_width="match_parent" android:layout_height="1dip" android:background="#4f4f4f" />
+	
+	<TextView
+        android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="3dp"
+		android:textSize="20sp" android:textStyle="italic"
+		android:text="Content:" />
+	<ScrollView
+        android:id="@+id/view_body_scrollview"
+    	android:layout_width="match_parent"
+    	android:layout_height="0dp"
+		android:layout_weight="1"
+    	android:orientation="vertical"
+        android:nextFocusRight="@+id/view_back"
+        android:nextFocusDown="@+id/view_back">
+	<TextView android:id="@+id/view_body" 
+	    android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:paddingLeft="3dp"
+	    android:inputType=""
+	    android:textSize="20sp"
+		android:scrollbars="vertical"
+		/>
+	</ScrollView>
+	<View android:layout_width="match_parent" android:layout_height="1dip" android:background="#4f4f4f" />
+	
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal" >
+		<Button
+			android:id="@+id/view_back"
+			android:layout_width="0dp"
+            android:layout_weight="1"
+			android:layout_height="50dp"
+			android:text="Back"
+			android:background="@drawable/button_nav"
+            android:nextFocusLeft="@+id/view_body_scrollview"
+            android:nextFocusUp="@+id/view_body_scrollview"
+            android:nextFocusRight="@+id/view_delete"
+            android:nextFocusDown="@+id/view_delete"/>
+		<Button
+			android:id="@+id/view_delete"
+			android:layout_width="0dp"
+            android:layout_weight="1"
+			android:layout_height="50dp"
+			android:text="Delete"
+			android:background="@drawable/button_nav"
+            android:nextFocusLeft="@+id/view_back"
+            android:nextFocusUp="@+id/view_body_scrollview"
+            android:nextFocusRight="@+id/view_confirm"
+            android:nextFocusDown="@+id/view_confirm"/>
+	    <Button
+	        android:id="@+id/view_confirm"
+	        android:layout_width="0dp"
+            android:layout_weight="1"
+	        android:layout_height="50dp"
+	        android:text="OK"
+			android:background="@drawable/button_nav"
+            android:nextFocusLeft="@+id/view_delete"
+            android:nextFocusUp="@+id/view_body_scrollview"
+            />
+	</LinearLayout>
+</LinearLayout>
+<LinearLayout
+    android:id="@+id/view_file_progress_bar"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/background_dark"
+    android:gravity="center">
+    <ProgressBar
+        android:id="@+id/import_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</LinearLayout> 
+</LinearLayout>
