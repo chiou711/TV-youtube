@@ -29,9 +29,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import androidx.fragment.app.Fragment;
 
@@ -45,11 +45,15 @@ public class Import_fileView extends Fragment
     View mViewFile,mViewFileProgressBar;
     public static boolean isAddingNewFolder = true;
     View rootView;
+    int linkSrcNum;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		System.out.println("Import_fileView / _onCreateView");
         rootView = inflater.inflate(R.layout.sd_file_view,container, false);
+
+		Bundle bundle = getArguments();
+		linkSrcNum = bundle.getInt("link_source_number");
 
 		mViewFile = rootView.findViewById(R.id.view_file);
 		mViewFileProgressBar = rootView.findViewById(R.id.view_file_progress_bar);
@@ -127,8 +131,7 @@ public class Import_fileView extends Fragment
 		});
 
 		// confirm to import view to DB
-		confirmButton.setOnClickListener(new View.OnClickListener()
-		{
+		confirmButton.setOnClickListener(new View.OnClickListener()	{
 
 			public void onClick(View view)
 			{
@@ -138,6 +141,9 @@ public class Import_fileView extends Fragment
 				confirmTask.setProgressBar(progressBar);
 				confirmTask.enableSaveDB(true);
 				confirmTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+				// set preference of link source number
+                Utils.setPref_link_source_number(getActivity(), linkSrcNum);
 			}
 		});
 

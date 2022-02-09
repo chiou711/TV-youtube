@@ -21,7 +21,8 @@
     <string name="related_movies">Related Videos</string>
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="select_category_title"><![CDATA[Select Category]]></string>
-    <string name="select_link_src_title"><![CDATA[Select Link Source]]></string>
+
+    <string name="select_link_src_title">Select Link Source</string>
 
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
@@ -143,5 +144,8 @@
     <!-- title-->
     <string name="current_category_title">Using now</string>
     <string name="current_list_title">List</string>
+
+    <string name="local_link_src">Local link source</string>
+    <string name="default_link_src">Default link source</string>
 
 </resources>

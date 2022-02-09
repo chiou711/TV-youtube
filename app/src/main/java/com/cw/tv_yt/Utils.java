@@ -150,11 +150,14 @@ public class Utils {
     }
 
     // get link source number
+    // Note:  after new installation, link source number
+    // 1 dedicated for Local: not ready
+    // 2 dedicated for Default: apply this
     public static int getPref_link_source_number (Context context)
     {
         SharedPreferences pref = context.getSharedPreferences("link_src", 0);
         String keyName = "link_source_number";
-        return pref.getInt(keyName, 1); // focus table Id: default is 1
+        return pref.getInt(keyName, 2);
     }
 
     // set category name

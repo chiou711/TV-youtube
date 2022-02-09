@@ -39,10 +39,13 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
     public FragmentManager fragmentManager;
     public FragmentManager.OnBackStackChangedListener onBackStackChangedListener;
     final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 98;
+    int linkSrcNum;
+
     @Override
     public void onCreate(Bundle bundle) 
     {
 
+        linkSrcNum = getIntent().getExtras().getInt("link_source_number");
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)//api23
         {
             // check permission
@@ -56,19 +59,11 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
                         PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
             }
             else
-            {
-//                final boolean ENABLE_DB_CHECK = false;//true;//false
-//                if(ENABLE_DB_CHECK)
-//                    Folder.listAllPageTables(act);
                 doCreate();
-            }
         }
         else
-//            createDB_data();
-        {
-
             doCreate();
-        }
+
         super.onCreate(bundle);
     }
 
@@ -220,6 +215,7 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
                     Import_fileView fragment = new Import_fileView();
                     final Bundle args = new Bundle();
                     args.putString("KEY_FILE_PATH", currFilePath);
+                    args.putInt("link_source_number", linkSrcNum);
                     fragment.setArguments(args);
                     FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                     transaction.setCustomAnimations(R.anim.fragment_slide_in_left, R.anim.fragment_slide_out_left, R.anim.fragment_slide_in_right, R.anim.fragment_slide_out_right);

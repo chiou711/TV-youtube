@@ -21,7 +21,8 @@
     <string name="related_movies">Related Videos</string>
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="select_category_title"><![CDATA[Select Category]]></string>
-    <string name="select_link_src_title"><![CDATA[Select Link Source]]></string>
+
+    <string name="select_link_src_title">選擇連結源</string>
 
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
@@ -144,5 +145,8 @@
     <!-- title-->
     <string name="current_category_title">現在使用</string>
     <string name="current_list_title">列表</string>
+
+    <string name="local_link_src">本地連結源</string>
+    <string name="default_link_src">預設連結源</string>
 
 </resources>

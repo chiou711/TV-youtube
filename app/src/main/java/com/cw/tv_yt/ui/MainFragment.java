@@ -661,26 +661,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // case: select link source
-//                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
-
-                //todo test new
-                Intent intent = new Intent(getActivity(), Import_fileListAct.class);
+                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                 startActivity(intent, bundle);
-
-                // case: renew DB
-//                startRenewFetchService();
-
-                // remove reference keys
-//                Utils.removePref_focus_category_number(getActivity());
-//
-//                int countVideoTables = Utils.getVideoTablesCount(getActivity());
-//
-//                // remove category name key
-//                for(int i = 1; i<= countVideoTables; i++)
-//                    Utils.removePref_category_name(getActivity(),i);
             }
         });
 

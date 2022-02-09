@@ -34,6 +34,7 @@ import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
+import com.cw.tv_yt.operation.Import_fileListAct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.leanback.app.VerticalGridSupportFragment;
 import androidx.leanback.widget.ArrayObjectAdapter;
@@ -50,7 +52,6 @@ import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
-import androidx.loader.app.LoaderManager;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -59,7 +60,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
  */
 public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
-    private static final String TAG = "Select link source";
+    private static final String TAG = "Select_link_source";
     private static final int NUM_COLUMNS = 5;
 
     private static class Adapter extends ArrayObjectAdapter {
@@ -75,7 +76,6 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
 	private List<String> mLinkSrcNames = new ArrayList<>();
 
     // Maps a Loader Id to its CursorObjectAdapter.
-    private LoaderManager mLoaderManager;
 
     @Override
     public void onAttach(Context context) {
@@ -127,7 +127,7 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
             @Override
             public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                        RowPresenter.ViewHolder rowViewHolder, Row row) {
-                Log.i(TAG, "onItemSelected: " + item + " row " + row);
+                Log.i(TAG, "onItemSelected: item = " + item + " row = " + row);
             }
         });
 
@@ -138,27 +138,35 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
                 Log.i(TAG, "onItemClicked: item = " + item + " row = " + row );
                 mAdapter.callNotifyChanged();
 
-                int clickedPos = 0;
+                int clickedSrcLinkNum = 1;
                 for(int i = 1; i<= mLinkSrcNames.size(); i++) {
                     if (mLinkSrcNames.get(i-1).equalsIgnoreCase(item.toString()))
-                    {
-                        clickedPos = i;
-                        System.out.println("------------------clickedPos = " + clickedPos);
-                    }
+                        clickedSrcLinkNum = i;
                 }
 
-                Utils.setPref_link_source_number(getActivity(),clickedPos);
+                // position number 1: is dedicated for local link source
+                // others: for link sources
+                if(clickedSrcLinkNum == 1){ // local link source
+                    Intent intent = new Intent(getActivity(), Import_fileListAct.class);
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+                    bundle.putInt("link_source_number",clickedSrcLinkNum);
+                    intent.putExtras(bundle);
+                    startActivity(intent, bundle);
+                } else { // link source
 
-                startRenewFetchService();
+                    Utils.setPref_link_source_number(getActivity(), clickedSrcLinkNum);
 
-                // remove reference keys
-                Utils.removePref_focus_category_number(getActivity());
+                    startRenewFetchService();
 
-                int countVideoTables = Utils.getVideoTablesCount(getActivity());
+                    // remove reference keys
+                    Utils.removePref_focus_category_number(getActivity());
 
-                // remove category name key
-                for(int i = 1; i<= countVideoTables; i++)
-                    Utils.removePref_category_name(getActivity(),i);
+                    int countVideoTables = Utils.getVideoTablesCount(getActivity());
+
+                    // remove category name key
+                    for (int i = 1; i <= countVideoTables; i++)
+                        Utils.removePref_category_name(getActivity(), i);
+                }
             }
         });
     }
@@ -208,21 +216,35 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
         List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
 
         System.out.println(" SelectLinkSrcFragment / _loadData / src_links.size() = " + src_links.size());
-            for(int i=0;i<src_links.size();i++) {
-                String title = src_links.get(i).getFirst();
+            for(int pos=0;pos<src_links.size();pos++) {
+                String title = src_links.get(pos).getFirst();
                 System.out.println(" SelectLinkSrcFragment / _loadData / title = " + title);
-            mLinkSrcNames.add(src_links.get(i).getFirst());
+
+                // set current usage marking *
+                int linkSrcNum = Utils.getPref_link_source_number(getActivity());
+
+                // position 0 and 1 are dedicated
+                if((pos>=2) && (pos+1) == linkSrcNum) // link src number starts from 1
+                    mLinkSrcNames.add(src_links.get(pos).getFirst().concat("*"));
+                else {
+                    // add marking after localized string at onBindViewHolder stage, not here
+                    mLinkSrcNames.add(src_links.get(pos).getFirst());
+                }
         }
 
         for(int i = 0; i< mLinkSrcNames.size(); i++) {
-            String categoryName = mLinkSrcNames.get(i);
-            mAdapter.add(categoryName);
+            String linkSrcName = mLinkSrcNames.get(i);
+            mAdapter.add(linkSrcName);
         }
     }
 }
 
 class SrcStringPresenter extends Presenter {
     private static final String TAG = "StringPresenter";
+
+    String localLinkSrc;
+    String defaultLinkSrc;
+    int linkSrcNum;
 
     public  ViewHolder onCreateViewHolder(ViewGroup parent) {
         Log.d(TAG, "onCreateViewHolder");
@@ -232,12 +254,29 @@ class SrcStringPresenter extends Presenter {
         tv.setFocusableInTouchMode(true);
         tv.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.text_bg,
                 context.getTheme()));
+
+        // get localized string
+        localLinkSrc = context.getResources().getString(R.string.local_link_src);
+        defaultLinkSrc =  context.getResources().getString(R.string.default_link_src);
+
+        linkSrcNum = Utils.getPref_link_source_number(context);
         return new ViewHolder(tv);
     }
 
     public  void onBindViewHolder(ViewHolder viewHolder, Object item) {
         Log.d(TAG, "onBindViewHolder for " + item.toString());
-        ((TextView) viewHolder.view).setText(item.toString());
+
+        // replace title with with localized string for position 0 and 1
+        if(item.toString().equalsIgnoreCase("Local_TV-youtube")) {
+            if(linkSrcNum == 1)
+                localLinkSrc = localLinkSrc.concat("*");
+            ((TextView) viewHolder.view).setText(localLinkSrc);
+        } else if(item.toString().equalsIgnoreCase("Default_TV-youtube")) {
+            if(linkSrcNum == 2)
+                defaultLinkSrc = defaultLinkSrc.concat("*");
+            ((TextView) viewHolder.view).setText(defaultLinkSrc);
+        } else
+            ((TextView) viewHolder.view).setText(item.toString());
     }
 
     public  void onUnbindViewHolder(ViewHolder viewHolder) {

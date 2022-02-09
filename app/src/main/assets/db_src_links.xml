@@ -2,6 +2,9 @@
 <resources >
     <!--   format:     https://drive.google.com/uc?export=download&amp;id=1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm-->
 
+    <src_link><title>Local_TV-youtube</title>
+        <id>123456789012345678901234567890123</id></src_link>
+
     <src_link><title>Default_TV-youtube</title>
         <id>1UwzWtBTecYcUADR9F6OurJ7t91ZCJ-dm</id></src_link>
 
