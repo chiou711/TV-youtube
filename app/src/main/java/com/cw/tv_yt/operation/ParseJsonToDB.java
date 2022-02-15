@@ -21,9 +21,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.os.Build;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
@@ -117,30 +117,30 @@ public class ParseJsonToDB {
         System.out.println("ParseJsonToDB / _parseJsonAndInsertDB / jsonObj string = " + jsonObj.toString());
 
         // 1) delete database
-        try {
-            System.out.println("ParseJsonToDB / _parseJsonAndInsertDB / will delete DB");
-            Objects.requireNonNull(mContext).deleteDatabase(DbHelper.DATABASE_NAME);
-
-            ContentResolver resolver = mContext.getContentResolver();
-            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
-            assert client != null;
-            VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
-
-            assert provider != null;
-            provider.mContentResolver = resolver;
-            provider.mOpenHelper.close();
-
-            provider.mOpenHelper = new DbHelper(mContext);
-            provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                client.close();
-            else
-                client.release();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println("ParseJsonToDB / _parseJsonAndInsertDB / will delete DB");
+//            Objects.requireNonNull(mContext).deleteDatabase(DbHelper.DATABASE_NAME);
+//
+//            ContentResolver resolver = mContext.getContentResolver();
+//            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
+//            assert client != null;
+//            VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
+//
+//            assert provider != null;
+//            provider.mContentResolver = resolver;
+//            provider.mOpenHelper.close();
+//
+//            provider.mOpenHelper = new DbHelper(mContext);
+//            provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//                client.close();
+//            else
+//                client.release();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
         // 2) import jsonObj: get category list
         JSONArray contentArray_cat = jsonObj.getJSONArray("content");
@@ -166,6 +166,22 @@ public class ParseJsonToDB {
                 contentValuesList.toArray(new ContentValues[contentValuesList.size()]);
 
         ContentResolver contentResolver = mContext.getApplicationContext().getContentResolver();
+
+        // get current video tables count
+        String[] projection = new String[]{"_id", "category_name"};
+        String selection = null;
+        String[] selectionArgs = null;
+        String sortOrder = null;
+        Cursor query = contentResolver.query(VideoContract.CategoryEntry.CONTENT_URI,projection,selection,selectionArgs,sortOrder);
+
+//        int index = query.getColumnIndex(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME);
+        int currentVideoTablesCount = 0;
+        if (query.moveToFirst()) {
+            do {
+//                String string = query.getString(index);
+                currentVideoTablesCount++;
+            } while (query.moveToNext());
+        }
 
         contentResolver.bulkInsert(VideoContract.CategoryEntry.CONTENT_URI, downloadedVideoContentValues);
 
@@ -234,10 +250,12 @@ public class ParseJsonToDB {
             // Will call DbHelper.onCreate()first time when WritableDatabase is not created yet
             SQLiteDatabase sqlDb;
             sqlDb = mOpenHelper.getWritableDatabase();
-            String tableId = String.valueOf(h+1); //Id starts from 1
 
-            // Create a table to hold videos.
-            final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.VideoEntry.TABLE_NAME.concat(tableId) + " (" +
+            // set new video table Id
+            String newVideoTableId = String.valueOf(currentVideoTablesCount + h+1); //Id starts from 1
+
+            // Create new video table to hold videos.
+            final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.VideoEntry.TABLE_NAME.concat(newVideoTableId) + " (" +
                     VideoContract.VideoEntry._ID + " INTEGER PRIMARY KEY," +
                     VideoContract.VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
                     VideoContract.VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.
@@ -262,7 +280,7 @@ public class ParseJsonToDB {
 
             ContentResolver contentResolver_video = mContext.getApplicationContext().getContentResolver();
 
-            VideoProvider.tableId = String.valueOf(i+1);
+            VideoProvider.tableId = String.valueOf(currentVideoTablesCount + i + 1);
             contentResolver_video.bulkInsert(VideoContract.VideoEntry.CONTENT_URI, downloadedVideoContentValues_video);
         }
 
