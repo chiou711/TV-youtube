@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.select_category;
 
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +28,7 @@ import android.widget.TextView;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.ui.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;

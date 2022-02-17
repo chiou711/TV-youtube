@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.vertical_grid;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.ui.LeanbackActivity;
 
 /*
  * SearchActivity for SearchFragment

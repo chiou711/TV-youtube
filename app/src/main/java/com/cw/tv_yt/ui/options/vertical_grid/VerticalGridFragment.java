@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.vertical_grid;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -41,9 +41,11 @@ import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
+import com.cw.tv_yt.ui.VideoDetailsActivity;
 import com.google.android.youtube.player.YouTubeIntents;
 
-import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
+import static com.cw.tv_yt.Utils.getYoutubeId;
+
 
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.

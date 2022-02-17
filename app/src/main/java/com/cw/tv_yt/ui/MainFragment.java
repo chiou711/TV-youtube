@@ -78,7 +78,6 @@ import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
-import com.cw.tv_yt.operation.Import_fileListAct;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.GridItemPresenter;
@@ -95,7 +94,12 @@ import java.util.Objects;
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.cw.tv_yt.Utils.getPref_focus_category_number;
-import static com.cw.tv_yt.ui.MovieList.getYoutubeId;
+import static com.cw.tv_yt.Utils.getYoutubeId;
+
+import com.cw.tv_yt.ui.options.select_category.SelectCategoryActivity;
+import com.cw.tv_yt.ui.link_src.SelectLinkSrcActivity;
+import com.cw.tv_yt.ui.options.setting.SettingsActivity;
+import com.cw.tv_yt.ui.options.vertical_grid.VerticalGridActivity;
 import com.google.android.youtube.player.YouTubeIntents;
 
 /*

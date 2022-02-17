@@ -1,4 +1,4 @@
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.os.SystemClock;
 import android.widget.Toast;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.ui.MainActivity;
 
 import java.net.URL;
 
@@ -39,7 +40,7 @@ public class SplashScreen extends Activity {
 
 					if(checkConnTask.connIsOK) {
 						// launch
-						Intent intent = new Intent(SplashScreen.this,MainActivity.class);
+						Intent intent = new Intent(SplashScreen.this, MainActivity.class);
 						startActivity(intent);
 					} else {
 						// exit

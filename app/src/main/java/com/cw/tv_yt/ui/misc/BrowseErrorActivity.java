@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
 //import android.app.Activity;
 //import android.app.Fragment;

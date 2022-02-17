@@ -51,7 +51,7 @@
 
 
         <activity
-            android:name=".ui.SplashScreen"
+            android:name=".ui.misc.SplashScreen"
             android:banner="@drawable/tt"
             android:label="@string/app_name"
             android:logo="@drawable/tt">
@@ -114,24 +114,24 @@
             android:launchMode="singleTask"
             android:resizeableActivity="true" />
         <activity
-            android:name=".ui.VerticalGridActivity"
+            android:name=".ui.options.vertical_grid.VerticalGridActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name=".ui.SelectCategoryActivity"
+            android:name=".ui.options.select_category.SelectCategoryActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name=".ui.SelectLinkSrcActivity"
+            android:name=".ui.link_src.SelectLinkSrcActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity android:name=".operation.Import_fileListAct"/>
-        <activity android:name=".ui.SearchActivity" />
+        <activity android:name=".ui.options.vertical_grid.SearchActivity" />
         <activity
-            android:name=".ui.GuidedStepActivity"
+            android:name=".ui.misc.GuidedStepActivity"
             android:theme="@style/Theme.Example.Leanback.GuidedStep" /> <!-- Provides search suggestions for keywords against video metadata. -->
         <provider
             android:name=".data.VideoProvider"
@@ -163,16 +163,16 @@
             android:enabled="true" />
 
         <activity
-            android:name=".ui.OnboardingActivity"
+            android:name=".ui.misc.OnboardingActivity"
             android:enabled="true"
             android:exported="true"
             android:theme="@style/Theme.Leanback.Onboarding" />
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name=".ui.options.setting.SettingsActivity"
             android:exported="true"
             android:theme="@style/LeanbackPreferences" />
         <activity
-            android:name=".ui.AuthenticationActivity"
+            android:name=".ui.options.setting.AuthenticationActivity"
             android:theme="@style/Theme.Example.Leanback.GuidedStep" />
     </application>
 

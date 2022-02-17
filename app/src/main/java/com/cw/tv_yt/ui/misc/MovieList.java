@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
 import android.os.AsyncTask;
 
@@ -30,14 +30,15 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.X509TrustManager;
+
+import static com.cw.tv_yt.Utils.getYoutubeId;
+
 
 public final class MovieList {
 //	public static final String MOVIE_CATEGORY[] = {
@@ -295,25 +296,6 @@ public final class MovieList {
 		} catch (Exception e) { // should never happen
 			e.printStackTrace();
 		}
-	}
-
-	// Get YouTube Id
-	public static String getYoutubeId(String url) {
-
-		String videoId = "";
-
-		if (url != null && url.trim().length() > 0 && url.startsWith("http")) {
-			String expression = "^.*((youtu.be\\/)|(v\\/)|(\\/u\\/w\\/)|(embed\\/)|(watch\\?))\\??(v=)?([^#\\&\\?]*).*";
-			CharSequence input = url;
-			Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-			Matcher matcher = pattern.matcher(input);
-			if (matcher.matches()) {
-				String groupIndex1 = matcher.group(8);
-				if (groupIndex1 != null && groupIndex1.length() == 11)
-					videoId = groupIndex1;
-			}
-		}
-		return videoId;
 	}
 
 }

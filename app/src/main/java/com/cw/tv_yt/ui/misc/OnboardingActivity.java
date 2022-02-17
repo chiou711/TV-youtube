@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
-import android.app.Activity;
 import android.os.Bundle;
+import androidx.fragment.app.FragmentActivity;
 
 import com.cw.tv_yt.R;
 
-public class SettingsActivity extends Activity {
+/*
+ * OnboardingActivity for OnboardingFragment
+ */
+public class OnboardingActivity extends FragmentActivity {
+
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_fragment);
+        setContentView(R.layout.onboarding);
     }
 }

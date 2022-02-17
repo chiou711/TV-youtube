@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.setting;
 
 import android.app.Activity;
 import android.graphics.drawable.Drawable;

@@ -12,7 +12,7 @@
  * the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.setting;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -12,9 +12,11 @@
  * the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
 import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /*
  * Movie class represents video entity with title, description, image thumbs and video url.

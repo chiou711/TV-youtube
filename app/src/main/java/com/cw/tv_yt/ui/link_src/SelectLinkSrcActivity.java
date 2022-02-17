@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.link_src;
 
 import android.os.Bundle;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.ui.LeanbackActivity;
 
 /*
  * VerticalGridActivity that loads VerticalGridFragment
  */
-public class SelectCategoryActivity extends LeanbackActivity {
+public class SelectLinkSrcActivity extends LeanbackActivity {
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.select_category_grid);
+        setContentView(R.layout.select_link_src_grid);
         getWindow().setBackgroundDrawableResource(R.drawable.grid_bg);
     }
 }

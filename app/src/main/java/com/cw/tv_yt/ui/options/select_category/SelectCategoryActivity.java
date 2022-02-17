@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 The Android Open Source Project
+ * Copyright (c) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.options.select_category;
 
 import android.os.Bundle;
-import androidx.fragment.app.FragmentActivity;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.ui.LeanbackActivity;
 
 /*
- * OnboardingActivity for OnboardingFragment
+ * VerticalGridActivity that loads VerticalGridFragment
  */
-public class OnboardingActivity extends FragmentActivity {
-
+public class SelectCategoryActivity extends LeanbackActivity {
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.onboarding);
+        setContentView(R.layout.select_category_grid);
+        getWindow().setBackgroundDrawableResource(R.drawable.grid_bg);
     }
 }

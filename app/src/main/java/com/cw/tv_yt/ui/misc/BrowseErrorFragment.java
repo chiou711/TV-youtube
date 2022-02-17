@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui;
+package com.cw.tv_yt.ui.misc;
 
 import android.content.res.Resources;
 import android.os.Bundle;
