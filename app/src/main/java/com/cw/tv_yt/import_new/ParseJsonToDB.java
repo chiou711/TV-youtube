@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.operation;
+package com.cw.tv_yt.import_new;
 
-import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;

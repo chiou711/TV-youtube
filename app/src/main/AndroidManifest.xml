@@ -128,7 +128,7 @@
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
-        <activity android:name=".operation.Import_fileListAct"/>
+        <activity android:name=".import_new.Import_fileListAct"/>
         <activity android:name=".ui.options.vertical_grid.SearchActivity" />
         <activity
             android:name=".ui.misc.GuidedStepActivity"
@@ -157,6 +157,9 @@
             android:exported="false" />
         <service
             android:name=".data.FetchCategoryService"
+            android:exported="false" />
+        <service
+            android:name=".import_new.FetchLinkSrcService"
             android:exported="false" />
         <service
             android:name=".recommendation.UpdateRecommendationsService"

@@ -1002,7 +1002,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         // in assets
         List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
-        int index = init_number -1;
+        int index = init_number -1; // starts from 1
 //        // note: AND sign expression
 //        //  in XML: &amp;
 //        //  in Java: &

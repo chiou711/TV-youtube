@@ -29,13 +29,10 @@ import android.widget.TextView;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
-import com.cw.tv_yt.data.VideoContract;
-import com.cw.tv_yt.data.VideoProvider;
-import com.cw.tv_yt.operation.Import_fileListAct;
-import com.cw.tv_yt.ui.MainActivity;
+import com.cw.tv_yt.import_new.FetchLinkSrcService;
+import com.cw.tv_yt.import_new.Import_fileListAct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,62 +150,23 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
                     bundle.putInt("link_source_number",clickedSrcLinkNum);
                     intent.putExtras(bundle);
                     startActivity(intent, bundle);
-                } else { // link source
-
+                } else { // add new data from selected link source
                     Utils.setPref_link_source_number(getActivity(), clickedSrcLinkNum);
 
-                    startRenewFetchService();
+                    // get URL string
+                    String urlString;
+                    List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
+                    int index = clickedSrcLinkNum -1;
+                    urlString =  "https://drive.google.com/uc?export=download&id=" + src_links.get(index).getSecond();
 
-                    // remove reference keys
-                    Utils.removePref_focus_category_number(getActivity());
-
-                    int countVideoTables = Utils.getVideoTablesCount(getActivity());
-
-                    // remove category name key
-                    for (int i = 1; i <= countVideoTables; i++)
-                        Utils.removePref_category_name(getActivity(), i);
+                    // start Fetch service to import DB data
+                    Intent serviceIntent = new Intent(getActivity(), FetchLinkSrcService.class);
+                    serviceIntent.putExtra("FetchUrl", urlString );
+                    getActivity().startService(serviceIntent);
                 }
             }
         });
     }
-
-
-    // start fetch service by URL string
-    private void startRenewFetchService() {
-        System.out.println("SelectLinkSrcFragment / _startFetchService");
-        // delete database
-        try {
-            System.out.println("SelectLinkSrcFragment / _startFetchService / will delete DB");
-            Objects.requireNonNull(getActivity()).deleteDatabase(DbHelper.DATABASE_NAME);
-
-            ContentResolver resolver = getActivity().getContentResolver();
-            ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
-            assert client != null;
-            VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
-
-            assert provider != null;
-            provider.mContentResolver = resolver;
-            provider.mOpenHelper.close();
-
-            provider.mOpenHelper = new DbHelper(getActivity());
-            provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                client.close();
-            else
-                client.release();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // start new MainActivity
-        Intent new_intent = new Intent(getActivity(), MainActivity.class);
-        new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-        new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-        Objects.requireNonNull(getActivity()).startActivity(new_intent);
-    }
-
 
     private void loadData() {
         System.out.println("SelectLinkSrcFragment / _loadData");

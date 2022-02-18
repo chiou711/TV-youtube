@@ -48,10 +48,10 @@ public class FetchCategoryService extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
         serviceUrl = workIntent.getStringExtra("FetchUrl");
         System.out.println("FetchCategoryService / _onHandleIntent / serviceUrl = " + serviceUrl);
-	    CategoryDbBuilder builder = new CategoryDbBuilder(getApplicationContext());
+	    CategoryDbBuilder catDbBuilder = new CategoryDbBuilder(getApplicationContext());
 
         try {
-	        List<ContentValues> contentValuesList = builder.fetch(serviceUrl);
+	        List<ContentValues> contentValuesList = catDbBuilder.fetch(serviceUrl);
 
 			ContentValues[] downloadedVideoContentValues =
 					contentValuesList.toArray(new ContentValues[contentValuesList.size()]);

@@ -48,10 +48,10 @@ public class FetchVideoService extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
 	    serviceUrl = workIntent.getStringExtra("FetchUrl");
 	    System.out.println("FetchVideoService / _onHandleIntent / serviceUrl = " + serviceUrl);
-        VideoDbBuilder builder = new VideoDbBuilder(getApplicationContext());
+        VideoDbBuilder videoDbBuilder = new VideoDbBuilder(getApplicationContext());
 
         try {
-			List<List<ContentValues>> contentValuesList = builder.fetch(serviceUrl);
+			List<List<ContentValues>> contentValuesList = videoDbBuilder.fetch(serviceUrl);
 
 			for(int i=0;i<contentValuesList.size();i++) {
 

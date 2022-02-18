@@ -14,8 +14,8 @@
 <!--    <src_link><title>日文歌曲</title>-->
 <!--        <id>1lekTQ4n9WuQgWRBlEcazMFsO0BbyRpUz</id></src_link>-->
 
-<!--    <src_link><title>bossa nova</title>-->
-<!--        <id>1XhjEiByWTzWrzYs9ouAVKaJnZbS19Vr1</id></src_link>-->
+    <src_link><title>bossa nova</title>
+        <id>1XhjEiByWTzWrzYs9ouAVKaJnZbS19Vr1</id></src_link>
 
     <src_link><title>20世紀英文歌曲</title>
         <id>1_RhQfJgkF_AlD3sUEMJ0nih-m-bGQLzH</id></src_link>
@@ -25,5 +25,8 @@
 
     <src_link><title>長青</title>
                        <id>1U8nwk4MGGW1NbPNnaGD7GwYE5wYNd5p2</id></src_link>
+
+    <src_link><title>Alison Balsom - 主題</title>
+        <id>15oO3-NRvHjUB0ptxvPHfYHLoMP-KFPm-</id></src_link>
 
 </resources>

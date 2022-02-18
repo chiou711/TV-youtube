@@ -14,7 +14,10 @@
 
 package com.cw.tv_yt.ui.options.setting;
 
+import android.content.ContentProviderClient;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.preference.PreferenceFragment;
 import androidx.leanback.preference.LeanbackPreferenceFragment;
@@ -24,6 +27,16 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data.DbHelper;
+import com.cw.tv_yt.data.VideoContract;
+import com.cw.tv_yt.data.VideoProvider;
+import com.cw.tv_yt.ui.MainActivity;
+
+import java.util.Objects;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class SettingsFragment extends LeanbackSettingsFragment
         implements DialogPreference.TargetFragment {
@@ -81,11 +94,63 @@ public class SettingsFragment extends LeanbackSettingsFragment
 
         @Override
         public boolean onPreferenceTreeClick(Preference preference) {
-            if (preference.getKey().equals(getString(R.string.pref_key_login))) {
-                // Open an AuthenticationActivity
-                startActivity(new Intent(getActivity(), AuthenticationActivity.class));
+//            if (preference.getKey().equals(getString(R.string.pref_key_login))) {
+//                // Open an AuthenticationActivity
+//                startActivity(new Intent(getActivity(), AuthenticationActivity.class));
+//            }
+
+            if (preference.getKey().equals(getString(R.string.pref_key_renew))) {
+                Utils.setPref_link_source_number(getActivity(), 2);
+                startRenewFetchService();
+
+                // remove reference keys
+                Utils.removePref_focus_category_number(getActivity());
+
+                int countVideoTables = Utils.getVideoTablesCount(getActivity());
+
+                // remove category name key
+                for (int i = 1; i <= countVideoTables; i++)
+                    Utils.removePref_category_name(getActivity(), i);
             }
+
             return super.onPreferenceTreeClick(preference);
         }
+
+        // start fetch service by URL string
+        private void startRenewFetchService() {
+            System.out.println("SelectLinkSrcFragment / _startFetchService");
+            // delete database
+            try {
+                System.out.println("SelectLinkSrcFragment / _startFetchService / will delete DB");
+                Objects.requireNonNull(getActivity()).deleteDatabase(DbHelper.DATABASE_NAME);
+
+                ContentResolver resolver = getActivity().getContentResolver();
+                ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
+                assert client != null;
+                VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
+
+                assert provider != null;
+                provider.mContentResolver = resolver;
+                provider.mOpenHelper.close();
+
+                provider.mOpenHelper = new DbHelper(getActivity());
+                provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                    client.close();
+                else
+                    client.release();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // start new MainActivity
+            Intent new_intent = new Intent(getActivity(), MainActivity.class);
+            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            Objects.requireNonNull(getActivity()).startActivity(new_intent);
+        }
+
     }
 }

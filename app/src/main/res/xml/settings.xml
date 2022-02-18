@@ -6,6 +6,10 @@
             android:title="@string/pref_title_auto_play"
             android:defaultValue="true"
             android:key="@string/pref_key_auto_play" />
+        <SwitchPreference
+            android:title="@string/renew"
+            android:defaultValue="true"
+            android:key="@string/pref_key_renew" />
 <!--        <SwitchPreference-->
 <!--            android:title="@string/pref_title_recommendations"-->
 <!--            android:defaultValue="true"-->
