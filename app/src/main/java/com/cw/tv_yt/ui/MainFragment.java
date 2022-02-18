@@ -97,7 +97,7 @@ import static com.cw.tv_yt.Utils.getPref_focus_category_number;
 import static com.cw.tv_yt.Utils.getYoutubeId;
 
 import com.cw.tv_yt.ui.options.select_category.SelectCategoryActivity;
-import com.cw.tv_yt.ui.link_src.SelectLinkSrcActivity;
+import com.cw.tv_yt.ui.add_category.AddCategoryActivity;
 import com.cw.tv_yt.ui.options.setting.SettingsActivity;
 import com.cw.tv_yt.ui.options.vertical_grid.VerticalGridActivity;
 import com.google.android.youtube.player.YouTubeIntents;
@@ -665,7 +665,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         setOnSearchClickedListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), SelectLinkSrcActivity.class);
+                Intent intent = new Intent(getActivity(), AddCategoryActivity.class);
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
                 startActivity(intent, bundle);
             }

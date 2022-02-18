@@ -124,7 +124,7 @@
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity
-            android:name=".ui.link_src.SelectLinkSrcActivity"
+            android:name=".ui.add_category.AddCategoryActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />

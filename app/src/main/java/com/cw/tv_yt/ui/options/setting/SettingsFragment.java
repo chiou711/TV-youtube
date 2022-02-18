@@ -100,7 +100,7 @@ public class SettingsFragment extends LeanbackSettingsFragment
 //            }
 
             if (preference.getKey().equals(getString(R.string.pref_key_renew))) {
-                Utils.setPref_link_source_number(getActivity(), 2);
+                Utils.setPref_link_source_number(getActivity(), 1);
                 startRenewFetchService();
 
                 // remove reference keys

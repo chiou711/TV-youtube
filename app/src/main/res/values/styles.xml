@@ -12,7 +12,7 @@
         <item name="searchOrbViewStyle">@style/ReplaceSearchOrbView</item>
     </style>
     <style name="ReplaceSearchOrbView" parent="Widget.Leanback.SearchOrbViewStyle">
-        <item name="searchOrbIcon">@drawable/refresh_40</item>
+        <item name="searchOrbIcon">@drawable/ic_input_add</item>
     </style>
 
     <!--search orb location-->

@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui.link_src;
+package com.cw.tv_yt.ui.add_category;
 
-import android.content.ContentProviderClient;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -51,14 +48,11 @@ import androidx.leanback.widget.Row;
 import androidx.leanback.widget.RowPresenter;
 import androidx.leanback.widget.VerticalGridPresenter;
 
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
 /*
  * VerticalGridFragment shows a grid of videos that can be scrolled vertically.
  */
-public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
-    private static final String TAG = "Select_link_source";
+public class AddCategoryFragment extends VerticalGridSupportFragment  {
+    private static final String TAG = "Add_category";
     private static final int NUM_COLUMNS = 5;
 
     private static class Adapter extends ArrayObjectAdapter {
@@ -94,7 +88,7 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
         mAdapter = new Adapter(new SrcStringPresenter());
         setAdapter(mAdapter);
 
-        setTitle(getString(R.string.select_link_src_title));
+        setTitle(getString(R.string.add_category_title));
 
         if (savedInstanceState == null) {
             prepareEntranceTransition();
@@ -137,9 +131,9 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
                 mAdapter.callNotifyChanged();
 
                 int clickedSrcLinkNum = 1;
-                for(int i = 1; i<= mLinkSrcNames.size(); i++) {
-                    if (mLinkSrcNames.get(i-1).equalsIgnoreCase(item.toString()))
-                        clickedSrcLinkNum = i;
+                for(int i = 0; i< mLinkSrcNames.size(); i++) {
+                    if (mLinkSrcNames.get(i).equalsIgnoreCase(item.toString()))
+                        clickedSrcLinkNum = i+1;
                 }
 
                 // position number 1: is dedicated for local link source
@@ -156,7 +150,7 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
                     // get URL string
                     String urlString;
                     List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
-                    int index = clickedSrcLinkNum -1;
+                    int index = clickedSrcLinkNum;
                     urlString =  "https://drive.google.com/uc?export=download&id=" + src_links.get(index).getSecond();
 
                     // start Fetch service to import DB data
@@ -169,26 +163,19 @@ public class SelectLinkSrcFragment extends VerticalGridSupportFragment  {
     }
 
     private void loadData() {
-        System.out.println("SelectLinkSrcFragment / _loadData");
+        System.out.println("AddCategoryFragment / _loadData");
 
         // add source names
         List<Pair<String, String>> src_links = Source_links.getFileIdList(Objects.requireNonNull(getActivity()));
 
-        System.out.println(" SelectLinkSrcFragment / _loadData / src_links.size() = " + src_links.size());
+        System.out.println(" AddCategoryFragment / _loadData / src_links.size() = " + src_links.size());
             for(int pos=0;pos<src_links.size();pos++) {
                 String title = src_links.get(pos).getFirst();
-                System.out.println(" SelectLinkSrcFragment / _loadData / title = " + title);
+                System.out.println(" AddCategoryFragment / _loadData / title = " + title);
 
-                // set current usage marking *
-                int linkSrcNum = Utils.getPref_link_source_number(getActivity());
-
-                // position 0 and 1 are dedicated
-                if((pos>=2) && (pos+1) == linkSrcNum) // link src number starts from 1
-                    mLinkSrcNames.add(src_links.get(pos).getFirst().concat("*"));
-                else {
-                    // add marking after localized string at onBindViewHolder stage, not here
+                // skip 0 (default)
+                if(pos != 0)
                     mLinkSrcNames.add(src_links.get(pos).getFirst());
-                }
         }
 
         for(int i = 0; i< mLinkSrcNames.size(); i++) {
@@ -216,7 +203,6 @@ class SrcStringPresenter extends Presenter {
 
         // get localized string
         localLinkSrc = context.getResources().getString(R.string.local_link_src);
-        defaultLinkSrc =  context.getResources().getString(R.string.default_link_src);
 
         linkSrcNum = Utils.getPref_link_source_number(context);
         return new ViewHolder(tv);
@@ -226,15 +212,9 @@ class SrcStringPresenter extends Presenter {
         Log.d(TAG, "onBindViewHolder for " + item.toString());
 
         // replace title with with localized string for position 0 and 1
-        if(item.toString().equalsIgnoreCase("Local_TV-youtube")) {
-            if(linkSrcNum == 1)
-                localLinkSrc = localLinkSrc.concat("*");
+        if(item.toString().equalsIgnoreCase("Local_TV-youtube"))
             ((TextView) viewHolder.view).setText(localLinkSrc);
-        } else if(item.toString().equalsIgnoreCase("Default_TV-youtube")) {
-            if(linkSrcNum == 2)
-                defaultLinkSrc = defaultLinkSrc.concat("*");
-            ((TextView) viewHolder.view).setText(defaultLinkSrc);
-        } else
+        else
             ((TextView) viewHolder.view).setText(item.toString());
     }
 

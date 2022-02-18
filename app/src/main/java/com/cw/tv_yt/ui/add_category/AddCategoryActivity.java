@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui.link_src;
+package com.cw.tv_yt.ui.add_category;
 
 import android.os.Bundle;
 
@@ -22,9 +22,9 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.ui.LeanbackActivity;
 
 /*
- * VerticalGridActivity that loads VerticalGridFragment
+ * AddCategoryActivity that loads VerticalGridFragment
  */
-public class SelectLinkSrcActivity extends LeanbackActivity {
+public class AddCategoryActivity extends LeanbackActivity {
     /**
      * Called when the activity is first created.
      */

@@ -22,12 +22,12 @@
     <string name="vertical_grid_title"><![CDATA[Vertical Video Grid]]></string>
     <string name="select_category_title"><![CDATA[Select Category]]></string>
 
-    <string name="select_link_src_title">Select Link Source</string>
+    <string name="add_category_title">Add Link Source</string>
 
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">Options</string>
-    <string name="renew">Renew</string>
+    <string name="set_default">Set default link source</string>
     <string name="refresh_links">Refresh Links</string>
     <string name="select_category">Select category</string>
     <string name="grid_view">Vertical Grid View</string>
