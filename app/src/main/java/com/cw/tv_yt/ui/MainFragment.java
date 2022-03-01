@@ -651,7 +651,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         setBrandColor(ContextCompat.getColor(getActivity(), R.color.fastlane_background));
 
         // Set search icon color.
-        setSearchAffordanceColor(ContextCompat.getColor(getActivity(), R.color.search_opaque));
+        setSearchAffordanceColor(ContextCompat.getColor(getActivity(), R.color.default_background));
 
         setHeaderPresenterSelector(new PresenterSelector() {
             @Override

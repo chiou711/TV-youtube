@@ -38,6 +38,7 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.YouTubeDeveloperKey;
 import com.cw.tv_yt.data.YouTubeTimeConvert;
+import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.ui.MainFragment;
 import com.cw.tv_yt.ui.VideoDetailsActivity;
@@ -138,26 +139,36 @@ public class CardPresenter extends Presenter {
             }
         }
 
-        // get duration
-        isGotDuration = false;
-        getDuration(Utils.getYoutubeId(video.videoUrl));
-        //wait for buffering
-        int time_out_count = 0;
-        while ((!isGotDuration) && time_out_count< 10)
-        {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            time_out_count++;
-        }
-        duration = acquiredDuration;
+        if(Define.SHOW_YOUTUBE_DURATION){
+            // get duration
+            isGotDuration = false;
 
-        // show row number - link number of the row
-        cardView.setContentText( duration +
-                "    (" + link_count + "/" + links_of_current_row+")    " +
-                cardView.getContext().getResources().getString(R.string.current_list_title) + row_count );
+            getDuration(Utils.getYoutubeId(video.videoUrl));
+
+            //wait for buffering
+            int time_out_count = 0;
+            while ((!isGotDuration) && time_out_count< 10)
+            {
+                try {
+                    Thread.sleep(30);//todo TBD
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                time_out_count++;
+            }
+            duration = acquiredDuration;
+
+            // show row number - link number of the row
+            cardView.setContentText( duration +
+                    "    (" + link_count + "/" + links_of_current_row+")    " +
+                    cardView.getContext().getResources().getString(R.string.current_list_title) + row_count );
+        } else {
+            cardView.setContentText(
+                    "    (" + link_count + "/" + links_of_current_row+")    " +
+                            cardView.getContext().getResources().getString(R.string.current_list_title) + row_count );
+
+        }
+
         TextView positionText = ((TextView)cardView.findViewById(R.id.content_text));
         positionText.setTextColor(cardView.getContext().getResources().getColor(R.color.category_text));
         positionText.setGravity(Gravity.RIGHT);
@@ -223,10 +234,10 @@ public class CardPresenter extends Presenter {
 //                    System.out.println("CardPresenter / _getDuration/ run /stringsList = "+ stringsList);
                     parameters.put("id", stringsList);
 
-                    YouTube.Videos.List videosListMultipleIdsRequest = youtube.videos().list(parameters.get("part").toString());
+                    YouTube.Videos.List videosListMultipleIdsRequest = youtube.videos().list(parameters.get("part"));
                     videosListMultipleIdsRequest.setKey(YouTubeDeveloperKey.DEVELOPER_KEY);
                     if (parameters.containsKey("id") && parameters.get("id") != "") {
-                        videosListMultipleIdsRequest.setId(parameters.get("id").toString());
+                        videosListMultipleIdsRequest.setId(parameters.get("id"));
                     }
 
                     VideoListResponse response = videosListMultipleIdsRequest.execute();

@@ -82,7 +82,7 @@ public class ImportAsyncTask extends AsyncTask<Void, Integer, Void> {
 		{
 			act.getSupportFragmentManager().popBackStack();
 			Import_fileListAct.isBack_fileView = true;
-			Toast.makeText(act,"Import finished",Toast.LENGTH_SHORT).show();//TODO locale
+			Toast.makeText(act,R.string.import_finish,Toast.LENGTH_SHORT).show();
 		}
 		else
 		{

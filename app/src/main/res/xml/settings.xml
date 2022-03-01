@@ -6,7 +6,7 @@
             android:title="@string/pref_title_auto_play"
             android:defaultValue="true"
             android:key="@string/pref_key_auto_play" />
-        <SwitchPreference
+        <Preference
             android:title="@string/set_default"
             android:defaultValue="true"
             android:key="@string/pref_key_renew" />

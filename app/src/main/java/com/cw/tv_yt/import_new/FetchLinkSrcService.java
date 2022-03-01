@@ -25,6 +25,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
@@ -71,6 +72,7 @@ public class FetchLinkSrcService extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
         serviceUrl = workIntent.getStringExtra("FetchUrl");
         System.out.println("FetchLinkSrcService / _onHandleIntent / serviceUrl = " + serviceUrl);
+	    Toast.makeText(this,R.string.please_wait,Toast.LENGTH_LONG).show();
 
 	    try {
 		    JSONObject videoData = fetchJSON(serviceUrl);

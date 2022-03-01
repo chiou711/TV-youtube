@@ -128,7 +128,6 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
             public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                       RowPresenter.ViewHolder rowViewHolder, Row row) {
                 Log.i(TAG, "onItemClicked: item = " + item + " row = " + row );
-                mAdapter.callNotifyChanged();
 
                 int clickedSrcLinkNum = 1;
                 for(int i = 0; i< mLinkSrcNames.size(); i++) {

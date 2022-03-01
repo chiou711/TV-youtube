@@ -27,7 +27,7 @@
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">Options</string>
-    <string name="set_default">Set default link source</string>
+    <string name="set_default">Recover default link source</string>
     <string name="refresh_links">Refresh Links</string>
     <string name="select_category">Select category</string>
     <string name="grid_view">Vertical Grid View</string>
@@ -148,5 +148,9 @@
 
     <string name="local_link_src">Local link source</string>
     <string name="default_link_src">Default link source</string>
+
+    <!-- import  -->
+    <string name="import_finish">Import finished</string>
+    <string name="please_wait">Please wait a moment</string>
 
 </resources>
