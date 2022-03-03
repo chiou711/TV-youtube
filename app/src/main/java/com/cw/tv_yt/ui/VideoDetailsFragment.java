@@ -428,19 +428,19 @@ public class VideoDetailsFragment extends DetailsSupportFragment
             if (item instanceof Video) {
                 Video video = (Video) item;
 
-                if(!Pref.isAutoPlay(getActivity())) {
+                if (Pref.isAutoPlayByList(getActivity()) ||
+                    Pref.isAutoPlayByCategory(getActivity())) {
+                    String idStr = getYoutubeId(video.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
+                    startActivity(intent);
+                } else {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);
-
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
                             getActivity(),
                             ((ImageCardView) itemViewHolder.view).getMainImageView(),
                             VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                     getActivity().startActivity(intent, bundle);
-                } else {
-                    String idStr = getYoutubeId(video.videoUrl);
-                    Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(getActivity(), idStr, true/*fullscreen*/, true/*finishOnEnd*/);
-                    startActivity(intent);
                 }
             }
         }

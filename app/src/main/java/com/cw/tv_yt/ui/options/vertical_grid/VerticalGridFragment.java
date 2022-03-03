@@ -54,18 +54,18 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int NUM_COLUMNS = 5;
-    private final CursorObjectAdapter mVideoCursorAdapter =
-            new CursorObjectAdapter(new CardPresenter());
+    private CursorObjectAdapter mVideoCursorAdapter;
     private static final int ALL_VIDEOS_LOADER = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mVideoCursorAdapter = new CursorObjectAdapter(new CardPresenter(getActivity()));
 
         mVideoCursorAdapter.setMapper(new VideoCursorMapper());
         setAdapter(mVideoCursorAdapter);
 
-        setTitle(getString(R.string.vertical_grid_title));
+        setTitle(getString(R.string.category_grid_view_title));
 
         if (savedInstanceState == null) {
             prepareEntranceTransition();
@@ -133,7 +133,14 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
                 Video video = (Video) item;
 
                 // if auto play is set then do direct launch
-                if(!Pref.isAutoPlay(getActivity())) {
+                if (Pref.isAutoPlayByList(getActivity()) ||
+                    Pref.isAutoPlayByCategory(getActivity())) {
+                    String idStr = getYoutubeId(video.videoUrl);
+                    Intent intent = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
+                    intent.putExtra("force_fullscreen", true);
+                    intent.putExtra("finish_on_ended", true);
+                    startActivity(intent);
+                } else {
                     Intent intent = new Intent(getActivity(), VideoDetailsActivity.class);
                     intent.putExtra(VideoDetailsActivity.VIDEO, video);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
@@ -141,12 +148,6 @@ public class VerticalGridFragment extends VerticalGridSupportFragment
                             ((ImageCardView) itemViewHolder.view).getMainImageView(),
                             VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                     getActivity().startActivity(intent, bundle);
-                } else {
-                    String idStr = getYoutubeId(video.videoUrl);
-                    Intent intent = YouTubeIntents.createPlayVideoIntent(getActivity(), idStr);
-                    intent.putExtra("force_fullscreen", true);
-                    intent.putExtra("finish_on_ended", true);
-                    startActivity(intent);
                 }
 
             }

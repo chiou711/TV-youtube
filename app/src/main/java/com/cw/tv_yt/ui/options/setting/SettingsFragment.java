@@ -14,11 +14,15 @@
 
 package com.cw.tv_yt.ui.options.setting;
 
+import android.app.Activity;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+
 import androidx.preference.PreferenceFragment;
 import androidx.leanback.preference.LeanbackPreferenceFragment;
 import androidx.leanback.preference.LeanbackSettingsFragment;
@@ -37,6 +41,8 @@ import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static com.cw.tv_yt.define.Define.DEFAULT_AUTO_PLAY_BY_CATEGORY;
+import static com.cw.tv_yt.define.Define.DEFAULT_AUTO_PLAY_BY_LIST;
 
 public class SettingsFragment extends LeanbackSettingsFragment
         implements DialogPreference.TargetFragment {
@@ -80,6 +86,7 @@ public class SettingsFragment extends LeanbackSettingsFragment
     }
 
     public static class PrefFragment extends LeanbackPreferenceFragment {
+        Activity act;
 
         @Override
         public void onCreatePreferences(Bundle bundle, String s) {
@@ -90,6 +97,8 @@ public class SettingsFragment extends LeanbackSettingsFragment
             } else {
                 setPreferencesFromResource(prefResId, root);
             }
+
+            act = getActivity();
         }
 
         @Override
@@ -98,22 +107,72 @@ public class SettingsFragment extends LeanbackSettingsFragment
 //                // Open an AuthenticationActivity
 //                startActivity(new Intent(getActivity(), AuthenticationActivity.class));
 //            }
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(act);
+            SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+
+            if (preference.getKey().equals(getString(R.string.pref_key_auto_play_by_list))){
+                if (preference.getKey().equals(getString(R.string.pref_key_auto_play_by_list))){
+                    boolean currentSetting = sharedPreferences.getBoolean(
+                                    act.getString(R.string.pref_key_auto_play_by_list),
+                                    DEFAULT_AUTO_PLAY_BY_LIST);
+
+                    // keep one auto play mode
+                    if(currentSetting) {
+                        sharedPreferencesEditor.putBoolean(
+                                getString(R.string.pref_key_auto_play_by_category),
+                                false);
+                        sharedPreferencesEditor.apply();
+                    }
+                }
+
+                startNewMainAct();
+            }
+
+            if (preference.getKey().equals(getString(R.string.pref_key_auto_play_by_category))) {
+                if (preference.getKey().equals(getString(R.string.pref_key_auto_play_by_category))){
+                    boolean currentSetting = sharedPreferences.getBoolean(
+                            act.getString(R.string.pref_key_auto_play_by_category),
+                            DEFAULT_AUTO_PLAY_BY_CATEGORY);
+                    // keep one auto play mode
+                    if(currentSetting) {
+                        sharedPreferencesEditor.putBoolean(
+                                getString(R.string.pref_key_auto_play_by_list),
+                                false);
+                        sharedPreferencesEditor.apply();
+                    }
+                }
+                startNewMainAct();
+            }
+
+            if (preference.getKey().equals(getString(R.string.pref_key_show_duration))) {
+                // start new MainActivity to refresh card view
+                startNewMainAct();
+            }
 
             if (preference.getKey().equals(getString(R.string.pref_key_renew))) {
-                Utils.setPref_link_source_number(getActivity(), 1);
+                Utils.setPref_link_source_number(act, 1);
                 startRenewFetchService();
 
                 // remove reference keys
-                Utils.removePref_focus_category_number(getActivity());
+                Utils.removePref_focus_category_number(act);
 
-                int countVideoTables = Utils.getVideoTablesCount(getActivity());
+                int countVideoTables = Utils.getVideoTablesCount(act);
 
                 // remove category name key
                 for (int i = 1; i <= countVideoTables; i++)
-                    Utils.removePref_category_name(getActivity(), i);
+                    Utils.removePref_category_name(act, i);
             }
 
             return super.onPreferenceTreeClick(preference);
+        }
+
+        // start new main activity
+        void startNewMainAct(){
+            // start new MainActivity to refresh card view
+            Intent new_intent = new Intent(act, MainActivity.class);
+            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            Objects.requireNonNull(act).startActivity(new_intent);
         }
 
         // start fetch service by URL string
@@ -122,9 +181,9 @@ public class SettingsFragment extends LeanbackSettingsFragment
             // delete database
             try {
                 System.out.println("SelectLinkSrcFragment / _startFetchService / will delete DB");
-                Objects.requireNonNull(getActivity()).deleteDatabase(DbHelper.DATABASE_NAME);
+                Objects.requireNonNull(act).deleteDatabase(DbHelper.DATABASE_NAME);
 
-                ContentResolver resolver = getActivity().getContentResolver();
+                ContentResolver resolver = act.getContentResolver();
                 ContentProviderClient client = resolver.acquireContentProviderClient(VideoContract.CONTENT_AUTHORITY);
                 assert client != null;
                 VideoProvider provider = (VideoProvider) client.getLocalContentProvider();
@@ -133,7 +192,7 @@ public class SettingsFragment extends LeanbackSettingsFragment
                 provider.mContentResolver = resolver;
                 provider.mOpenHelper.close();
 
-                provider.mOpenHelper = new DbHelper(getActivity());
+                provider.mOpenHelper = new DbHelper(act);
                 provider.mOpenHelper.setWriteAheadLoggingEnabled(false);
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
@@ -146,10 +205,10 @@ public class SettingsFragment extends LeanbackSettingsFragment
             }
 
             // start new MainActivity
-            Intent new_intent = new Intent(getActivity(), MainActivity.class);
+            Intent new_intent = new Intent(act, MainActivity.class);
             new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
             new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            Objects.requireNonNull(getActivity()).startActivity(new_intent);
+            Objects.requireNonNull(act).startActivity(new_intent);
         }
 
     }

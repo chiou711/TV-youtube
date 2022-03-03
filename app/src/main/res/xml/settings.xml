@@ -3,9 +3,17 @@
     <PreferenceCategory
         android:title="@string/pref_title_settings">
         <SwitchPreference
-            android:title="@string/pref_title_auto_play"
+            android:title="@string/pref_title_auto_play_by_list"
             android:defaultValue="true"
-            android:key="@string/pref_key_auto_play" />
+            android:key="@string/pref_key_auto_play_by_list" />
+        <SwitchPreference
+            android:title="@string/pref_title_auto_play_by_category"
+            android:defaultValue="false"
+            android:key="@string/pref_key_auto_play_by_category" />
+        <SwitchPreference
+            android:title="@string/pref_title_show_duration"
+            android:defaultValue="false"
+            android:key="@string/pref_key_show_duration" />
         <Preference
             android:title="@string/set_default"
             android:defaultValue="true"

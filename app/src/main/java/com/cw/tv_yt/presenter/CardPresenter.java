@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.YouTubeDeveloperKey;
@@ -139,7 +140,7 @@ public class CardPresenter extends Presenter {
             }
         }
 
-        if(Define.SHOW_YOUTUBE_DURATION){
+        if(Pref.isShowDuration(act)){
             // get duration
             isGotDuration = false;
 
@@ -150,7 +151,7 @@ public class CardPresenter extends Presenter {
             while ((!isGotDuration) && time_out_count< 10)
             {
                 try {
-                    Thread.sleep(30);//todo TBD
+                    Thread.sleep(Define.DEFAULT_DELAY_GET_DURATION);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

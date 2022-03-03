@@ -23,7 +23,15 @@ package com.cw.tv_yt.define;
  */
 public class Define {
 
-    // show duration could cause lag
-    public final static boolean SHOW_YOUTUBE_DURATION = false;//true;
+    // show duration (default: disabled, show duration could cause card view display lag)
+    public final static boolean DEFAULT_SHOW_YOUTUBE_DURATION = false;
 
+    // auto play by list (default: by list)
+    public final static boolean DEFAULT_AUTO_PLAY_BY_LIST = true;
+
+    // auto play by category (default: by list)
+    public final static boolean DEFAULT_AUTO_PLAY_BY_CATEGORY = false;
+
+    // delay time for getting duration
+    public final static int DEFAULT_DELAY_GET_DURATION = 80;
 }
