@@ -23,14 +23,14 @@
     <string name="select_category_title"><![CDATA[Select Category]]></string>
 
     <string name="add_category_title">添加链接源</string>
-    <string name="category_grid_view_title">类别网格视图</string>
+    <string name="category_grid_view_title">浏览分类内容</string>
 
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">选项</string>
     <string name="set_default">恢复默认链接源</string>
     <string name="refresh_links">Refresh Links</string>
-    <string name="select_category">选择类别</string>
+    <string name="select_category">选择分类</string>
     <string name="error_fragment">Error Fragment</string>
     <string name="personal_settings">个人设置</string>
     <string name="play_1">播放</string>
@@ -148,7 +148,7 @@
     <!--  connection error  -->
     <string name="connection_error">网络连接错误</string>
     <!-- title-->
-    <string name="current_category_title">现在使用</string>
+    <string name="current_category_title">现在使用分类</string>
     <string name="current_list_title">列表</string>
 
     <string name="local_link_src">本地链接源</string>

@@ -23,7 +23,7 @@
     <string name="select_category_title"><![CDATA[Select Category]]></string>
 
     <string name="add_category_title">Add Link Source</string>
-    <string name="category_grid_view_title">Category grid view</string>
+    <string name="category_grid_view_title">browse category content</string>
 
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
@@ -147,7 +147,7 @@
     <!--  connection error  -->
     <string name="connection_error">Network connection error</string>
     <!-- title-->
-    <string name="current_category_title">Using now</string>
+    <string name="current_category_title">Using category now</string>
     <string name="current_list_title">List</string>
 
     <string name="local_link_src">Local link source</string>

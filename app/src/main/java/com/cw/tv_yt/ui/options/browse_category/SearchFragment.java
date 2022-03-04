@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui.options.vertical_grid;
+package com.cw.tv_yt.ui.options.browse_category;
 
 import android.Manifest;
 import android.app.Activity;

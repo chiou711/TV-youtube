@@ -114,7 +114,7 @@
             android:launchMode="singleTask"
             android:resizeableActivity="true" />
         <activity
-            android:name=".ui.options.vertical_grid.VerticalGridActivity"
+            android:name=".ui.options.browse_category.BrowseCategoryActivity"
             android:exported="true"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
@@ -129,7 +129,7 @@
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity android:name=".import_new.Import_fileListAct"/>
-        <activity android:name=".ui.options.vertical_grid.SearchActivity" />
+        <activity android:name=".ui.options.browse_category.SearchActivity" />
         <activity
             android:name=".ui.misc.GuidedStepActivity"
             android:theme="@style/Theme.Example.Leanback.GuidedStep" /> <!-- Provides search suggestions for keywords against video metadata. -->

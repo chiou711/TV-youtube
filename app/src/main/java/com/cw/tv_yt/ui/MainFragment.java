@@ -99,7 +99,7 @@ import static com.cw.tv_yt.Utils.getYoutubeId;
 import com.cw.tv_yt.ui.options.select_category.SelectCategoryActivity;
 import com.cw.tv_yt.ui.add_category.AddCategoryActivity;
 import com.cw.tv_yt.ui.options.setting.SettingsActivity;
-import com.cw.tv_yt.ui.options.vertical_grid.VerticalGridActivity;
+import com.cw.tv_yt.ui.options.browse_category.BrowseCategoryActivity;
 import com.google.android.youtube.player.YouTubeIntents;
 
 /*
@@ -1215,7 +1215,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     startActivity(intent, bundle);
 
                 } else if (((String) item).contains(getString(R.string.category_grid_view_title))) {
-			        Intent intent = new Intent(getActivity(), VerticalGridActivity.class);
+			        Intent intent = new Intent(getActivity(), BrowseCategoryActivity.class);
 			        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
 			        startActivity(intent, bundle);
 //                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.ui.options.vertical_grid;
+package com.cw.tv_yt.ui.options.browse_category;
 
 import android.os.Bundle;
 
@@ -22,16 +22,16 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.ui.LeanbackActivity;
 
 /*
- * VerticalGridActivity that loads VerticalGridFragment
+ * BrowseCategoryActivity that loads BrowseCategoryFragment
  */
-public class VerticalGridActivity extends LeanbackActivity {
+public class BrowseCategoryActivity extends LeanbackActivity {
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.vertical_grid);
+        setContentView(R.layout.browser_category_vertical_grid);
         getWindow().setBackgroundDrawableResource(R.drawable.grid_bg);
     }
 }
