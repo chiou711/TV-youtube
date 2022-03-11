@@ -23,15 +23,23 @@ package com.cw.tv_yt.define;
  */
 public class Define {
 
-    // show duration (default: disabled, show duration could cause card view display lag)
-    public final static boolean DEFAULT_SHOW_YOUTUBE_DURATION = false;
-
+    // --- setting ---
     // auto play by list (default: by list)
     public final static boolean DEFAULT_AUTO_PLAY_BY_LIST = true;
 
     // auto play by category (default: by list)
     public final static boolean DEFAULT_AUTO_PLAY_BY_CATEGORY = false;
 
-    // delay time for getting duration
+    // show duration (default: disabled, show duration could cause card view display lag)
+    public final static boolean DEFAULT_SHOW_YOUTUBE_DURATION = false;
+
+    // select file manager app (default: disabled, user enabled this will need advanced operation)
+    public final static boolean DEFAULT_SEL_FILE_MGR_APP = false;
+
+    // --- time ---
+    // delay time for getting YouTube duration
     public final static int DEFAULT_DELAY_GET_DURATION = 80;
+
+    // count down seconds to play next
+    public final static int DEFAULT_COUNT_DOWN_TIME_TO_PLAY_NEXT = 5;
 }

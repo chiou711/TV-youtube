@@ -24,12 +24,14 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.import_new.FetchLinkSrcService;
 import com.cw.tv_yt.import_new.Import_fileListAct;
+import com.cw.tv_yt.import_new.gdrive.ImportGDriveAct;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,11 +140,18 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
                 // position number 1: is dedicated for local link source
                 // others: for link sources
                 if(clickedSrcLinkNum == 1){ // local link source
-                    Intent intent = new Intent(getActivity(), Import_fileListAct.class);
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
-                    bundle.putInt("link_source_number",clickedSrcLinkNum);
-                    intent.putExtras(bundle);
-                    startActivity(intent, bundle);
+
+                    if(Pref.isSelFileMgrApp(getActivity())){
+                        // select file manager app : can access google drive
+                        Intent intent = new Intent(getActivity(), ImportGDriveAct.class);
+                        startActivity(intent);
+                    } else{
+                        Intent intent = new Intent(getActivity(), Import_fileListAct.class);
+                        Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity()).toBundle();
+                        bundle.putInt("link_source_number", clickedSrcLinkNum);
+                        intent.putExtras(bundle);
+                        startActivity(intent, bundle);
+                    }
                 } else { // add new data from selected link source
                     Utils.setPref_link_source_number(getActivity(), clickedSrcLinkNum);
 
@@ -201,7 +210,7 @@ class SrcStringPresenter extends Presenter {
                 context.getTheme()));
 
         // get localized string
-        localLinkSrc = context.getResources().getString(R.string.local_link_src);
+        localLinkSrc = context.getResources().getString(R.string.open_file);
 
         linkSrcNum = Utils.getPref_link_source_number(context);
         return new ViewHolder(tv);

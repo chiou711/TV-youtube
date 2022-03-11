@@ -77,6 +77,7 @@ import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
+import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
 import com.cw.tv_yt.model.VideoCursorMapper;
@@ -205,7 +206,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //	    }
 
         if(requestCode == YOUTUBE_LINK_INTENT) {
-            count = 5; // countdown time to play next
+            count = Define.DEFAULT_COUNT_DOWN_TIME_TO_PLAY_NEXT; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
             setPlayId(getNewId());
@@ -599,6 +600,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     public void onPause() {
         super.onPause();
         System.out.println("MainFragment / _onPause");
+
+        if(alertDlg != null)
+            alertDlg.dismiss();
+
+        cancelYouTubeHandler(); //todo Why not stop when power off
     }
 
     @Override

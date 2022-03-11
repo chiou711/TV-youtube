@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    tools:context=".import_new.gdrive.ImportGDriveAct">
+
+  <EditText
+      android:id="@+id/file_title_edittext"
+      android:layout_height="48dp"
+      android:layout_width="match_parent"
+      android:layout_alignParentTop="true" />
+
+  <TextView
+      android:id="@+id/json_text"
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:layout_below="@id/file_title_edittext"
+      android:layout_above="@id/btn_layout"
+      android:scrollbars="vertical" />
+
+  <LinearLayout
+      android:id="@+id/btn_layout"
+      android:layout_width="match_parent"
+      android:layout_height="48dp"
+      android:orientation="horizontal"
+      android:layout_alignParentBottom="true">
+
+    <Button
+        android:id="@+id/cancel_btn"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="Cancel"
+        style="?attr/buttonBarButtonStyle" />
+
+    <Button
+        android:id="@+id/import_btn"
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:text="Import"
+        style="?attr/buttonBarButtonStyle" />
+
+  </LinearLayout>
+
+</RelativeLayout>

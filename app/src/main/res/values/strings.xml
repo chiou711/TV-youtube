@@ -28,6 +28,7 @@
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">Options</string>
+    <string name="sel_file_mgr_app">Select file manager App</string>
     <string name="set_default">Recover default link source</string>
     <string name="refresh_links">Refresh Links</string>
     <string name="select_category">Select category</string>
@@ -131,7 +132,8 @@
     <string name="pref_title_username">Username</string>
     <string name="pref_title_password">Password</string>
     <string name="pref_key_login">pref_login</string>
-    <string name="pref_key_renew">pref_renew</string>
+    <string name="pref_key_sel_file_mgr_app">pref_sel_file_mgr_app</string>
+    <string name="pref_key_set_default">pref_renew</string>
     <string name="pref_title_login">Login</string>
     <string name="playback_tag">PLAYBACK_TAG</string>
     <!-- dialog    -->
@@ -150,11 +152,18 @@
     <string name="current_category_title">Using category now</string>
     <string name="current_list_title">List</string>
 
-    <string name="local_link_src">Local link source</string>
+    <string name="open_file">Link source by file</string>
     <string name="default_link_src">Default link source</string>
 
     <!-- import  -->
     <string name="import_finish">Import finished</string>
     <string name="please_wait">Please wait a moment</string>
+
+    <!-- gdrive  -->
+    <string name="toast_no_json_found">JSON string is not found!</string>
+    <string name="toast_import_gdrive_json">Import JSON content from Google Drive?</string>
+    <string name="confirm_dialog_title">Confirmation</string>
+    <string name="edit_note_button_back">Cancel</string>
+    <string name="edit_note_button_save">OK</string>
 
 </resources>

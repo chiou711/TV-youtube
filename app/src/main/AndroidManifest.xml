@@ -129,6 +129,8 @@
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/Theme.Leanback.VerticalGrid" />
         <activity android:name=".import_new.Import_fileListAct"/>
+        <activity android:name=".import_new.gdrive.ImportGDriveAct"
+            android:theme="@style/Theme.AppCompat"/>
         <activity android:name=".ui.options.browse_category.SearchActivity" />
         <activity
             android:name=".ui.misc.GuidedStepActivity"

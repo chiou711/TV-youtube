@@ -250,4 +250,15 @@ public class Utils {
         return dirName;
     }
 
+    // is Empty string
+    public static boolean isEmptyString(String str)
+    {
+        boolean empty = true;
+        if( str != null )
+        {
+            if(str.length() > 0 )
+                empty = false;
+        }
+        return empty;
+    }
 }

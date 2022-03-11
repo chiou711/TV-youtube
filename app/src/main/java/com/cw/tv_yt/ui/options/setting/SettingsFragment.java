@@ -149,7 +149,7 @@ public class SettingsFragment extends LeanbackSettingsFragment
                 startNewMainAct();
             }
 
-            if (preference.getKey().equals(getString(R.string.pref_key_renew))) {
+            if (preference.getKey().equals(getString(R.string.pref_key_set_default))) {
                 Utils.setPref_link_source_number(act, 1);
                 startRenewFetchService();
 

@@ -28,6 +28,7 @@
     <string name="dir_name">TV_YouTube</string>
     <string name="popular_header">TV YouTube</string>
     <string name="options">選項</string>
+    <string name="sel_file_mgr_app">選擇文件管理器應用</string>
     <string name="set_default">恢復預設鏈接源</string>
     <string name="refresh_links">Refresh Links</string>
     <string name="select_category">選擇分類</string>
@@ -132,7 +133,8 @@
     <string name="pref_title_username">Username</string>
     <string name="pref_title_password">Password</string>
     <string name="pref_key_login">pref_login</string>
-    <string name="pref_key_renew">pref_renew</string>
+    <string name="pref_key_sel_file_mgr_app">pref_sel_file_mgr_app</string>
+    <string name="pref_key_set_default">pref_renew</string>
     <string name="pref_title_login">Login</string>
     <string name="playback_tag">PLAYBACK_TAG</string>
     <!-- dialog    -->
@@ -151,11 +153,18 @@
     <string name="current_category_title">現在使用分類</string>
     <string name="current_list_title">列表</string>
 
-    <string name="local_link_src">本地連結源</string>
+    <string name="open_file">打開檔案</string>
     <string name="default_link_src">預設連結源</string>
 
     <!-- import  -->
     <string name="import_finish">導入完成</string>
     <string name="please_wait">請稍候</string>
+
+    <!-- gdrive -->
+    <string name="toast_no_json_found">JSON string is not found!</string>
+    <string name="toast_import_gdrive_json">Import JSON content from Google Drive?</string>
+    <string name="confirm_dialog_title">Confirmation</string>
+    <string name="edit_note_button_back">取消</string>
+    <string name="edit_note_button_save">確定</string>
 
 </resources>
