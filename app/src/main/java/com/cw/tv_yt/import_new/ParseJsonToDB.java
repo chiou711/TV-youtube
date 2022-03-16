@@ -30,6 +30,7 @@ import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.ui.MainActivity;
+import com.cw.tv_yt.ui.MainFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -152,6 +153,11 @@ public class ParseJsonToDB {
             // category name
             String category_name = contentObj.getString("category");
 
+            // add suffix for duplicated category name
+            int duplicatedTimes = getCategoryNameDuplicatedTimes(category_name);
+            if(duplicatedTimes > 0)
+                category_name = category_name.concat(String.valueOf(duplicatedTimes));
+
             // save category names
             ContentValues categoryValues = new ContentValues();
             categoryValues.put("category_name", category_name);
@@ -166,7 +172,7 @@ public class ParseJsonToDB {
 
         ContentResolver contentResolver = mContext.getApplicationContext().getContentResolver();
 
-        // get current video tables count
+        // get current video* tables count
         String[] projection = new String[]{"_id", "category_name"};
         String selection = null;
         String[] selectionArgs = null;
@@ -392,4 +398,18 @@ public class ParseJsonToDB {
         thread.start();
     }
 
+    // get duplicated times of same category name
+    // i.e.
+    // 1. JSON file is the same
+    // 2. category names in DB are different
+    int getCategoryNameDuplicatedTimes(String categoryName){
+        int size = MainFragment.mCategoryNames.size();
+        int duplicatedTimes = 0;
+
+        for(int i=0;i<size;i++) {
+            if (MainFragment.mCategoryNames.get(i).contains(categoryName))
+                duplicatedTimes++;
+        }
+        return duplicatedTimes;
+    }
 }

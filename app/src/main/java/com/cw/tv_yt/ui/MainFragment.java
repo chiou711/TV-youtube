@@ -119,7 +119,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private LoaderManager mLoaderManager;
     private static final int TITLE_LOADER = 123; // Unique ID for Title Loader.
 	private static final int CATEGORY_LOADER = 246; // Unique ID for Category Loader.
-	private List<String> mCategoryNames = new ArrayList<>();
+	public static List<String> mCategoryNames = new ArrayList<>();
     final private static int YOUTUBE_LINK_INTENT = 99;
     public final static int VIDEO_DETAILS_INTENT = 98;
     // Maps a Loader Id to its CursorObjectAdapter.
@@ -725,7 +725,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             return new CursorLoader(
                     getContext(),
                     VideoContract.CategoryEntry.CONTENT_URI, // Table to query
+                    // not show duplicated category name
                     new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
+                    // show duplicated category name
+//                    new String[]{VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
                     // Only categories
                     null, // No selection clause
                     null, // No selection arguments
@@ -766,9 +769,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        System.out.println("MainFragment / _onLoadFinished");
-        System.out.println("MainFragment / _onLoadFinished /  start rowsLoadedCount = " + rowsLoadedCount);
-        System.out.println("MainFragment / _onLoadFinished /  mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
+//        System.out.println("MainFragment / _onLoadFinished");
+//        System.out.println("MainFragment / _onLoadFinished /  start rowsLoadedCount = " + rowsLoadedCount);
+//        System.out.println("MainFragment / _onLoadFinished /  mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
 
         // return when load is OK
         if( (rowsLoadedCount!=0 ) && (rowsLoadedCount >= mVideoCursorAdapters.size()) ) {
@@ -779,12 +782,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
 
-            if (loaderId == CATEGORY_LOADER)
-	            System.out.println("MainFragment / _onLoadFinished / loaderId = CATEGORY_LOADER");
-            else if(loaderId == TITLE_LOADER)
-                System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
-            else
-                System.out.println("MainFragment / _onLoadFinished / loaderId (video) = " + loaderId);
+//            if (loaderId == CATEGORY_LOADER)
+//	            System.out.println("MainFragment / _onLoadFinished / loaderId = CATEGORY_LOADER");
+//            else if(loaderId == TITLE_LOADER)
+//                System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
+//            else
+//                System.out.println("MainFragment / _onLoadFinished / loaderId (video) = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
                 mCategoryNames = new ArrayList<>();
@@ -794,6 +797,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     String category_name = data.getString(categoryIndex);
                     System.out.println("MainFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
+
                     data.moveToNext();
                 }
 
@@ -816,6 +820,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
 	            ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
 
+	            // show category name
                 for(int i=1;i<= mCategoryNames.size();i++)
                     gridRowAdapterCategory.add(mCategoryNames.get(i-1));
 
@@ -838,7 +843,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 while (!data.isAfterLast()) {
                     int titleIndex = data.getColumnIndex(VideoContract.VideoEntry.COLUMN_ROW_TITLE);
                     String title = data.getString(titleIndex);
-                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
+//                    System.out.println("MainFragment / _onLoadFinished / title = " + title);
 
                     // Create header for this category.
                     HeaderItem header = new HeaderItem(title);
@@ -856,7 +861,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         ListRow row = new ListRow(header, videoCursorAdapter);
                         mTitleRowAdapter.add(row);
                         row.setId(row_id);
-	                    System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
+//	                    System.out.println("MainFragment / _onLoadFinished / existingAdapter is null  / will initLoader / videoLoaderId = " + videoLoaderId);
 
                         // Start loading the videos from the database for a particular category.
                         Bundle args = new Bundle();
@@ -897,9 +902,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 /**
                  *  end of loading category
                  * */
-                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
-                System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished category");
-                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
+//                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
+//                System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished category");
+//                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
 
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
@@ -907,9 +912,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 int columnIndex = data.getColumnIndex(VideoContract.VideoEntry._ID);
                 int video_id = data.getInt(columnIndex);
-                System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
+//                System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + video_id);
                 int sizeOfRowLinks = data.getCount();
-                System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
+//                System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
 
                 // start number of a row
                 start_number_of_row.add(video_id);
@@ -925,7 +930,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // one row added
                 rowsLoadedCount++;
-                System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
+//                System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
 
                 /**
                  *  end of loading video
@@ -959,7 +964,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             }
             // Start an Intent to fetch the videos
             else if ((loader.getId() == TITLE_LOADER) && (rowsLoadedCount == 0)) {
-                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
+//                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
 
                 // avoid endless loop due to empty category selection
                 Utils.setPref_focus_category_number(getContext(),1);
@@ -1031,7 +1036,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             Utils.setPref_category_name(getContext(), clickedPos, mCategoryNames.get(clickedPos - 1));
             mLoaderManager.destroyLoader(TITLE_LOADER);
 
-            getActivity().recreate();
+            // start new MainActivity to renew video provider
+            getActivity().finish();
+            Intent new_intent = new Intent(getActivity(), MainActivity.class);
+            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            startActivity(new_intent);
         }
         catch (Exception e)
         {
