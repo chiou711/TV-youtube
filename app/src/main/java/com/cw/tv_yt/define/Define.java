@@ -36,6 +36,9 @@ public class Define {
     // select file manager app (default: disabled, user enabled this will need advanced operation)
     public final static boolean DEFAULT_SEL_FILE_MGR_APP = false;
 
+    // initial number of default URL: db_source_id_x
+    public final static int INIT_NUMBER = 1;
+
     // --- time ---
     // delay time for getting YouTube duration
     public final static int DEFAULT_DELAY_GET_DURATION = 80;

@@ -36,6 +36,7 @@ import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.ui.MainActivity;
+import com.cw.tv_yt.ui.MainFragment;
 
 import java.util.Objects;
 
@@ -161,6 +162,10 @@ public class SettingsFragment extends LeanbackSettingsFragment
                 // remove category name key
                 for (int i = 1; i <= countVideoTables; i++)
                     Utils.removePref_category_name(act, i);
+
+                MainFragment.mCategoryNames = null;
+
+                startNewMainAct();
             }
 
             return super.onPreferenceTreeClick(preference);
@@ -203,12 +208,6 @@ public class SettingsFragment extends LeanbackSettingsFragment
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            // start new MainActivity
-            Intent new_intent = new Intent(act, MainActivity.class);
-            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            Objects.requireNonNull(act).startActivity(new_intent);
         }
 
     }
