@@ -21,6 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.cw.tv_yt.data.VideoContract.VideoEntry;
+import com.cw.tv_yt.ui.MainFragment;
 
 /**
  * VideoDbHelper manages the creation and upgrade of the database used in this sample.
@@ -58,11 +59,16 @@ public class DbHelper extends SQLiteOpenHelper {
         System.out.println("DbHelper / _onCreate (will create category table)");
         final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.CategoryEntry.TABLE_NAME + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
-                "category_name" + " TEXT NOT NULL " +
+                "category_name" + " TEXT NOT NULL," +
+                "video_table_id" + " INTEGER" +
                 " );";
 
         // Do the creating of the databases.
         db.execSQL(SQL_CREATE_CATEGORY_TABLE);
+
+        // set null for fetching link source
+        MainFragment.mCategoryNames = null;
+
     }
 
     @Override

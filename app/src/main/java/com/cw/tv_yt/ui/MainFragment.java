@@ -74,7 +74,6 @@ import com.cw.tv_yt.data.FetchVideoService;
 import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.data.VideoContract;
-import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.presenter.CardPresenter;
@@ -724,7 +723,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     getContext(),
                     VideoContract.CategoryEntry.CONTENT_URI, // Table to query
                     // not show duplicated category name
-                    new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
+                    new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME,
+                             VideoContract.CategoryEntry.COLUMN_VIDEO_TABLE_ID},
                     // show duplicated category name
 //                    new String[]{VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME},
                     // Only categories
@@ -795,6 +795,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     String category_name = data.getString(categoryIndex);
                     System.out.println("MainFragment / _onLoadFinished / category_name = " + category_name);
                     mCategoryNames.add(category_name);
+
+                    int video_table_id_index = data.getColumnIndex(VideoContract.CategoryEntry.COLUMN_VIDEO_TABLE_ID);
+                    int video_table_id = data.getInt(video_table_id_index);
+                    System.out.println(" @ MainFragment / _onLoadFinished / video_table_id = " + video_table_id);
 
                     data.moveToNext();
                 }
@@ -1359,6 +1363,21 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 }
             }
         }
+    }
+
+    // get duplicated times of same category name
+    // i.e.
+    // 1. JSON file is the same
+    // 2. category names in DB are different
+    public static int getCategoryNameDuplicatedTimes(String categoryName){
+        int size = mCategoryNames.size();
+        int duplicatedTimes = 0;
+
+        for(int i=0;i<size;i++) {
+            if (mCategoryNames.get(i).contains(categoryName))
+                duplicatedTimes++;
+        }
+        return duplicatedTimes;
     }
 
 }

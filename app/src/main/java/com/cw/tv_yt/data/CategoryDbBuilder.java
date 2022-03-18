@@ -85,6 +85,7 @@ public class CategoryDbBuilder {
             // save category names
             ContentValues categoryValues = new ContentValues();
             categoryValues.put("category_name", category_name);
+            categoryValues.put("video_table_id", h+1);
             videosToInsert.add(categoryValues);
         }
         return videosToInsert;

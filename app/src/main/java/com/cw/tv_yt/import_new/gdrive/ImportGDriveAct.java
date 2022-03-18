@@ -63,7 +63,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-
 /**
  * The main {@link Activity} for the Drive API migration sample app.
  *
@@ -220,7 +219,7 @@ public class ImportGDriveAct extends AppCompatActivity {
 
         try {
             jsonObj = new JSONObject(jsonContent);
-            importObject.parseJsonAndInsertDB(jsonObj);
+            Utils.parseJsonAndInsertDB(this,jsonObj);
         } catch (JSONException e) {
             e.printStackTrace();
         }
