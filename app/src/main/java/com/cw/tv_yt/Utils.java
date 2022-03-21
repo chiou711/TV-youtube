@@ -16,7 +16,6 @@
 
 package com.cw.tv_yt;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -26,19 +25,12 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Point;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
-import android.widget.VideoView;
 
 import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
+import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.ui.MainActivity;
 import com.cw.tv_yt.ui.MainFragment;
 
@@ -47,7 +39,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -56,9 +47,9 @@ import java.util.regex.Pattern;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.cw.tv_yt.data.VideoDbBuilder.TAG_LINK_PAGE;
-import static com.cw.tv_yt.data.VideoDbBuilder.TAG_MEDIA;
-import static com.cw.tv_yt.data.VideoDbBuilder.TAG_TITLE;
+import static com.cw.tv_yt.data.DbBuilder_video.TAG_LINK_PAGE;
+import static com.cw.tv_yt.data.DbBuilder_video.TAG_MEDIA;
+import static com.cw.tv_yt.data.DbBuilder_video.TAG_TITLE;
 
 /**
  * A collection of utility methods, all static.
@@ -98,25 +89,15 @@ public class Utils {
         return videoId;
     }
 
-    // set category number
-    public static void setPref_focus_category_number(Context context, int cateNumber )
+    // get preference video table ID
+    public static int getPref_video_table_id(Context context)
     {
-        SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "current_category_number";
-        pref.edit().putInt(keyName, cateNumber).apply();
-    }
-
-    // get category number
-    public static int getPref_focus_category_number (Context context)
-    {
-        SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "current_category_number";
-        return pref.getInt(keyName, 1); // focus table Id: default is 1
+        String catName = getPref_category_name(context);
+        return getVideoTableId_byCategoryName(context,catName);
     }
 
     // set link source number
-    public static void setPref_link_source_number(Context context, int linkSrcNumber )
-    {
+    public static void setPref_link_source_number(Context context, int linkSrcNumber ){
         SharedPreferences pref = context.getSharedPreferences("link_src", 0);
         String keyName = "link_source_number";
         pref.edit().putInt(keyName, linkSrcNumber).apply();
@@ -126,50 +107,36 @@ public class Utils {
     // Note:  after new installation, link source number
     // 1 dedicated for Default: apply this
     // 2 dedicated for Local: not ready
-    public static int getPref_link_source_number (Context context)
-    {
+    public static int getPref_link_source_number (Context context) {
         SharedPreferences pref = context.getSharedPreferences("link_src", 0);
         String keyName = "link_source_number";
-        return pref.getInt(keyName, 1);
+        return pref.getInt(keyName, Define.INIT_SOURCE_LINK_NUMBER);
     }
 
-    // set category name
-    public static void setPref_category_name(Context context, int cateNumber, String categoryStr )
-    {
-        System.out.println("Utils / _setPref_category_name / cateNumber = " + cateNumber);
+    // set preference category name
+    public static void setPref_category_name(Context context, String name ){
         SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "category_name_" + cateNumber;
-        pref.edit().putString(keyName, categoryStr).apply();
+        String keyName = "category_name";
+        pref.edit().putString(keyName, name).apply();
     }
 
-    // get category name
-    public static String getPref_category_name(Context context,int cateNumber)
+    // get preference category name
+    public static String getPref_category_name(Context context )
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "category_name_" + cateNumber;
-        return pref.getString(keyName, String.valueOf(cateNumber)); // folder table Id: default is 1
+        String keyName = "category_name";
+        return pref.getString(keyName, "no name"); // folder table Id: default is 1
     }
 
-    // remove key of category name
-    public static void removePref_category_name(Context context,int index)
-    {
+    // remove key of preference category name
+    public static void removePref_category_name(Context context){
         SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyPrefix = "category_name_";
-        String keyName = keyPrefix.concat(String.valueOf(index));
-        pref.edit().remove(keyName).apply();
-    }
-
-    // remove key of category focus number
-    public static void removePref_focus_category_number(Context context)
-    {
-        SharedPreferences pref = context.getSharedPreferences("category", 0);
-        String keyName = "current_category_number";
+        String keyName = "category_name";
         pref.edit().remove(keyName).apply();
     }
 
     // get video tables count
-    public static int getVideoTablesCount(Context context)
-    {
+    public static int getVideoTablesCount(Context context){
         // get video tables count
         DbHelper mOpenHelper = new DbHelper(context);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
@@ -250,14 +217,20 @@ public class Utils {
         String sortOrder = null;
         Cursor query = contentResolver.query(VideoContract.CategoryEntry.CONTENT_URI,projection,selection,selectionArgs,sortOrder);
 
-//        int index = query.getColumnIndex(VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME);
-        int currentVideoTablesCount = 0;
+        // get unique video table ID (base on current biggest one)
+        int biggestVideoTableId = 0;
         if (query.moveToFirst()) {
             do {
-//                String string = query.getString(index);
-                currentVideoTablesCount++;
+                String columnStr = VideoContract.CategoryEntry.COLUMN_VIDEO_TABLE_ID;
+                int index = query.getColumnIndex(columnStr);
+                int pointedVideoTableId = query.getInt(index);
+                if(pointedVideoTableId >= biggestVideoTableId)
+                    biggestVideoTableId = pointedVideoTableId;
+
             } while (query.moveToNext());
         }
+
+        query.close();
 
         // 2) import jsonObj: get category list
         JSONArray contentArray_cat = jsonObj.getJSONArray("content");
@@ -271,7 +244,7 @@ public class Utils {
             String category_name = contentObj.getString("category");
 
             // video table Id
-            int video_table_id = currentVideoTablesCount + h + 1;
+            int video_table_id = biggestVideoTableId + h + 1;
 
             // add suffix for duplicated category name
             int duplicatedTimes = MainFragment.getCategoryNameDuplicatedTimes(category_name);
@@ -362,7 +335,7 @@ public class Utils {
             sqlDb = mOpenHelper.getWritableDatabase();
 
             // set new video table Id
-            String newVideoTableId = String.valueOf(currentVideoTablesCount + h+1); //Id starts from 1
+            String newVideoTableId = String.valueOf(biggestVideoTableId + h+1); //Id starts from 1
 
             // Create new video table to hold videos.
             final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + VideoContract.VideoEntry.TABLE_NAME.concat(newVideoTableId) + " (" +
@@ -390,7 +363,7 @@ public class Utils {
 
             ContentResolver contentResolver_video = mContext.getApplicationContext().getContentResolver();
 
-            VideoProvider.tableId = String.valueOf(currentVideoTablesCount + i + 1);
+            VideoProvider.tableId = String.valueOf(biggestVideoTableId + i + 1);
             contentResolver_video.bulkInsert(VideoContract.VideoEntry.CONTENT_URI, downloadedVideoContentValues_video);
         }
 
@@ -399,6 +372,48 @@ public class Utils {
         new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
         new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         Objects.requireNonNull(mContext).startActivity(new_intent);
+    }
+
+    // Get video_table_id by category name
+    public static int getVideoTableId_byCategoryName(Context act,String categoryName){
+        int videoTableId = 0;
+
+        System.out.println("Utils / _getVideoTableId_byCategoryName /  categoryName =　" + categoryName);
+
+        // initial video table ID
+        if(categoryName.equalsIgnoreCase("no name"))
+            return Define.INIT_CATEGORY_NUMBER;
+
+        DbHelper mOpenHelper = new DbHelper(act);
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
+
+        SQLiteDatabase sqlDb;
+        sqlDb = mOpenHelper.getReadableDatabase();
+
+        Cursor cursor = sqlDb.query(
+                "category",
+                new String[]{"video_table_id"},
+                "category_name="+"\'"+ categoryName+"\'",
+                null,
+                null,
+                null,
+                null);
+
+        cursor.moveToFirst();
+
+        try {
+            int columnIndex = cursor.getColumnIndex(VideoContract.CategoryEntry.COLUMN_VIDEO_TABLE_ID);
+            videoTableId = cursor.getInt(columnIndex);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println(" cursor get int : error !");
+        }
+
+        cursor.close();
+        sqlDb.close();
+        mOpenHelper.close();
+
+        return videoTableId;
     }
 
 }

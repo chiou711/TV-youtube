@@ -42,7 +42,7 @@ import androidx.annotation.NonNull;
  * The VideoDbBuilder is used to grab a JSON file from a server and parse the data
  * to be placed into a local database
  */
-public class VideoDbBuilder {
+public class DbBuilder_video {
     public static final String TAG_LINK_PAGE = "link_page";//"googlevideos";
     public static final String TAG_MEDIA = "links";
     public static final String TAG_TITLE = "title";
@@ -55,7 +55,7 @@ public class VideoDbBuilder {
      * Default constructor that can be used for tests
      */
 
-    public VideoDbBuilder(Context mContext) {
+    public DbBuilder_video(Context mContext) {
         this.mContext = mContext;
     }
 
@@ -99,7 +99,7 @@ public class VideoDbBuilder {
                 JSONObject page = pageArray.getJSONObject(i);
                 String rowTitle = page.getString(TAG_TITLE);
 
-                System.out.println("VideoDbBuilder / _buildMedia / pageTitle = " + rowTitle);
+                System.out.println("DbBuilder_video / _buildMedia / pageTitle = " + rowTitle);
 
                 linksArray = page.getJSONArray(TAG_MEDIA);
 
@@ -108,14 +108,14 @@ public class VideoDbBuilder {
                     JSONObject link = linksArray.getJSONObject(j);
 
                     String linkTitle = link.optString("note_title");
-                    System.out.println("VideoDbBuilder / _buildMedia / linkTitle = " + linkTitle);
+                    System.out.println("DbBuilder_video / _buildMedia / linkTitle = " + linkTitle);
 
                     String linkUrl = (String) link.opt("note_link_uri"); // Get the first link only.
 
                     // card image Url: YouTube or HTML
                     String cardImageUrl;
                     cardImageUrl = (String) link.opt("note_image_uri");
-                    System.out.println("VideoDbBuilder / _buildMedia / cardImageUrl = " + cardImageUrl);
+                    System.out.println("DbBuilder_video / _buildMedia / cardImageUrl = " + cardImageUrl);
 
                     // for YouTube link
                     if(( !linkUrl.contains("playlist") && (linkUrl.contains("youtube") || linkUrl.contains("youtu.be")) ) ) {
@@ -177,7 +177,7 @@ public class VideoDbBuilder {
      * @throws IOException
      */
     private JSONObject fetchJSON(String urlString) throws JSONException, IOException {
-        System.out.println("VideoDbBuilder / fetchJSON / urlString = " + urlString);
+        System.out.println("DbBuilder_video / fetchJSON / urlString = " + urlString);
 
         BufferedReader reader = null;
         java.net.URL url = new java.net.URL(urlString);

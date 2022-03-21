@@ -21,6 +21,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.cw.tv_yt.data.VideoContract.VideoEntry;
+import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.ui.MainFragment;
 
 /**
@@ -44,7 +45,7 @@ public class DbHelper extends SQLiteOpenHelper {
         System.out.println("DbHelper / _onCreate (will create video1 table)");
 
         // Create a table to hold videos.
-        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + "video1" + " (" +
+        final String SQL_CREATE_VIDEO_TABLE = "CREATE TABLE IF NOT EXISTS " + "video" + Define.INIT_CATEGORY_NUMBER + " (" +
                 VideoEntry._ID + " INTEGER PRIMARY KEY," +
                 VideoEntry.COLUMN_ROW_TITLE + " TEXT NOT NULL, " +
                 VideoEntry.COLUMN_LINK_URL + " TEXT NOT NULL, " + // TEXT UNIQUE NOT NULL will make the URL unique.

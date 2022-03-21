@@ -35,6 +35,7 @@ import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.data.VideoProvider;
+import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.ui.MainActivity;
 import com.cw.tv_yt.ui.MainFragment;
 
@@ -151,17 +152,11 @@ public class SettingsFragment extends LeanbackSettingsFragment
             }
 
             if (preference.getKey().equals(getString(R.string.pref_key_set_default))) {
-                Utils.setPref_link_source_number(act, 1);
+                Utils.setPref_link_source_number(act, Define.INIT_SOURCE_LINK_NUMBER);
                 startRenewFetchService();
 
-                // remove reference keys
-                Utils.removePref_focus_category_number(act);
-
-                int countVideoTables = Utils.getVideoTablesCount(act);
-
                 // remove category name key
-                for (int i = 1; i <= countVideoTables; i++)
-                    Utils.removePref_category_name(act, i);
+                Utils.removePref_category_name(act);
 
                 MainFragment.mCategoryNames = null;
 

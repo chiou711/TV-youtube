@@ -86,8 +86,7 @@ public class GridItemPresenter extends Presenter {
 
         // highlight category name
         try {
-            int cate_num = Utils.getPref_focus_category_number(mainFragment.getContext());
-            String cate_name = Utils.getPref_category_name(mainFragment.getContext(), cate_num);
+            String cate_name = Utils.getPref_category_name(mainFragment.getContext());
 
             // set focus category text color
             if (item.toString().equalsIgnoreCase(cate_name))

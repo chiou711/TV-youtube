@@ -112,7 +112,7 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 loadData();
-                setSelectedPosition(Utils.getPref_focus_category_number(getActivity())-1);
+                setSelectedPosition(Utils.getPref_video_table_id(getActivity())-1);
                 startEntranceTransition();
             }
         }, 500);

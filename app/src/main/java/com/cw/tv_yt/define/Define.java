@@ -37,7 +37,10 @@ public class Define {
     public final static boolean DEFAULT_SEL_FILE_MGR_APP = false;
 
     // initial number of default URL: db_source_id_x
-    public final static int INIT_NUMBER = 1;
+    public final static int INIT_SOURCE_LINK_NUMBER = 1;
+
+    // initial category number
+    public final static int INIT_CATEGORY_NUMBER = 1;
 
     // --- time ---
     // delay time for getting YouTube duration

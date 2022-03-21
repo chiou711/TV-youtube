@@ -233,7 +233,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                 } else if(action.getId() == ACTION_DELETE){
                     // delete current item
                     ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
-                    VideoProvider.tableId = String.valueOf(Utils.getPref_focus_category_number(getActivity()));
+                    VideoProvider.tableId = String.valueOf(Utils.getPref_video_table_id(getActivity()));
                     contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + mSelectedVideo.id,null);
 
                     Intent returnIntent = new Intent();

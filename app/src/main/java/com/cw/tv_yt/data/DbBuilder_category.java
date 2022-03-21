@@ -34,22 +34,19 @@ import javax.net.ssl.HttpsURLConnection;
 import androidx.annotation.NonNull;
 
 /**
- * The VideoDbBuilder is used to grab a JSON file from a server and parse the data
+ * The DbBuilder_category is used to grab a JSON file from a server and parse the data
  * to be placed into a local database
  */
-public class CategoryDbBuilder {
+public class DbBuilder_category {
 
-    private static final String TAG = "VideoDbBuilder";
+    private static final String TAG = "DbBuilder_category";
 
-    private Context mContext;
+    public DbBuilder_category() {}
 
     /**
      * Default constructor that can be used for tests
      */
 
-    public CategoryDbBuilder(Context mContext) {
-        this.mContext = mContext;
-    }
 
     /**
      * Fetches JSON data representing videos from a server and populates that in a database
@@ -57,9 +54,9 @@ public class CategoryDbBuilder {
      */
     public @NonNull List<ContentValues> fetch(String url)
             throws IOException, JSONException {
-        JSONObject videoData = fetchJSON(url);
-        System.out.println("CategoryDbBuilder / _fetch / videoData length = " + videoData.length());
-        return buildMedia(videoData);
+        JSONObject categoryData = fetchJSON(url);
+        System.out.println("DbBuilder_category / _fetch / categoryData length = " + categoryData.length());
+        return buildMedia(categoryData);
     }
 
     /**
@@ -69,11 +66,11 @@ public class CategoryDbBuilder {
      */
     public List<ContentValues> buildMedia(JSONObject jsonObj) throws JSONException {
 
-        System.out.println("CategoryDbBuilder_yt / _buildMedia / jsonObj.toString = " + jsonObj.toString());
+        System.out.println("DbBuilder_category / _buildMedia / jsonObj.toString = " + jsonObj.toString());
 
         JSONArray contentArray = jsonObj.getJSONArray("content");
         List<ContentValues> videosToInsert = new ArrayList<>();
-        System.out.println("CategoryDbBuilder_yt / _buildMedia / contentArray.length() = " + contentArray.length());
+        System.out.println("DbBuilder_category / _buildMedia / contentArray.length() = " + contentArray.length());
 
         for (int h = 0; h < contentArray.length(); h++) {
 
@@ -99,7 +96,7 @@ public class CategoryDbBuilder {
      * @throws IOException
      */
     private JSONObject fetchJSON(String urlString) throws JSONException, IOException {
-        System.out.println("VideoDbBuilder / fetchJSON / urlString = " + urlString);
+        System.out.println("DbBuilder_category / fetchJSON / urlString = " + urlString);
 
         BufferedReader reader = null;
         java.net.URL url = new java.net.URL(urlString);

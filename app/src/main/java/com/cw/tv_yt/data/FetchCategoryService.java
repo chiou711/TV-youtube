@@ -48,7 +48,7 @@ public class FetchCategoryService extends IntentService {
     protected void onHandleIntent(Intent workIntent) {
         serviceUrl = workIntent.getStringExtra("FetchUrl");
         System.out.println("FetchCategoryService / _onHandleIntent / serviceUrl = " + serviceUrl);
-	    CategoryDbBuilder catDbBuilder = new CategoryDbBuilder(getApplicationContext());
+	    DbBuilder_category catDbBuilder = new DbBuilder_category();
 
         try {
 	        List<ContentValues> contentValuesList = catDbBuilder.fetch(serviceUrl);
@@ -62,7 +62,7 @@ public class FetchCategoryService extends IntentService {
 			contentResolver.bulkInsert(VideoContract.CategoryEntry.CONTENT_URI, downloadedVideoContentValues);
 
         } catch (IOException | JSONException e) {
-            Log.e(TAG, "Error occurred in downloading videos");
+            Log.e(TAG, "Error occurred in downloading categories");
             e.printStackTrace();
         }
 

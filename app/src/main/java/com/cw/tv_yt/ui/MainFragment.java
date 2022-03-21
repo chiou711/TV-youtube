@@ -91,9 +91,8 @@ import java.util.Objects;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-import static com.cw.tv_yt.Utils.getPref_focus_category_number;
 import static com.cw.tv_yt.Utils.getYoutubeId;
-import static com.cw.tv_yt.define.Define.INIT_NUMBER;
+import static com.cw.tv_yt.define.Define.INIT_CATEGORY_NUMBER;
 
 import com.cw.tv_yt.ui.options.select_category.SelectCategoryActivity;
 import com.cw.tv_yt.ui.add_category.AddCategoryActivity;
@@ -175,8 +174,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	    // list for Show row number - link number
         links_count_of_row = new ArrayList<>();
         start_number_of_row = new ArrayList<>();
-
-	    setTotalLinksCount();
     }
 
     AlertDialog.Builder builder;
@@ -291,7 +288,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     private String getYouTubeLink()
     {
-        int focusCatNum = Utils.getPref_focus_category_number(act);
+        int focusCatNum = Utils.getPref_video_table_id(act);
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
         String columnName = VideoContract.VideoEntry.COLUMN_LINK_URL;
         int pos = getPlayId()-1;
@@ -302,7 +299,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     private String getYouTubeTitle()
     {
-        int focusCatNum = Utils.getPref_focus_category_number(act);
+        int focusCatNum = Utils.getPref_video_table_id(act);
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
         String columnName = VideoContract.VideoEntry.COLUMN_LINK_TITLE;
         int pos = getPlayId()-1;
@@ -316,7 +313,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         DbHelper mOpenHelper = new DbHelper(act);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
-        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+        Cursor cursor = sqlDb.query(
                 table,
                 null,//projection,
                 null,//selection,
@@ -335,16 +332,16 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         return retData;
     }
 
-    private int totalLinksCount;
-    private void setTotalLinksCount()
+    private int getTotalLinksCount()
     {
-        int focusCatNum = Utils.getPref_focus_category_number(act);
+        int focusCatNum = Utils.getPref_video_table_id(act);
+
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
         DbHelper mOpenHelper = new DbHelper(act);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
 
-        Cursor cursor = mOpenHelper.getReadableDatabase().query(
+        Cursor cursor = sqlDb.query(
                 table,
                 null,//projection,
                 null,//selection,
@@ -354,13 +351,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 null//sortOrder
         );
 
-        totalLinksCount = cursor.getCount();
-
+        int totalLinksCount = cursor.getCount();
         cursor.close();
-    }
 
-    private int getTotalLinksCount()
-    {
         return totalLinksCount;
     }
 
@@ -803,22 +796,26 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     data.moveToNext();
                 }
 
-                for(int i=1;i<= mCategoryNames.size();i++)
-                    Utils.setPref_category_name(act,i,mCategoryNames.get(i-1));
-
                 mLoaderManager.initLoader(TITLE_LOADER, null, this);
 
             } else if (loaderId == TITLE_LOADER) {
 
 	            // Create a row for category selections at top
-                int focusNumber = getPref_focus_category_number(act);
-                String categoryName = Utils.getPref_category_name(act,focusNumber);
+                String categoryName = Utils.getPref_category_name(act);
+                String currCatMessage;
 
-                String currCatName = act.getResources().getString(R.string.current_category_title).
-                        concat(" : ").
-                        concat(categoryName);
+                if(categoryName.equalsIgnoreCase("no name")){// initial
+                    // get first available category name
+                    categoryName = mCategoryNames.get(INIT_CATEGORY_NUMBER - 1);
+                    Utils.setPref_category_name(getActivity(),categoryName);
+                }
 
-	            HeaderItem gridHeaderCategory = new HeaderItem(currCatName);
+                currCatMessage = act.getResources().
+                    getString(R.string.current_category_title).
+                    concat(" : ").
+                    concat(categoryName);
+
+	            HeaderItem gridHeaderCategory = new HeaderItem(currCatMessage);
 	            GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
 	            ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
 
@@ -897,7 +894,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 startEntranceTransition(); // TODO: Move startEntranceTransition to after all
 
                 // set focus category item position ??? why position error for 1st time launch (run App)
-                int cate_number = Utils.getPref_focus_category_number(MainFragment.this.act);
+                int cate_number = Utils.getPref_video_table_id(MainFragment.this.act);
                 setSelectedPosition(0);
                 setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(cate_number-1));
 
@@ -954,7 +951,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             // Start an Intent to fetch the categories
             if ((loader.getId() == CATEGORY_LOADER) && (mCategoryNames == null)) {
-                Utils.setPref_focus_category_number(act, INIT_NUMBER);
+//                Utils.setPref_focus_category_number(act, INIT_NUMBER);
 
                 System.out.println("MainFragment / onLoadFinished / start Fetch category service =================================");
 
@@ -968,8 +965,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             else if ((loader.getId() == TITLE_LOADER) && (rowsLoadedCount == 0)) {
 //                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
 
-                // avoid endless loop due to empty category selection
-                Utils.setPref_focus_category_number(act,1);
+                //todo test? avoid endless loop due to empty category selection
+//                Utils.setPref_focus_category_number(act,INIT_NUMBER);
 
                 Intent serviceIntent = new Intent(act, FetchVideoService.class);
                 int linkSrcNum = Utils.getPref_link_source_number(act);
@@ -1031,11 +1028,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // switch Data base
-    private void switchDB(int clickedPos)
+    private void switchDB(String categoryName)
     {
+        System.out.println(" MainFragment / _switchDB / categoryName = " + categoryName);
+
         try {
-            Utils.setPref_focus_category_number(getContext(), clickedPos);
-            Utils.setPref_category_name(getContext(), clickedPos, mCategoryNames.get(clickedPos - 1));
+            Utils.setPref_category_name(getContext(), categoryName );
             mLoaderManager.destroyLoader(TITLE_LOADER);
 
             // start new MainActivity to renew video provider
@@ -1076,7 +1074,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 // video ID starts with 1
                 currentRow1stId = (int)mPages.get(currentRowPos).get(0);
                 currentRowSize = mPages.get(currentRowPos).size();
-                currentRowLastId = currentRow1stId + currentRowSize - 1;
+                currentRowLastId = currentRow1stId + currentRowSize - 1; //todo ID count changed now
 
                 String urlStr = ((Video) item).videoUrl;
 
@@ -1211,18 +1209,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             } else if (item instanceof String) {
 
-                // category selection click
-                for(int i=1;i<= mCategoryNames.size();i++) {
-                      if (((String) item).equalsIgnoreCase(mCategoryNames.get(i-1))) {
-                          // After delay, start switch DB
-                          new Handler().postDelayed(new Runnable() {
-                              public void run() {
-                                  switchDB(currentNavPosition+1);
-                              }
-                          }, 100);
-                    }
-                }
-
                 if (((String) item).contains(getString(R.string.select_category))) {
 
                     localBroadcastMgr.unregisterReceiver(responseReceiver);
@@ -1249,6 +1235,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     startActivity(intent, bundle);
 //                } else {
                     //Toast.makeText(act, ((String) item), Toast.LENGTH_SHORT).show();
+                } else {
+                    String categoryName =  (String) item;//mCategoryNames.get(i-1);
+                        // After delay, start switch DB
+                        new Handler().postDelayed(new Runnable() {
+                            public void run() {
+                                switchDB(categoryName);
+                            }
+                        }, 100);
                 }
 
             }
@@ -1291,8 +1285,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         return new_id;
     }
 
-    private static int currentNavPosition;
-
     // selected is navigated here
     private final class ItemViewSelectedListener implements OnItemViewSelectedListener {
         @Override
@@ -1317,14 +1309,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                System.out.println("---------- itemViewHolder.view.getId() = " + itemViewHolder.view.getId());
 //                System.out.println("---------- mCategoryNames.size() = " + mCategoryNames.size());
 
-                for(int i=0;i<mCategoryNames.size();i++)
-                {
-                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i)))
-                    {
-                        currentNavPosition = i;
-                        System.out.println("---------- current navigation position = " + currentNavPosition);
-                    }
-                }
+//                for(int i=0;i<mCategoryNames.size();i++)
+//                {
+//                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i)))
+//                    {
+//                        currentNavPosition = i;
+//                        System.out.println("---------- current navigation position = " + currentNavPosition);
+//                    }
+//                }
             }
         }
     }
