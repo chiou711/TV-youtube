@@ -16,24 +16,18 @@
 
 package com.cw.tv_yt.ui.options.select_category;
 
-import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
 import com.cw.tv_yt.ui.MainActivity;
 
@@ -249,66 +243,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
             ((TextView) viewHolder.view).setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-
-                    //todo Put in a routine: begin
-                    //Delete video table after remove its category_name
-                    DbHelper mOpenHelper = new DbHelper(act);
-                    mOpenHelper.setWriteAheadLoggingEnabled(false);
-                    SQLiteDatabase sqlDb = mOpenHelper.getWritableDatabase();
-
-                    // get video table ID
-                    System.out.println(" ? ");
-                    System.out.println(" item = " + item);
-                    int videoTableId = Utils.getVideoTableId_byCategoryName(act.getApplicationContext(),(String)item);
-                    System.out.println(" videoTableId = " + videoTableId);
-
-                    // Drop video table
-                    final String SQL_DROP_VIDEO_TABLE = "DROP TABLE IF EXISTS " +
-                            VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(videoTableId));
-
-                    System.out.println(" SQL_DROP_VIDEO_TABLE = " + SQL_DROP_VIDEO_TABLE);
-                    System.out.println(" ? ");
-
-                    // Do the creating of the databases.
-                    sqlDb.execSQL(SQL_DROP_VIDEO_TABLE);
-                    sqlDb.close();
-                    mOpenHelper.close();
-                    //todo Put in a routine: end
-
-                    // delete current row in category table
-                    ContentResolver contentResolver = act.getApplicationContext().getContentResolver();
-                    contentResolver.delete(VideoContract.CategoryEntry.CONTENT_URI,
-                            "category_name=" + "\'"+(String)item+"\'" ,
-                            null);
-
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
-                    act.setResult( Activity.RESULT_OK, returnIntent);
-
-                    // show toast
-                    act.runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(act, getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    // update category names, in order get next available category name
-                    for(int i=0;i< mCategoryNames.size();i++){
-                        if(mCategoryNames.get(i).equalsIgnoreCase((String)item))
-                            mCategoryNames.remove(i);
-                    }
-
-                    // update focus with first category name
-                    Utils.setPref_category_name(act,mCategoryNames.get(0));
-
-                    act.finish();
-
-                    // start new MainActivity
-                    Intent new_intent = new Intent(act, MainActivity.class);
-                    new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(new_intent);
-
+                    Utils.deleteSelectedCategory(act,mCategoryNames,(String)item);
                     return true;
                 }
             });
@@ -317,6 +252,6 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
         public  void onUnbindViewHolder(ViewHolder viewHolder) {
             Log.d(TAG, "onUnbindViewHolder");
         }
-}
+    }
 
 }

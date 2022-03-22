@@ -16,6 +16,7 @@
 
 package com.cw.tv_yt;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -26,6 +27,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.widget.Toast;
 
 import com.cw.tv_yt.data.DbHelper;
 import com.cw.tv_yt.data.VideoContract;
@@ -44,6 +46,8 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.fragment.app.FragmentActivity;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -416,4 +420,58 @@ public class Utils {
         return videoTableId;
     }
 
+    // delete selected category
+    public static void deleteSelectedCategory(FragmentActivity act, List<String> mCategoryNames, String item){
+        DbHelper mOpenHelper = new DbHelper(act);
+        mOpenHelper.setWriteAheadLoggingEnabled(false);
+        SQLiteDatabase sqlDb = mOpenHelper.getWritableDatabase();
+
+        // get video table ID
+        int videoTableId = Utils.getVideoTableId_byCategoryName(act.getApplicationContext(),(String)item);
+        System.out.println("Utils / _deleteSelectedCategory / videoTableId = " + videoTableId);
+
+        // Drop video table
+        final String SQL_DROP_VIDEO_TABLE = "DROP TABLE IF EXISTS " +
+                VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(videoTableId));
+
+//        System.out.println(" SQL_DROP_VIDEO_TABLE = " + SQL_DROP_VIDEO_TABLE);
+
+        // Do the creating of the databases.
+        sqlDb.execSQL(SQL_DROP_VIDEO_TABLE);
+        sqlDb.close();
+        mOpenHelper.close();
+
+        // delete current row in category table after drop its video table
+        ContentResolver contentResolver = act.getApplicationContext().getContentResolver();
+        contentResolver.delete(VideoContract.CategoryEntry.CONTENT_URI,
+                "category_name=" + "\'"+(String)item+"\'" ,
+                null);
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
+        act.setResult( Activity.RESULT_OK, returnIntent);
+
+        // show toast
+        act.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(act, act.getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // update category names, in order get next available category name
+        for(int i=0;i< mCategoryNames.size();i++){
+            if(mCategoryNames.get(i).equalsIgnoreCase((String)item))
+                mCategoryNames.remove(i);
+        }
+
+        // update focus with first category name
+        Utils.setPref_category_name(act,mCategoryNames.get(0));
+
+        // start new MainActivity
+        Intent new_intent = new Intent(act, MainActivity.class);
+        new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+        new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+        act.startActivity(new_intent);
+        act.finish();
+    }
 }
