@@ -243,7 +243,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
             ((TextView) viewHolder.view).setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    Utils.deleteSelectedCategory(act,mCategoryNames,(String)item);
+                    Utils.confirmDeleteCategory(act,mCategoryNames,(String)item);
                     return true;
                 }
             });

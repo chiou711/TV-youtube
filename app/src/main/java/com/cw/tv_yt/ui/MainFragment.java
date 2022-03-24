@@ -295,10 +295,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
             }
-            else if (item instanceof String) {
+//            else if (item instanceof String) {
 //                System.out.println("---------- onItemSelected / category");
-
-                // category selection header
+//                // category selection header
 //                for(int i=0;i<mCategoryNames.size();i++)
 //                {
 //                    if(item.toString().equalsIgnoreCase(mCategoryNames.get(i)))
@@ -307,7 +306,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                        System.out.println("---------- current navigation position = " + currentNavPosition);
 //                    }
 //                }
-            }
+//            }
         }
     }
 
@@ -532,7 +531,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 public boolean onLongClick(View v) {
                     System.out.println("CategoryItemPresenter / onLongClick / category item = " + item);
                     isLongClicked = true;
-                    Utils.deleteSelectedCategory(act,mCategoryNames,(String)item);
+                    Utils.confirmDeleteCategory(act,mCategoryNames,(String)item);
                     return false;
                 }
             });
@@ -640,7 +639,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         if (id == CATEGORY_LOADER) {
             return new CursorLoader(
-                    getContext(),
+                    Objects.requireNonNull(getContext()),
                     VideoContract.CategoryEntry.CONTENT_URI, // Table to query
                     // not show duplicated category name
                     new String[]{"DISTINCT " + VideoContract.CategoryEntry.COLUMN_CATEGORY_NAME,

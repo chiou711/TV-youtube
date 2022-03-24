@@ -163,8 +163,11 @@
     <!-- gdrive -->
     <string name="toast_no_json_found">JSON string is not found!</string>
     <string name="toast_import_gdrive_json">Import JSON content from Google Drive?</string>
-    <string name="confirm_dialog_title">Confirmation</string>
-    <string name="edit_note_button_back">取消</string>
-    <string name="edit_note_button_save">確定</string>
+
+    <!-- confirmation   -->
+    <string name="confirm_dialog_title">確認</string>
+    <string name="button_cancel">取消</string>
+    <string name="button_ok">確定</string>
+    <string name="delete_category_message">要刪除此分類嗎？</string>
 
 </resources>

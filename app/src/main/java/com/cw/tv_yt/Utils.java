@@ -17,9 +17,11 @@
 package com.cw.tv_yt;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -27,6 +29,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.cw.tv_yt.data.DbHelper;
@@ -420,8 +423,58 @@ public class Utils {
         return videoTableId;
     }
 
+    // Delete category confirmation
+    public static void confirmDeleteCategory(FragmentActivity act, List<String> mCategoryNames, String item){
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(act);
+
+        builder.setTitle(R.string.confirm_dialog_title)
+                .setMessage( act.getResources().getString(R.string.delete_category_message) + " " + item )
+                .setPositiveButton(act.getString(R.string.button_cancel), new DialogInterface.OnClickListener()
+                {
+                    // stop
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(act.getString(R.string.button_ok), new DialogInterface.OnClickListener()
+                {
+                    // continue
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                        deleteSelectedCategory(act,mCategoryNames,(String)item);
+                    }
+                }).
+                setOnCancelListener(new DialogInterface.OnCancelListener(){
+                    // cancel
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                    }
+                } );
+        AlertDialog alertDlg = builder.create();
+
+        // set listener for selection
+        alertDlg.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dlgInterface) {
+
+                // focus
+                Button negative = alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE);
+                negative.setFocusable(true);
+                negative.setFocusableInTouchMode(true);
+                negative.requestFocus();
+            }
+        });
+        alertDlg.show();
+    }
+
     // delete selected category
-    public static void deleteSelectedCategory(FragmentActivity act, List<String> mCategoryNames, String item){
+    static void deleteSelectedCategory(FragmentActivity act, List<String> mCategoryNames, String item){
         DbHelper mOpenHelper = new DbHelper(act);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getWritableDatabase();
