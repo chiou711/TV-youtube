@@ -696,15 +696,16 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             return;
         }
 
+        // cursor data is not null
         if (data != null && data.moveToFirst()) {
             final int loaderId = loader.getId();
 
-//            if (loaderId == CATEGORY_LOADER)
-//	            System.out.println("MainFragment / _onLoadFinished / loaderId = CATEGORY_LOADER");
-//            else if(loaderId == TITLE_LOADER)
-//                System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
-//            else
-//                System.out.println("MainFragment / _onLoadFinished / loaderId (video) = " + loaderId);
+            if (loaderId == CATEGORY_LOADER)
+	            System.out.println("MainFragment / _onLoadFinished / loaderId = CATEGORY_LOADER");
+            else if(loaderId == TITLE_LOADER)
+                System.out.println("MainFragment / _onLoadFinished / loaderId = TITLE_LOADER");
+            else
+                System.out.println("MainFragment / _onLoadFinished / loaderId (video) = " + loaderId);
 
             if (loaderId == CATEGORY_LOADER) {
                 mCategoryNames = new ArrayList<>();
@@ -717,11 +718,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                     int video_table_id_index = data.getColumnIndex(VideoContract.CategoryEntry.COLUMN_VIDEO_TABLE_ID);
                     int video_table_id = data.getInt(video_table_id_index);
-                    System.out.println(" @ MainFragment / _onLoadFinished / video_table_id = " + video_table_id);
+                    System.out.println("MainFragment / _onLoadFinished / video_table_id = " + video_table_id);
 
                     data.moveToNext();
                 }
 
+                //start fetching video
                 mLoaderManager.initLoader(TITLE_LOADER, null, this);
 
             } else if (loaderId == TITLE_LOADER) {
@@ -730,7 +732,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 String categoryName = Utils.getPref_category_name(act);
                 String currCatMessage;
 
-                if(categoryName.equalsIgnoreCase("no name")){// initial
+                if(categoryName.equalsIgnoreCase("no category name")){// initial
                     // get first available category name
                     categoryName = mCategoryNames.get(INIT_CATEGORY_NUMBER - 1);
                     Utils.setPref_category_name(getActivity(),categoryName);
@@ -743,7 +745,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 HeaderItem gridHeaderCategory = new HeaderItem(currCatMessage);
 
-                //todo ??? how to change
+                // Category item presenter
 //                GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
                 GridItemPresenter gridPresenterCategory = new CategoryItemPresenter(this,mCategoryNames);
                 ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
@@ -870,7 +872,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
                 }
             }
-        } else {
+        } else { // cursor data is null after App installation
             /***
              *  call fetch service to load or update data base
              */
@@ -880,8 +882,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             // Start an Intent to fetch the categories
             if ((loader.getId() == CATEGORY_LOADER) && (mCategoryNames == null)) {
-//                Utils.setPref_focus_category_number(act, INIT_NUMBER);
-
                 System.out.println("MainFragment / onLoadFinished / start Fetch category service =================================");
 
                 // data base is not created yet, call service for the first time
@@ -892,10 +892,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             }
             // Start an Intent to fetch the videos
             else if ((loader.getId() == TITLE_LOADER) && (rowsLoadedCount == 0)) {
-//                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
-
-                //todo test? avoid endless loop due to empty category selection
-//                Utils.setPref_focus_category_number(act,INIT_NUMBER);
+                System.out.println("MainFragment / onLoadFinished / start Fetch video service =================================");
 
                 Intent serviceIntent = new Intent(act, FetchVideoService.class);
                 int linkSrcNum = Utils.getPref_link_source_number(act);
@@ -1250,7 +1247,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
-    class FetchServiceResponseReceiver extends BroadcastReceiver {
+    public class FetchServiceResponseReceiver extends BroadcastReceiver {
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         public void onReceive(Context context, Intent intent) {
             /*

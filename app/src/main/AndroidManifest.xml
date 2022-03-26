@@ -173,7 +173,7 @@
             android:name=".data.FetchCategoryService"
             android:exported="false" />
         <service
-            android:name=".import_new.FetchLinkSrcService"
+            android:name=".ui.add_category.FetchLinkSrcService"
             android:exported="false" />
         <service
             android:name=".recommendation.UpdateRecommendationsService"

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cw.tv_yt.import_new;
+package com.cw.tv_yt.ui.add_category;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
+import com.cw.tv_yt.data.FetchVideoService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +33,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
  * FetchLinkSrcService is responsible for fetching the videos from the Internet and inserting the
@@ -68,6 +71,16 @@ public class FetchLinkSrcService extends IntentService {
 	    } catch (IOException e) {
 		    e.printStackTrace();
 	    }
+
+	    // Puts the status into the Intent
+	    String status = "FetchVideoServiceIsDone"; // any data that you want to send back to receivers
+
+	    Intent localIntent = new Intent(FetchVideoService.Constants.BROADCAST_ACTION);
+	    localIntent.putExtra(FetchVideoService.Constants.EXTENDED_DATA_STATUS, status);
+
+	    // Broadcasts the Intent to receivers in this app.
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+	    System.out.println("FetchLinkSrcService / _onHandleIntent / sendBroadcast");
     }
 
     // fetch JSON by Url string

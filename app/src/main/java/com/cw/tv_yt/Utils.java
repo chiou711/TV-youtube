@@ -132,7 +132,7 @@ public class Utils {
     {
         SharedPreferences pref = context.getSharedPreferences("category", 0);
         String keyName = "category_name";
-        return pref.getString(keyName, "no name"); // folder table Id: default is 1
+        return pref.getString(keyName, "no category name"); // folder table Id: default is 1
     }
 
     // remove key of preference category name
@@ -388,7 +388,7 @@ public class Utils {
         System.out.println("Utils / _getVideoTableId_byCategoryName /  categoryName =　" + categoryName);
 
         // initial video table ID
-        if(categoryName.equalsIgnoreCase("no name"))
+        if(categoryName.equalsIgnoreCase("no category name"))
             return Define.INIT_CATEGORY_NUMBER;
 
         DbHelper mOpenHelper = new DbHelper(act);

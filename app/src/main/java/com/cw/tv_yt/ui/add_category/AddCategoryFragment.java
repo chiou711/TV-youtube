@@ -18,6 +18,7 @@ package com.cw.tv_yt.ui.add_category;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -29,7 +30,6 @@ import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
 import com.cw.tv_yt.data.Pair;
 import com.cw.tv_yt.data.Source_links;
-import com.cw.tv_yt.import_new.FetchLinkSrcService;
 import com.cw.tv_yt.import_new.Import_fileListAct;
 import com.cw.tv_yt.import_new.gdrive.ImportGDriveAct;
 
@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -99,9 +98,6 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
         setupFragment();
     }
 
-    @NonNull
-
-
     // setup fragment
     private void setupFragment() {
         VerticalGridPresenter gridPresenter = new VerticalGridPresenter();
@@ -152,7 +148,10 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
                         intent.putExtras(bundle);
                         startActivity(intent, bundle);
                     }
-                } else { // add new data from selected link source
+                } else { // add new data from selected link source provided by default
+
+                    itemViewHolder.view.setAlpha(0.5f);
+
                     Utils.setPref_link_source_number(getActivity(), clickedSrcLinkNum);
 
                     // get URL string
@@ -197,7 +196,6 @@ class SrcStringPresenter extends Presenter {
     private static final String TAG = "StringPresenter";
 
     String localLinkSrc;
-    String defaultLinkSrc;
     int linkSrcNum;
 
     public  ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -206,6 +204,7 @@ class SrcStringPresenter extends Presenter {
         TextView tv = new TextView(context);
         tv.setFocusable(true);
         tv.setFocusableInTouchMode(true);
+        tv.setTextColor(Color.BLUE);
         tv.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.text_bg,
                 context.getTheme()));
 

@@ -36,7 +36,6 @@ public class ParseJsonToDB {
     public static boolean isParsing;
     public String fileBody = "";
     String filePath;
-    String content;
 
     ParseJsonToDB(String filePath, Context context)
     {

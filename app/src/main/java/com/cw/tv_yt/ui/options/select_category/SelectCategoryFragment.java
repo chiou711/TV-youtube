@@ -19,6 +19,7 @@ package com.cw.tv_yt.ui.options.select_category;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -231,6 +232,7 @@ public class SelectCategoryFragment extends VerticalGridSupportFragment implemen
             TextView tv = new TextView(context);
             tv.setFocusable(true);
             tv.setFocusableInTouchMode(true);
+            tv.setTextColor(Color.BLUE);
             tv.setBackground(ResourcesCompat.getDrawable(context.getResources(), R.drawable.text_bg,
                     context.getTheme()));
             return new ViewHolder(tv);
