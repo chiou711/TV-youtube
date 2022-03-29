@@ -64,8 +64,8 @@ public class VideoProvider extends ContentProvider {
         mOpenHelper = new DbHelper(context);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
 
-        int focusCategoryNumber = Utils.getPref_video_table_id(context);
-        table_id = String.valueOf(focusCategoryNumber);
+        int focusVideoTableId = Utils.getPref_video_table_id(context);
+        table_id = String.valueOf(focusVideoTableId);
         System.out.println("VideoProvider / _onCreate / table_id = " + table_id);
 
         updateQueryBuilder(table_id);

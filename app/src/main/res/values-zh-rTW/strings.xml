@@ -169,5 +169,6 @@
     <string name="button_cancel">取消</string>
     <string name="button_ok">確定</string>
     <string name="delete_category_message">要刪除此分類嗎？</string>
+    <string name="delete_playlist_message">要刪除此播放列表嗎？</string>
 
 </resources>
