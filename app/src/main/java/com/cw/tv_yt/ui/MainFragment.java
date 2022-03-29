@@ -28,6 +28,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -689,7 +690,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        System.out.println("MainFragment / _onLoadFinished");
 //        System.out.println("MainFragment / _onLoadFinished /  start rowsLoadedCount = " + rowsLoadedCount);
 //        System.out.println("MainFragment / _onLoadFinished /  mVideoCursorAdapters.size() = " + mVideoCursorAdapters.size());
 
@@ -727,12 +727,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     data.moveToNext();
                 }
 
-                createPresenter_category();
+                //todo Below caused URL download failure
+//                createPresenter_category();
 
                 //start loading video
                 mLoaderManager.initLoader(TITLE_LOADER, null, this);
 
             } else if (loaderId == TITLE_LOADER) {
+
+                createPresenter_category();
 
                 row_id = createPresenter_video(data);
 
@@ -893,7 +896,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             // Create header for this category.
             HeaderItem header = new HeaderItem(title);
 
-            ///
             System.out.println("MainFragment / _onLoadFinished / header.getName() = " + header.getName());
             if (getHeadersSupportFragment() != null){
                 // header on selected
@@ -915,11 +917,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                                 + row.getHeaderItem().getName());
 
                         // delete playlist
-                        Utils.confirmDeletePlaylist(act,row.getHeaderItem().getName());
+                        if(Build.VERSION.SDK_INT >= 26)
+                            Utils.confirmDeletePlaylist(act,row.getHeaderItem().getName());
                     }
                 });
             }
-            ///
 
             int videoLoaderId = title.hashCode(); // Create unique int from title.
             CursorObjectAdapter existingAdapter = mVideoCursorAdapters.get(videoLoaderId);

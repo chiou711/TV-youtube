@@ -57,6 +57,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static com.cw.tv_yt.data.DbBuilder_video.TAG_LINK_PAGE;
 import static com.cw.tv_yt.data.DbBuilder_video.TAG_MEDIA;
 import static com.cw.tv_yt.data.DbBuilder_video.TAG_TITLE;
+import static com.cw.tv_yt.ui.MainFragment.mCategoryNames;
 
 /**
  * A collection of utility methods, all static.
@@ -488,7 +489,7 @@ public class Utils {
         final String SQL_DROP_VIDEO_TABLE = "DROP TABLE IF EXISTS " +
                 VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(videoTableId));
 
-//        System.out.println(" SQL_DROP_VIDEO_TABLE = " + SQL_DROP_VIDEO_TABLE);
+        System.out.println(" SQL_DROP_VIDEO_TABLE = " + SQL_DROP_VIDEO_TABLE);
 
         // Execute drop command
         sqlDb.execSQL(SQL_DROP_VIDEO_TABLE);
@@ -531,68 +532,59 @@ public class Utils {
 
     // Delete playlist confirmation
     public static void confirmDeletePlaylist(FragmentActivity act, String item){
-        deleteSelectedPlaylist(act,(String)item);
 
-//        AlertDialog.Builder builder;
-//        builder = new AlertDialog.Builder(act);
-//
-//        builder.setTitle(R.string.confirm_dialog_title)
-//                .setMessage( act.getResources().getString(R.string.delete_playlist_message) + " " + item )
-//                .setPositiveButton(act.getString(R.string.button_cancel), new DialogInterface.OnClickListener()
-//                {
-//                    // stop
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which1)
-//                    {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setNegativeButton(act.getString(R.string.button_ok), new DialogInterface.OnClickListener()
-//                {
-//                    // continue
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which1)
-//                    {
-//                        dialog.dismiss();
-//                        deleteSelectedPlaylist(act,(String)item);
-//                    }
-//                }).
-//                setOnCancelListener(new DialogInterface.OnCancelListener(){
-//                    // cancel
-//                    @Override
-//                    public void onCancel(DialogInterface dialog) {
-//                        dialog.dismiss();
-//                    }
-//                } );
-//        AlertDialog alertDlg = builder.create();
-//
-//        // set listener for selection
-//        alertDlg.setOnShowListener(new DialogInterface.OnShowListener() {
-//            @Override
-//            public void onShow(DialogInterface dlgInterface) {
-//
-//                // focus
-//                Button negative = alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE);
-//                negative.setFocusable(true);
-//                negative.setFocusableInTouchMode(true);
-//                negative.requestFocus();
-//            }
-//        });
-//        alertDlg.show();
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(act);
+
+        builder.setTitle(R.string.confirm_dialog_title)
+                .setMessage( act.getResources().getString(R.string.delete_playlist_message) + " " + item )
+                .setPositiveButton(act.getString(R.string.button_cancel), new DialogInterface.OnClickListener()
+                {
+                    // stop
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(act.getString(R.string.button_ok), new DialogInterface.OnClickListener()
+                {
+                    // continue
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                        deleteSelectedPlaylist(act,(String)item);
+                    }
+                }).
+                setOnCancelListener(new DialogInterface.OnCancelListener(){
+                    // cancel
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                    }
+                } );
+        AlertDialog alertDlg = builder.create();
+
+        // set listener for selection
+        alertDlg.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dlgInterface) {
+
+                // focus
+                Button negative = alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE);
+                negative.setFocusable(true);
+                negative.setFocusableInTouchMode(true);
+                negative.requestFocus();
+            }
+        });
+        alertDlg.show();
     }
 
     // delete selected playlist
     static void deleteSelectedPlaylist(FragmentActivity act, String item){
 
         System.out.println("Utils / _deleteSelectedPlaylist / item = " + item);
-
-        DbHelper mOpenHelper = new DbHelper(act);
-        mOpenHelper.setWriteAheadLoggingEnabled(false);
-        SQLiteDatabase sqlDb = mOpenHelper.getWritableDatabase();
-
-        // get video table ID
-//        int focusVideoTableId = Utils.getPref_video_table_id(act);
-//        String video_table_id = String.valueOf(focusVideoTableId);
 //        System.out.println("Utils / _deleteSelectedPlaylist / video table_id = " + video_table_id);
 
         // delete current item
@@ -601,53 +593,27 @@ public class Utils {
         System.out.println("Utils / _deleteSelectedPlaylist / VideoProvider.tableId = " + VideoProvider.tableId);
         contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "row_title=" + "\""+item+"\"",null);
 
+        // check if playlist still exists
+        Cursor cursor = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            // Call requires API level 26(8.0)
+            cursor = contentResolver.query(VideoContract.VideoEntry.CONTENT_URI, null,null,null);
+        }
+        int leftRows = cursor.getCount();
+        cursor.close();
 
-
-        //        int videoTableId = Utils.getVideoTableId_byCategoryName(act.getApplicationContext(),(String)item);
-//        System.out.println("Utils / _deleteSelectedPlaylist / videoTableId = " + videoTableId);
-
-        // drop command
-//        final String SQL_DROP_VIDEO_TABLE = "DROP TABLE IF EXISTS " +
-//                VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(videoTableId));
-
-//        System.out.println(" SQL_DROP_VIDEO_TABLE = " + SQL_DROP_VIDEO_TABLE);
-
-        // execute Drop command
-//        sqlDb.execSQL(SQL_DROP_VIDEO_TABLE);
-//        sqlDb.close();
-//        mOpenHelper.close();
-
-        // delete current row in category table after drop its video table
-//        ContentResolver contentResolver = act.getApplicationContext().getContentResolver();
-//        contentResolver.delete(VideoContract.CategoryEntry.CONTENT_URI,
-//                "category_name=" + "\'"+(String)item+"\'" ,
-//                null);
-//
-//        Intent returnIntent = new Intent();
-//        returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
-//        act.setResult( Activity.RESULT_OK, returnIntent);
-
-        // show toast
-//        act.runOnUiThread(new Runnable() {
-//            public void run() {
-//                Toast.makeText(act, act.getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-
-        // update category names, in order get next available category name
-//        for(int i=0;i< mCategoryNames.size();i++){
-//            if(mCategoryNames.get(i).equalsIgnoreCase((String)item))
-//                mCategoryNames.remove(i);
-//        }
-
-        // update focus with first category name
-//        Utils.setPref_category_name(act,mCategoryNames.get(0));
-
-        // start new MainActivity
-        Intent new_intent = new Intent(act, MainActivity.class);
-        new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-        new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-        act.startActivity(new_intent);
-        act.finish();
+        if(leftRows == 0) {
+            String currCategoryName = Utils.getPref_category_name(act);
+            deleteSelectedCategory(act, mCategoryNames, currCategoryName);
+        }
+        else {
+            // start new MainActivity
+            Intent new_intent = new Intent(act, MainActivity.class);
+            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
+            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
+            act.startActivity(new_intent);
+            act.finish();
+        }
     }
+
 }
