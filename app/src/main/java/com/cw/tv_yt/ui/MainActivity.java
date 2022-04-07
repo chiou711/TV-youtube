@@ -37,6 +37,7 @@ public class MainActivity extends LeanbackActivity {
         System.out.println("-------------------------------------");
         System.out.println("--------New start Main Activity------");
         System.out.println("-------------------------------------");
+
         //todo temporary mark
 //        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 //        if(!sharedPreferences.getBoolean(OnboardingFragment.COMPLETED_ONBOARDING, false)) {

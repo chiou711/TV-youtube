@@ -18,10 +18,14 @@ package com.cw.tv_yt.presenter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+
+import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.HeaderItem;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.RowHeaderPresenter;
+
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,14 +33,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cw.tv_yt.R;
+import com.cw.tv_yt.Utils;
+
+import static com.cw.tv_yt.ui.MainFragment.getPlaylistsCount;
 
 public class IconHeaderItemPresenter extends RowHeaderPresenter {
 
     private float mUnselectedAlpha;
-    int rowsCount;
+    FragmentActivity act;
 
-    public IconHeaderItemPresenter(int _rowsCount){
-        rowsCount = _rowsCount;
+    public IconHeaderItemPresenter(FragmentActivity _act){
+        act = _act;
     }
 
     @Override
@@ -58,12 +65,26 @@ public class IconHeaderItemPresenter extends RowHeaderPresenter {
         View rootView = viewHolder.view;
         rootView.setFocusable(true);
 
-        // set icon for list row
-        if( (((ListRow) item).getId() != 0) &&
-            (((ListRow) item).getId() <= rowsCount) )  {
+        long id = ((ListRow) item).getId();
+//        System.out.println(" IconHeaderItemPresenter /　_onLongClick / id　= " + id);
+
+        // for playlist rows
+        if( (id >= 1) && (id <= getPlaylistsCount()) )  {
+            // set header icon
             ImageView iconView = (ImageView) rootView.findViewById(R.id.header_icon);
             Drawable icon = rootView.getResources().getDrawable(R.drawable.lb_ic_actions_right_arrow, null);
             iconView.setImageDrawable(icon);
+
+            // long click listener for Delete playlist
+            rootView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // delete playlist row
+                    if(Build.VERSION.SDK_INT >= 26)
+                        Utils.confirmDeletePlaylist(act,headerItem.getName());
+                    return false;
+                }
+            });
         }
 
         TextView label = (TextView) rootView.findViewById(R.id.header_label);

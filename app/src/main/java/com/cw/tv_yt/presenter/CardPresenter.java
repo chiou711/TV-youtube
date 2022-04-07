@@ -71,11 +71,13 @@ public class CardPresenter extends Presenter {
     String duration;
 
     public  CardPresenter(){}
+    int row_id;
 
-    public CardPresenter(FragmentActivity main_act){
+    public CardPresenter(FragmentActivity main_act,int rowId){
         act = main_act;
+        row_id = rowId;
 
-        // for Get duration
+        // Get duration
         youtube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
             }
@@ -124,26 +126,29 @@ public class CardPresenter extends Presenter {
         // get row number - link number of the row
         List<Integer> links_of_row = MainFragment.links_count_of_row;
         List<Integer> start_of_row = MainFragment.start_number_of_row;
+
         int rows_count = links_of_row.size();
-        long link_count = 0;
-        int links_of_current_row = 0;
-        int row_count = 0;
-        for(int i=0;i<rows_count;i++) {
-            if(i == 0 ) {
-                link_count = video.id;
-                row_count = 1;
-                links_of_current_row = links_of_row.get(0);
-            } else if( (start_of_row.get(i) <= video.id) && (video.id <= (start_of_row.get(i) + links_of_row.get(i))) ) {
-                link_count = video.id - start_of_row.get(i) + 1;
-                row_count = i+1;
-                links_of_current_row = links_of_row.get(i);
+        long link_number = 0;
+        int links_count_of_current_row = 0;
+
+        int begin;
+        int end;
+        for(int i=0;i<rows_count;i++)
+        {
+            begin = start_of_row.get(i);
+            end = begin + links_of_row.get(i)-1;
+            if( (begin <= video.id) && (video.id <= end) ) {
+                link_number = video.id - begin + 1;
+                links_count_of_current_row = links_of_row.get(i);
+                break;
             }
         }
 
+        // get duration
         if(Pref.isShowDuration(act)){
-            // get duration
             isGotDuration = false;
 
+            // get duration by YouTube ID
             getDuration(Utils.getYoutubeId(video.videoUrl));
 
             //wait for buffering
@@ -158,17 +163,25 @@ public class CardPresenter extends Presenter {
                 time_out_count++;
             }
             duration = acquiredDuration;
-
-            // show row number - link number of the row
-            cardView.setContentText( duration +
-                    "    (" + link_count + "/" + links_of_current_row+")    " +
-                    cardView.getContext().getResources().getString(R.string.current_list_title) + row_count );
-        } else {
-            cardView.setContentText(
-                    "    (" + link_count + "/" + links_of_current_row+")    " +
-                            cardView.getContext().getResources().getString(R.string.current_list_title) + row_count );
-
+        } else { // no duration
+            duration = "";
         }
+
+        // set position info
+        int row_number = row_id;
+        String positionInfo;
+        String linkNumberOfRowLinks = "    (" + link_number + "/" +
+                                              links_count_of_current_row + ")    ";
+        if(row_number == -1) {
+            // duration + link number of row links
+            positionInfo = duration +linkNumberOfRowLinks;
+
+        } else {
+            //  duration + link number of row links + playlist number
+            positionInfo = cardView.getContext().getResources().getString(R.string.current_list_title);
+            positionInfo = duration + linkNumberOfRowLinks + positionInfo + row_number;
+        }
+        cardView.setContentText(positionInfo);
 
         TextView positionText = ((TextView)cardView.findViewById(R.id.content_text));
         positionText.setTextColor(cardView.getContext().getResources().getColor(R.color.category_text));

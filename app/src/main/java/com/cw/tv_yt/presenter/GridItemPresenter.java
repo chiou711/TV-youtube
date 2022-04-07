@@ -63,7 +63,7 @@ public class GridItemPresenter extends Presenter {
         view.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-//                System.out.println("currentNavPosition = " + MainFragment.currentNavPosition);
+//                System.out.println("_onFocusChange / currentNavPosition = " + MainFragment.currentNavPosition);
 //                System.out.println("hasFocus = " + hasFocus);
 //                if(v.isSelected()) {
 //                    System.out.println("v is selected");
@@ -93,6 +93,7 @@ public class GridItemPresenter extends Presenter {
                 ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.lb_tv_white));
             else
                 ((TextView) viewHolder.view).setTextColor(mainFragment.getResources().getColor(R.color.category_text));
+
         } catch(Exception e)
         {
             e.printStackTrace();
