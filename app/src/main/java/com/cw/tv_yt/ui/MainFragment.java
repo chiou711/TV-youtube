@@ -163,13 +163,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         // Map title results from the database to ListRow objects.
         // This Adapter is used to render the MainFragment sidebar labels.
 
-        int focusPos = getFocusPositionOfCategoryRow();
-
-//        ListRowPresenter listRowPresenter = new ListRowPresenter();
-        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter(act,focusPos);
-        listRowPresenter.setRowHeight(400);
-        mTitleRowAdapter = new ArrayObjectAdapter(listRowPresenter);
-        setAdapter(mTitleRowAdapter);
+//        int focusPos = getFocusPositionOfCategoryRow();
+//        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter(act,focusPos);
+//        listRowPresenter.setRowHeight(400);
+//        mTitleRowAdapter = new ArrayObjectAdapter(listRowPresenter);
+//        setAdapter(mTitleRowAdapter);
 
 //        updateRecommendations();
 
@@ -313,22 +311,33 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                int currentNavPosition =  gridRowAdapterCategory.indexOf(item);
 //                System.out.println("----------  currentNavPosition = " + currentNavPosition);
 
-                // category selection
+                // switch category by onItemViewSelected
                 String cate_name = Utils.getPref_category_name(act);
-                if( !cate_name.equalsIgnoreCase((String)item))
+                if( !cate_name.equalsIgnoreCase((String)item) && isOkToChangeCategory)
                     switchCategory(item);
             }
         }
     }
 
+    boolean isOkToChangeCategory;
     // Switch category by category name
     void switchCategory(Object catName) {
         String categoryName =  (String) catName;
         // After delay, start switch DB
         new Handler().postDelayed(new Runnable() {
             public void run() {
-                if(isCategoryRow(categoryName))
-                    switchDB(categoryName);
+                isOkToChangeCategory = false;
+                if(isCategoryRow(categoryName)) {
+                    try {
+                        // switch DB
+                        Utils.setPref_category_name(getContext(), categoryName );
+                        mLoaderManager.destroyLoader(TITLE_LOADER);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
             }
         }, 100);
     }
@@ -342,158 +351,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
                                   RowPresenter.ViewHolder rowViewHolder, Row row) {
 
+            // item is video
             if (item instanceof Video) {
-                Video video = (Video) item;
-                System.out.println("MainFragment / onItemClicked / id = "+ video.id );
-
-                // for auto play by list only
-                if(!Pref.isAutoPlayByCategory(act)) {
-                    // check row position
-                    for (int i = 0; i < mPlayLists.size(); i++) {
-                        if (video.id >= (int) mPlayLists.get(i).get(0))
-                            currentRowPos = i;
-                    }
-                }
-
-                // video ID starts with 1
-                currentRow1stId = (int) mPlayLists.get(currentRowPos).get(0);
-                currentRowSize = mPlayLists.get(currentRowPos).size();
-                currentRowLastId = currentRow1stId + currentRowSize - 1;
-
-                String urlStr = ((Video) item).videoUrl;
-
-                String path;
-                // YouTube or HTML
-                if(!urlStr.contains("playlist") && ( urlStr.contains("youtube") || urlStr.contains("youtu.be") ))
-                    path = "https://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
-                else
-                    path = urlStr;
-
-                System.out.println("MainFragment / onItemClicked / path= "+ path);
-                new Thread(new Runnable(){
-                    @Override
-                    public void run() {
-                        /**
-                         *  check connection response
-                         *  404: not found, 200: OK
-                         */
-                        int responseCode = -1;
-                        HttpURLConnection urlConnection = null;
-                        try {
-                            URL url = new URL(path);
-                            urlConnection = (HttpURLConnection) url.openConnection();
-                            urlConnection.setRequestMethod("GET");
-                            urlConnection.connect();
-                            responseCode = urlConnection.getResponseCode();
-                            System.out.println("MainFragment / _onItemClicked / responseCode  OK = " + responseCode);
-                        }
-                        catch (IOException e)
-                        {
-                            System.out.println("MainFragment / _onItemClicked / responseCode NG = "+ responseCode);
-                            e.printStackTrace();
-                            return;
-                        }
-                        urlConnection.disconnect();
-
-                        /**
-                         *  normal response: launch VideoDetailsActivity
-                         */
-                        // YouTube  or video or HTML
-                        if(responseCode == 200) {
-                            // play YouTube
-                            if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
-                            {
-                                // auto play
-                                if (Pref.isAutoPlayByList(act) ||
-                                        Pref.isAutoPlayByCategory(act)) {
-                                    setPlayId((int) ((Video) (item)).id);
-                                    startYouTubeIntent(((Video) item).videoUrl);
-                                    setNewId(getNextCursorPositionIdByCurrentId(getPlayId()));
-
-                                } else {
-                                    // manual play
-                                    act.runOnUiThread(new Runnable() {
-                                        public void run() {
-                                            // for VideoDetailsActivity
-//                                            Intent intent = new Intent(act, VideoDetailsActivity.class);
-//                                            intent.putExtra(VideoDetailsActivity.VIDEO, video);
-//                                            if (urlStr.contains("youtube") || urlStr.contains("youtu.be")) {
-//                                                // play YouTube
-//                                                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-//                                                        act,
-//                                                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
-//                                                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
-//                                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
-//                                            }
-
-                                            if(((Video) item).videoUrl.contains("playlist"))
-                                            {
-                                                String playListIdStr = Utils.getYoutubePlaylistId(((Video) item).videoUrl);
-                                                Intent intent = YouTubeIntents.createPlayPlaylistIntent(act, playListIdStr);
-                                                intent.putExtra("force_fullscreen", true);
-                                                intent.putExtra("finish_on_ended", true);
-                                                startActivity(intent);
-                                            }
-                                            else {
-                                                // for open directly
-                                                setPlayId((int) ((Video) (item)).id);
-                                                String idStr = getYoutubeId(((Video) item).videoUrl);
-                                                Intent intent = YouTubeIntents.createPlayVideoIntent(act, idStr);
-                                                intent.putExtra("force_fullscreen", true);
-                                                intent.putExtra("finish_on_ended", true);
-                                                startActivity(intent);
-                                            }
-
-                                            // for testing NewPipe
-//                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
-//                                            Intent appIntent = new Intent(Intent.ACTION_VIEW, linkUri);
-
-                                            // case: w/o chooser
-//                                            startActivity(appIntent);
-
-                                            // case: w/ chooser
-//                                            String title = "Select an APP";
-//                                            Intent chooser = Intent.createChooser(appIntent, title);
-//                                            if (appIntent.resolveActivity(act.getPackageManager()) != null) {
-//                                                startActivity(chooser);
-//                                            }
-
-                                        }
-                                    });
-                                }
-                            }
-                            else {
-                                // play video
-                                // https://drive.google.com/uc?export=view&id=ID
-                                if(urlStr.contains("https://drive.google.com/uc?export=view") ||
-                                        urlStr.contains("https://storage.googleapis.com/android-tv") ){
-                                    Intent intent = new Intent(act, PlaybackActivity.class);
-                                    intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
-                                    startActivity(intent);
-                                }
-                                // play HTML
-                                else {
-                                    String link = ((Video) item).videoUrl;
-                                    Uri uriStr = Uri.parse(link);
-                                    Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
-                                    startActivity(intent);
-                                }
-                            }
-                        } else {
-                            /*
-                             *  show connection error toast
-                             */
-                            act.runOnUiThread(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(act, getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
-                    }
-                }).start();
-
+                openVideoItem(item);
             } else if (item instanceof String) {
                 System.out.println("MainFragment / onItemClicked / item = "+ item);
+                // item is Select category
                 if (((String) item).contains(getString(R.string.select_category))) {
 
                     localBroadcastMgr.unregisterReceiver(responseReceiver);
@@ -503,10 +366,29 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(act).toBundle();
                     startActivity(intent, bundle);
 
+                // item is Browse category
                 } else if (((String) item).contains(getString(R.string.category_grid_view_title))) {
                     Intent intent = new Intent(act, BrowseCategoryActivity.class);
                     Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(act).toBundle();
                     startActivity(intent, bundle);
+
+                // item is Setting
+                } else if(((String) item).contains(getString(R.string.personal_settings))) {
+                    Intent intent = new Intent(act, SettingsActivity.class);
+                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(act).toBundle();
+                    startActivity(intent, bundle);
+
+                // item is Category
+                } else {
+                    if(isLongClicked) {
+                        System.out.println("--- is Long clicked");
+                        isLongClicked = false;
+                        return;
+                    } else {
+                        // switch category by onItemClicked
+//                        switchCategory(item);
+                    }
+                }
 //                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
 //                    Intent intent = new Intent(act, GuidedStepActivity.class);
 //                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(act).toBundle();
@@ -514,22 +396,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                } else if (((String) item).contains(getString(R.string.error_fragment))) {
 //                    BrowseErrorFragment errorFragment = new BrowseErrorFragment();
 //                    getFragmentManager().beginTransaction().replace(R.id.main_frame, errorFragment).addToBackStack(null).commit();
-                } else if(((String) item).contains(getString(R.string.personal_settings))) {
-                    Intent intent = new Intent(act, SettingsActivity.class);
-                    Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(act).toBundle();
-                    startActivity(intent, bundle);
 //                } else {
                     //Toast.makeText(act, ((String) item), Toast.LENGTH_SHORT).show();
-                } else {
-                    if(isLongClicked) {
-                        System.out.println("--- is Long clicked");
-                        isLongClicked = false;
-                        return;
-                    } else {
-                        // note: move Switch category to onItemSelected
-                        //switchCategory(item);
-                    }
-                }
 
             }
         }
@@ -755,10 +623,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 createPresenter_option(row_id);
 
-                // init row position
+                // init row position and focus item
                 setSelectedPosition(0);
-                //note: SelectItemViewHolderTask below is not working for focus category
-                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(0));
+                int pos = getFocusPositionOfCategoryRow();
+                setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(pos));
 
                 startEntranceTransition(); //Move startEntranceTransition to after all
 
@@ -771,7 +639,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             } else {
                 // The CursorAdapter contains a Cursor pointing to all videos.
-                mVideoCursorAdapters.get(loaderId).changeCursor(data);
+                if((mVideoCursorAdapters!= null) && (mVideoCursorAdapters.get(loaderId)!= null))
+                    mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
                 int columnIndex = data.getColumnIndex(VideoContract.VideoEntry._ID);
                 int video_id = data.getInt(columnIndex);
@@ -801,6 +670,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 if(rowsLoadedCount == mVideoCursorAdapters.size() )
                 {
                     setPlaylistsCount(rowsLoadedCount);
+                    isOkToChangeCategory = true;
+
                     System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
                     System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished video");
                     System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
@@ -845,6 +716,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             mVideoCursorAdapters.get(loaderId).changeCursor(null);
         } else {
             mTitleRowAdapter.clear();
+            mVideoCursorAdapters.clear();
+
+            rowsLoadedCount = 0;
+            mLoaderManager.restartLoader(CATEGORY_LOADER, null, this);
         }
     }
 
@@ -853,6 +728,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     // create Category presenter
     //
     void createPresenter_category(){
+        // set focus category
+        int focusPos = getFocusPositionOfCategoryRow();
+        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter(act,focusPos);
+        listRowPresenter.setRowHeight(400);
+        mTitleRowAdapter = new ArrayObjectAdapter(listRowPresenter);
+        setAdapter(mTitleRowAdapter);
+
         // category UI
         // Create a row for category selections at top
         String categoryName = Utils.getPref_category_name(act);
@@ -1265,28 +1147,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    // switch Data base
-    private void switchDB(String categoryName)
-    {
-        System.out.println(" MainFragment / _switchDB / categoryName = " + categoryName);
-
-        try {
-            Utils.setPref_category_name(getContext(), categoryName );
-            mLoaderManager.destroyLoader(TITLE_LOADER);
-
-            // start new MainActivity to renew video provider
-            act.finish();
-            Intent new_intent = new Intent(act, MainActivity.class);
-            new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-            new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-            startActivity(new_intent);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     // play id
     private int play_id;
     private void setPlayId(int id)
@@ -1561,5 +1421,158 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 return true;
         }
         return false;
+    }
+
+    // open video item
+    void openVideoItem(Object item){
+        Video video = (Video) item;
+        System.out.println("MainFragment / _openVideoItem / item = "+ item );
+
+        // for auto play by list only
+        if(!Pref.isAutoPlayByCategory(act)) {
+            // check row position
+            for (int i = 0; i < mPlayLists.size(); i++) {
+                if (video.id >= (int) mPlayLists.get(i).get(0))
+                    currentRowPos = i;
+            }
+        }
+
+        // video ID starts with 1
+        currentRow1stId = (int) mPlayLists.get(currentRowPos).get(0);
+        currentRowSize = mPlayLists.get(currentRowPos).size();
+        currentRowLastId = currentRow1stId + currentRowSize - 1;
+
+        String urlStr = ((Video) item).videoUrl;
+
+        String path;
+        // YouTube or HTML
+        if(!urlStr.contains("playlist") && ( urlStr.contains("youtube") || urlStr.contains("youtu.be") ))
+            path = "https://img.youtube.com/vi/"+getYoutubeId(urlStr)+"/0.jpg";
+        else
+            path = urlStr;
+
+        System.out.println("MainFragment / _openVideoItem / path= "+ path);
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                /**
+                 *  check connection response
+                 *  404: not found, 200: OK
+                 */
+                int responseCode = -1;
+                HttpURLConnection urlConnection = null;
+                try {
+                    URL url = new URL(path);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+                    responseCode = urlConnection.getResponseCode();
+                    System.out.println("MainFragment / _openVideoItem / responseCode  OK = " + responseCode);
+                }
+                catch (IOException e)
+                {
+                    System.out.println("MainFragment / _openVideoItem / responseCode NG = "+ responseCode);
+                    e.printStackTrace();
+                    return;
+                }
+                urlConnection.disconnect();
+
+                /**
+                 *  normal response: launch VideoDetailsActivity
+                 */
+                // YouTube  or video or HTML
+                if(responseCode == 200) {
+                    // play YouTube
+                    if(urlStr.contains("youtube") || urlStr.contains("youtu.be"))
+                    {
+                        // auto play
+                        if (Pref.isAutoPlayByList(act) ||
+                                Pref.isAutoPlayByCategory(act)) {
+                            setPlayId((int) ((Video) (item)).id);
+                            startYouTubeIntent(((Video) item).videoUrl);
+                            setNewId(getNextCursorPositionIdByCurrentId(getPlayId()));
+
+                        } else {
+                            // manual play
+                            act.runOnUiThread(new Runnable() {
+                                public void run() {
+                                    // for VideoDetailsActivity
+//                                            Intent intent = new Intent(act, VideoDetailsActivity.class);
+//                                            intent.putExtra(VideoDetailsActivity.VIDEO, video);
+//                                            if (urlStr.contains("youtube") || urlStr.contains("youtu.be")) {
+//                                                // play YouTube
+//                                                Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
+//                                                        act,
+//                                                        ((ImageCardView) itemViewHolder.view).getMainImageView(),
+//                                                        VideoDetailsActivity.SHARED_ELEMENT_NAME).toBundle();
+//                                                        startActivityForResult(intent, VIDEO_DETAILS_INTENT, bundle);
+//                                            }
+
+                                    if(((Video) item).videoUrl.contains("playlist"))
+                                    {
+                                        String playListIdStr = Utils.getYoutubePlaylistId(((Video) item).videoUrl);
+                                        Intent intent = YouTubeIntents.createPlayPlaylistIntent(act, playListIdStr);
+                                        intent.putExtra("force_fullscreen", true);
+                                        intent.putExtra("finish_on_ended", true);
+                                        startActivity(intent);
+                                    }
+                                    else {
+                                        // for open directly
+                                        setPlayId((int) ((Video) (item)).id);
+                                        String idStr = getYoutubeId(((Video) item).videoUrl);
+                                        Intent intent = YouTubeIntents.createPlayVideoIntent(act, idStr);
+                                        intent.putExtra("force_fullscreen", true);
+                                        intent.putExtra("finish_on_ended", true);
+                                        startActivity(intent);
+                                    }
+
+                                    // for testing NewPipe
+//                                            Uri linkUri = Uri.parse(((Video) item).videoUrl);
+//                                            Intent appIntent = new Intent(Intent.ACTION_VIEW, linkUri);
+
+                                    // case: w/o chooser
+//                                            startActivity(appIntent);
+
+                                    // case: w/ chooser
+//                                            String title = "Select an APP";
+//                                            Intent chooser = Intent.createChooser(appIntent, title);
+//                                            if (appIntent.resolveActivity(act.getPackageManager()) != null) {
+//                                                startActivity(chooser);
+//                                            }
+
+                                }
+                            });
+                        }
+                    }
+                    else {
+                        // play video
+                        // https://drive.google.com/uc?export=view&id=ID
+                        if(urlStr.contains("https://drive.google.com/uc?export=view") ||
+                                urlStr.contains("https://storage.googleapis.com/android-tv") ){
+                            Intent intent = new Intent(act, PlaybackActivity.class);
+                            intent.putExtra(VideoDetailsActivity.VIDEO, ((Video) item));
+                            startActivity(intent);
+                        }
+                        // play HTML
+                        else {
+                            String link = ((Video) item).videoUrl;
+                            Uri uriStr = Uri.parse(link);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uriStr);
+                            startActivity(intent);
+                        }
+                    }
+                } else {
+                    /*
+                     *  show connection error toast
+                     */
+                    act.runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(act, getString(R.string.connection_error), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        }).start();
+
     }
 }
