@@ -137,7 +137,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         // Create a list to contain all the CursorObjectAdapters.
         // Each adapter is used to render a specific row of videos in the MainFragment.
-        mVideoCursorAdapters = new SparseArray<CursorObjectAdapter>();//new HashMap<>();
+        mVideoCursorAdapters = new SparseArray<>();//new HashMap<>();
 
         // Start loading the titles from the database.
         mLoaderManager = LoaderManager.getInstance(this);
@@ -163,18 +163,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         // Map title results from the database to ListRow objects.
         // This Adapter is used to render the MainFragment sidebar labels.
 
-//        int focusPos = getFocusPositionOfCategoryRow();
-//        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter(act,focusPos);
-//        listRowPresenter.setRowHeight(400);
-//        mTitleRowAdapter = new ArrayObjectAdapter(listRowPresenter);
-//        setAdapter(mTitleRowAdapter);
-
 //        updateRecommendations();
 
         rowsLoadedCount = 0;
 	    mPlayLists = new ArrayList<>();
 
-	    // list for Show row number - link number
+	    // list for Show row number and link number
         links_count_of_row = new ArrayList<>();
         start_number_of_row = new ArrayList<>();
     }
@@ -293,7 +287,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 itemViewHolder.view.setBackgroundColor(getResources().getColor(R.color.selected_background));
 
             if (item instanceof Video) {
-                System.out.println("---------- onItemSelected / video");
+//                System.out.println("---------- onItemSelected / video");
                 mBackgroundURI = Uri.parse(((Video) item).bgImageUrl);
                 startBackgroundTimer();
             }
@@ -312,9 +306,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                System.out.println("----------  currentNavPosition = " + currentNavPosition);
 
                 // switch category by onItemViewSelected
-                String cate_name = Utils.getPref_category_name(act);
-                if( !cate_name.equalsIgnoreCase((String)item) && isOkToChangeCategory)
-                    switchCategory(item);
+//                String cate_name = Utils.getPref_category_name(act);
+//                if( !cate_name.equalsIgnoreCase((String)item) && isOkToChangeCategory)
+//                    switchCategory(item);
             }
         }
     }
@@ -322,6 +316,11 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     boolean isOkToChangeCategory;
     // Switch category by category name
     void switchCategory(Object catName) {
+
+        // renew list for Show row number and link number
+        links_count_of_row = new ArrayList<>();
+        start_number_of_row = new ArrayList<>();
+
         String categoryName =  (String) catName;
         // After delay, start switch DB
         new Handler().postDelayed(new Runnable() {
@@ -346,6 +345,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     int currentRow1stId;
     int currentRowSize;
     int currentRowLastId;
+    static boolean isLongClicked;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -386,7 +386,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         return;
                     } else {
                         // switch category by onItemClicked
-//                        switchCategory(item);
+                        switchCategory(item);
                     }
                 }
 //                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
@@ -400,29 +400,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     //Toast.makeText(act, ((String) item), Toast.LENGTH_SHORT).show();
 
             }
-        }
-    }
-
-    boolean isLongClicked;
-    // for item long clicked
-    class CategoryItemPresenter extends GridItemPresenter{
-
-        public CategoryItemPresenter(MainFragment mainFragment, List<String> category_names) {
-            super(mainFragment, category_names);
-        }
-
-        @Override
-        public void onBindViewHolder(ViewHolder viewHolder, Object item) {
-            viewHolder.view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    System.out.println("CategoryItemPresenter / onLongClick / category item = " + item);
-                    isLongClicked = true;
-                    Utils.confirmDeleteCategory(act,mCategoryNames,(String)item);
-                    return false;
-                }
-            });
-            super.onBindViewHolder(viewHolder, item);
         }
     }
 
@@ -617,15 +594,18 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             } else if (loaderId == TITLE_LOADER) {
 
-                createPresenter_category();
+                // create category list row
+                createListRow_category();
 
-                row_id = createPresenter_video(data);
+                // create video list rows
+                row_id = createListRows_video(data);
 
-                createPresenter_option(row_id);
+                // create option list row
+                createListRow_option(row_id);
 
                 // init row position and focus item
                 setSelectedPosition(0);
-                int pos = getFocusPositionOfCategoryRow();
+                int pos = getFocusItemPosition_categoryRow();
                 setSelectedPosition(0, true, new ListRowPresenter.SelectItemViewHolderTask(pos));
 
                 startEntranceTransition(); //Move startEntranceTransition to after all
@@ -638,8 +618,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                System.out.println("MainFragment / _onLoadFinished / -----------------------------------------");
 
             } else {
-                // The CursorAdapter contains a Cursor pointing to all videos.
-                if((mVideoCursorAdapters!= null) && (mVideoCursorAdapters.get(loaderId)!= null))
+                // The CursorAdapter(mVideoCursorAdapters)
+                // contains a Cursor pointing to all videos.
+                if((mVideoCursorAdapters!= null) &&
+                   (mVideoCursorAdapters.get(loaderId)!= null))
                     mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
                 int columnIndex = data.getColumnIndex(VideoContract.VideoEntry._ID);
@@ -723,54 +705,57 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    ArrayObjectAdapter gridRowAdapterCategory;
     //
     // create Category presenter
     //
-    void createPresenter_category(){
+    void createListRow_category(){
         // set focus category
-        int focusPos = getFocusPositionOfCategoryRow();
-        CustomListRowPresenter listRowPresenter = new CustomListRowPresenter(act,focusPos);
-        listRowPresenter.setRowHeight(400);
-        mTitleRowAdapter = new ArrayObjectAdapter(listRowPresenter);
+        int focusPos = getFocusItemPosition_categoryRow();
+        CategoryListRowPresenter cate_listRowPresenter = new CategoryListRowPresenter(act,focusPos);
+        cate_listRowPresenter.setRowHeight(400);
+        mTitleRowAdapter = new ArrayObjectAdapter(cate_listRowPresenter);
         setAdapter(mTitleRowAdapter);
 
         // category UI
         // Create a row for category selections at top
-        String categoryName = Utils.getPref_category_name(act);
-        String currCatMessage;
+        String cate_name = Utils.getPref_category_name(act);
+        String curr_cate_message;
 
-        if(categoryName.equalsIgnoreCase("no category name")){// initial
+        // initial category name
+        if(cate_name.equalsIgnoreCase("no category name")){
             // get first available category name
-            categoryName = mCategoryNames.get(INIT_CATEGORY_NUMBER - 1);
-            Utils.setPref_category_name(getActivity(),categoryName);
+            cate_name = mCategoryNames.get(INIT_CATEGORY_NUMBER - 1);
+            Utils.setPref_category_name(getActivity(),cate_name);
         }
 
-        currCatMessage = act.getResources().
+        // current category message
+        curr_cate_message = act.getResources().
                 getString(R.string.current_category_title).
                 concat(" : ").
-                concat(categoryName);
+                concat(cate_name);
 
-        HeaderItem gridHeaderCategory = new HeaderItem(currCatMessage);
+        // category header
+        HeaderItem cate_gridHeader = new HeaderItem(curr_cate_message);
 
         // Category item presenter
-//                GridItemPresenter gridPresenterCategory = new GridItemPresenter(this,mCategoryNames);
-        GridItemPresenter gridPresenterCategory = new CategoryItemPresenter(this,mCategoryNames);
-//        ArrayObjectAdapter gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
-        gridRowAdapterCategory = new ArrayObjectAdapter(gridPresenterCategory);
+        CategoryGridItemPresenter cate_gridItemPresenter= new CategoryGridItemPresenter(this,mCategoryNames);
+        ArrayObjectAdapter cate_gridRowAdapter = new ArrayObjectAdapter(cate_gridItemPresenter);
 
         // show category name
         for(int i=1;i<= mCategoryNames.size();i++)
-            gridRowAdapterCategory.add(mCategoryNames.get(i-1));
+            cate_gridRowAdapter.add(mCategoryNames.get(i-1));
 
-        ListRow listRowCategory = new ListRow(gridHeaderCategory, gridRowAdapterCategory);
-        mTitleRowAdapter.add(listRowCategory);
+        // category list row
+        ListRow cate_listRow = new ListRow(cate_gridHeader, cate_gridRowAdapter);
+
+        // add category row
+        mTitleRowAdapter.add(cate_listRow);
     }
 
     //
     // create Video presenter
     //
-    int createPresenter_video(Cursor data){
+    int createListRows_video(Cursor data){
         // row id count start
         int row_id = 0;
 //                listRowCategory.setId(row_id);
@@ -852,7 +837,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     //
     // create Option presenter
     //
-    void createPresenter_option(int _row_id){
+    void createListRow_option(int _row_id){
 
         row_id = _row_id;
 
@@ -1386,7 +1371,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // get focus position of category row
-    int getFocusPositionOfCategoryRow(){
+    int getFocusItemPosition_categoryRow(){
         // get current video* tables
         int prefVideoTableId = Utils.getPref_video_table_id(MainFragment.this.act);
         ContentResolver contentResolver = act.getApplicationContext().getContentResolver();

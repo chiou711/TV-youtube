@@ -124,6 +124,9 @@ public class CardPresenter extends Presenter {
 
         // set position text view
         // get row number - link number of the row
+
+        // Sorting pair
+        // the original list pair below could be not ordered due to playlist size
         List<Integer> links_of_row = MainFragment.links_count_of_row;
         List<Integer> start_of_row = MainFragment.start_number_of_row;
 
@@ -131,15 +134,31 @@ public class CardPresenter extends Presenter {
         long link_number = 0;
         int links_count_of_current_row = 0;
 
-        int begin;
-        int end;
+        int begin = 0,begin1,begin2;
+        int end = 0,end1,end2;
         for(int i=0;i<rows_count;i++)
         {
-            begin = start_of_row.get(i);
-            end = begin + links_of_row.get(i)-1;
-            if( (begin <= video.id) && (video.id <= end) ) {
+            begin1 = start_of_row.get(i);
+            end1 = begin1 + links_of_row.get(i)-1;
+
+            for(int j=0;j<rows_count;j++) {
+
+                begin2 = start_of_row.get(j);
+                end2 = begin2 + links_of_row.get(j)-1;
+
+                if(begin2 < begin1) {
+                    begin = begin2;
+                    end = end2;
+                    links_count_of_current_row = links_of_row.get(j);
+                } else {
+                    begin = begin1;
+                    end = end1;
+                    links_count_of_current_row = links_of_row.get(i);
+                }
+            }
+
+            if ((begin <= video.id) && (video.id <= end)) {
                 link_number = video.id - begin + 1;
-                links_count_of_current_row = links_of_row.get(i);
                 break;
             }
         }

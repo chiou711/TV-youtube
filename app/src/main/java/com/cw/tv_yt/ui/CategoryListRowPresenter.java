@@ -8,12 +8,12 @@ import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.RowPresenter;
 
-class CustomListRowPresenter extends ListRowPresenter {
+class CategoryListRowPresenter extends ListRowPresenter {
 
    private int mInitialSelectedPosition;
    FragmentActivity act;
 
-   public CustomListRowPresenter(FragmentActivity _act, int position) {
+   public CategoryListRowPresenter(FragmentActivity _act, int position) {
       this.mInitialSelectedPosition = position;
       act = _act;
    }
