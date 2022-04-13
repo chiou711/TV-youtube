@@ -169,8 +169,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	    mPlayLists = new ArrayList<>();
 
 	    // list for Show row number and link number
-        links_count_of_row = new ArrayList<>();
-        start_number_of_row = new ArrayList<>();
+        rowDimensionList = new ArrayList<>();
     }
 
     AlertDialog.Builder builder;
@@ -318,8 +317,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     void switchCategory(Object catName) {
 
         // renew list for Show row number and link number
-        links_count_of_row = new ArrayList<>();
-        start_number_of_row = new ArrayList<>();
+        rowDimensionList = new ArrayList<>();
 
         String categoryName =  (String) catName;
         // After delay, start switch DB
@@ -546,9 +544,19 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     private List<List> mPlayLists;
-    public static List<Integer> links_count_of_row;
-    public static List<Integer> start_number_of_row;
+    public static List<RowDimension> rowDimensionList;
+
     int row_id;
+
+    // row dimension
+    public class RowDimension {
+        public int start_number;
+        public int links_count;
+        RowDimension(int start_number, int links_count) {
+            this.start_number=start_number;
+            this.links_count=links_count;
+        }
+    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -630,11 +638,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 int sizeOfRowLinks = data.getCount();
 //                System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
 
-                // start number of a row
-                start_number_of_row.add(video_id);
-
-                // links count of a row
-                links_count_of_row.add(sizeOfRowLinks);
+                // start number and links count of a row
+                RowDimension rowDimension = new RowDimension(video_id,sizeOfRowLinks);
+                rowDimensionList.add(rowDimension);
 
                 List<Integer> playlist = new ArrayList<>();
                 for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)

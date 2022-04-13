@@ -127,10 +127,10 @@ public class CardPresenter extends Presenter {
 
         // Sorting pair
         // the original list pair below could be not ordered due to playlist size
-        List<Integer> links_of_row = MainFragment.links_count_of_row;
-        List<Integer> start_of_row = MainFragment.start_number_of_row;
+        MainFragment.RowDimension rowDimension1, rowDimension2;
+        List<MainFragment.RowDimension> rowDimensionList = MainFragment.rowDimensionList;
 
-        int rows_count = links_of_row.size();
+        int rows_count = rowDimensionList.size();
         long link_number = 0;
         int links_count_of_current_row = 0;
 
@@ -138,22 +138,24 @@ public class CardPresenter extends Presenter {
         int end = 0,end1,end2;
         for(int i=0;i<rows_count;i++)
         {
-            begin1 = start_of_row.get(i);
-            end1 = begin1 + links_of_row.get(i)-1;
+            rowDimension1 = rowDimensionList.get(i);
+            begin1 = rowDimension1.start_number;
+            end1 = begin1 + rowDimension1.links_count-1;
 
             for(int j=0;j<rows_count;j++) {
 
-                begin2 = start_of_row.get(j);
-                end2 = begin2 + links_of_row.get(j)-1;
+                rowDimension2 = rowDimensionList.get(j);
+                begin2 = rowDimension2.start_number;
+                end2 = begin2 + rowDimension2.links_count-1;
 
                 if(begin2 < begin1) {
                     begin = begin2;
                     end = end2;
-                    links_count_of_current_row = links_of_row.get(j);
+                    links_count_of_current_row = rowDimension2.links_count;
                 } else {
                     begin = begin1;
                     end = end1;
-                    links_count_of_current_row = links_of_row.get(i);
+                    links_count_of_current_row = rowDimension1.links_count;
                 }
             }
 
