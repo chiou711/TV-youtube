@@ -129,6 +129,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private int rowsLoadedCount;
 
     private FragmentActivity act;
+    public static List<RowLength> rowLengthList;
 
     @Override
     public void onAttach(Context context) {
@@ -169,7 +170,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 	    mPlayLists = new ArrayList<>();
 
 	    // list for Show row number and link number
-        rowDimensionList = new ArrayList<>();
+        rowLengthList = new ArrayList<>();
     }
 
     AlertDialog.Builder builder;
@@ -317,7 +318,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     void switchCategory(Object catName) {
 
         // renew list for Show row number and link number
-        rowDimensionList = new ArrayList<>();
+        rowLengthList = new ArrayList<>();
 
         String categoryName =  (String) catName;
         // After delay, start switch DB
@@ -544,19 +545,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     private List<List> mPlayLists;
-    public static List<RowDimension> rowDimensionList;
 
     int row_id;
 
-    // row dimension
-    public class RowDimension {
-        public int start_number;
-        public int links_count;
-        RowDimension(int start_number, int links_count) {
-            this.start_number=start_number;
-            this.links_count=links_count;
-        }
-    }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -639,8 +630,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 //                System.out.println("MainFragment / _onLoadFinished / sizeOfLinks= " + sizeOfRowLinks);
 
                 // start number and links count of a row
-                RowDimension rowDimension = new RowDimension(video_id,sizeOfRowLinks);
-                rowDimensionList.add(rowDimension);
+                rowLengthList.add(new RowLength(video_id,sizeOfRowLinks));
 
                 List<Integer> playlist = new ArrayList<>();
                 for(int i=video_id;i<(video_id+sizeOfRowLinks);i++)
@@ -1566,4 +1556,59 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }).start();
 
     }
+
+    // row length class
+    public static class RowLength {
+        public long start_id;
+        public int row_length;
+        RowLength(long start_id, int row_length) {
+            this.start_id = start_id;
+            this.row_length = row_length;
+        }
+    }
+
+    // get row length by video id
+    public static RowLength getRowLengthByVideoId(long videoId){
+        // set position info text view : get link id & current row length
+        // Sorting pair : original row length pair below could be not ordered
+
+        RowLength rowLen1, rowLen2;
+        List<RowLength> rowLenList = rowLengthList;
+
+        int rows_count = rowLenList.size();
+        long link_id = 0;
+        int current_row_len = 0;
+
+        long start = 0,start1,start2;
+        long end = 0,end1,end2;
+        for(int i=0;i<rows_count;i++) {
+            rowLen1 = rowLenList.get(i);
+            start1 = rowLen1.start_id;
+            end1 = start1 + rowLen1.row_length -1;
+
+            for(int j=0;j<rows_count;j++) {
+
+                rowLen2 = rowLenList.get(j);
+                start2 = rowLen2.start_id;
+                end2 = start2 + rowLen2.row_length -1;
+
+                if(start2 < start1) {
+                    start = start2;
+                    end = end2;
+                    current_row_len = rowLen2.row_length;
+                } else {
+                    start = start1;
+                    end = end1;
+                    current_row_len = rowLen1.row_length;
+                }
+            }
+
+            if ((start <= videoId) && (videoId <= end)) {
+                link_id = videoId - start + 1;
+                break;
+            }
+        }
+        return new RowLength(link_id,current_row_len);
+    }
+
 }

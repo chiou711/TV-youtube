@@ -42,6 +42,7 @@ import com.cw.tv_yt.data.YouTubeTimeConvert;
 import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.ui.MainFragment;
+import com.cw.tv_yt.ui.MainFragment.RowLength;
 import com.cw.tv_yt.ui.VideoDetailsActivity;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -53,7 +54,6 @@ import com.google.api.services.youtube.model.VideoListResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.Executors;
 
 /*
@@ -122,49 +122,6 @@ public class CardPresenter extends Presenter {
         cardView.setTitleText(video.title);
         ((TextView)cardView.findViewById(R.id.title_text)).setLines(3);// setMaxLines(5);
 
-        // set position text view
-        // get row number - link number of the row
-
-        // Sorting pair
-        // the original list pair below could be not ordered due to playlist size
-        MainFragment.RowDimension rowDimension1, rowDimension2;
-        List<MainFragment.RowDimension> rowDimensionList = MainFragment.rowDimensionList;
-
-        int rows_count = rowDimensionList.size();
-        long link_number = 0;
-        int links_count_of_current_row = 0;
-
-        int begin = 0,begin1,begin2;
-        int end = 0,end1,end2;
-        for(int i=0;i<rows_count;i++)
-        {
-            rowDimension1 = rowDimensionList.get(i);
-            begin1 = rowDimension1.start_number;
-            end1 = begin1 + rowDimension1.links_count-1;
-
-            for(int j=0;j<rows_count;j++) {
-
-                rowDimension2 = rowDimensionList.get(j);
-                begin2 = rowDimension2.start_number;
-                end2 = begin2 + rowDimension2.links_count-1;
-
-                if(begin2 < begin1) {
-                    begin = begin2;
-                    end = end2;
-                    links_count_of_current_row = rowDimension2.links_count;
-                } else {
-                    begin = begin1;
-                    end = end1;
-                    links_count_of_current_row = rowDimension1.links_count;
-                }
-            }
-
-            if ((begin <= video.id) && (video.id <= end)) {
-                link_number = video.id - begin + 1;
-                break;
-            }
-        }
-
         // get duration
         if(Pref.isShowDuration(act)){
             isGotDuration = false;
@@ -191,8 +148,9 @@ public class CardPresenter extends Presenter {
         // set position info
         int row_number = row_id;
         String positionInfo;
-        String linkNumberOfRowLinks = "    (" + link_number + "/" +
-                                              links_count_of_current_row + ")    ";
+        RowLength rowLength = MainFragment.getRowLengthByVideoId(video.id);
+        String linkNumberOfRowLinks = "    (" + rowLength.start_id + "/" +
+                rowLength.row_length + ")    ";
         if(row_number == -1) {
             // duration + link number of row links
             positionInfo = duration +linkNumberOfRowLinks;
