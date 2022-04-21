@@ -166,11 +166,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
 //        updateRecommendations();
 
-        rowsLoadedCount = 0;
-	    mPlayLists = new ArrayList<>();
-
-	    // list for Show row number and link number
-        rowLengthList = new ArrayList<>();
     }
 
     AlertDialog.Builder builder;
@@ -410,7 +405,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             count = Define.DEFAULT_COUNT_DOWN_TIME_TO_PLAY_NEXT; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
 
-            setPlayId(getNextCursorPositionIdByCurrentId(getPlayId()));
+            // prepare next Id
+            int nextId_auto = getNextCursorPositionId_auto(getPlayId());
+            setNextId_auto(nextId_auto);
+
+            // set new play Id
+            setPlayId(nextId_auto);
 
             nextLinkTitle =  getYouTubeTitle();
 
@@ -444,10 +444,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             alertDlg.dismiss();
                             cancelYouTubeHandler();
                             launchYouTubeIntent();
-
-                            // prepare next Id
-                            setNewId(getNextCursorPositionIdByCurrentId(getPlayId()));
-
                         }
                     }).
                     setOnCancelListener(new DialogInterface.OnCancelListener(){
@@ -500,6 +496,16 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             System.out.println("MainFragment / _onCreateLoader / id = TITLE_LOADER");
         else
             System.out.println("MainFragment / _onCreateLoader / id = "+ id);
+
+        // init loaded rows count
+        rowsLoadedCount = 0;
+
+        // init playlists
+        mPlayLists = new ArrayList<>();
+
+        // list for Show row number and link number
+        rowLengthList = new ArrayList<>();
+
 
         if (id == CATEGORY_LOADER) {
             return new CursorLoader(
@@ -875,10 +881,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                 alertDlg.dismiss();
                 cancelYouTubeHandler();
                 launchYouTubeIntent();
-
-                // prepare next Id
-                setNewId(getNextCursorPositionIdByCurrentId(getPlayId()));
-
             }
         }
     };
@@ -921,7 +923,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
             // method 1: by intent
             String video_url = getYouTubeLink();
-            startYouTubeIntent(video_url);
+            startYouTubeIntentForResult(video_url);
 
             // method 2 : by UI
 //            mInputConnection = new BaseInputConnection(act.findViewById(R.id.main_frame), true);
@@ -931,7 +933,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
     }
 
-    private void startYouTubeIntent(String url)
+    // start YouTube intent
+    private void startYouTubeIntentForResult(String url)
     {
         String idStr = getYoutubeId(url);
         //Intent intent = YouTubeIntents.createPlayVideoIntentWithOptions(act, idStr, true/*fullscreen*/, true/*finishOnEnd*/);
@@ -1023,16 +1026,17 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             super.onPostExecute(result);
 
             String video_url = getYouTubeLink();
-            startYouTubeIntent(video_url);
+            startYouTubeIntentForResult(video_url);
         }
     }
 
     private int backSteps;
 
+    // check if Row End
     private boolean isRowEnd()
     {
         boolean isEnd = false;
-        System.out.println("isRowEnd / getNewId() = " + getNewId());
+        System.out.println("isRowEnd / getNextId_auto() = " + getNextId_auto());
         backSteps = 0;
 
         // for auto play by category only
@@ -1040,9 +1044,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             for (int i = 0; i < mPlayLists.size(); i++) {
                 List<Integer> playlist = mPlayLists.get(i);
                 int firstIdOfRow = playlist.get(0);
-                if (firstIdOfRow == getNewId()) {
+                if (firstIdOfRow == getNextId_auto()) {
                     isEnd = true;
-                    if (getNewId() == 1) {
+                    if (getNextId_auto() == 1) {
                         // back steps for last row or 1st row
                         backSteps = mPlayLists.get(mPlayLists.size() - 1).size() - 1;
                     } else if (i != 0) {
@@ -1055,8 +1059,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
 
         // for auto play by list only
-        if(!Pref.isAutoPlayByCategory(act)) {
-            if (getNewId() == currentRow1stId) {
+        if(Pref.isAutoPlayByList(act)) {
+            if (getNextId_auto() == currentRow1stId) {
                 backSteps = currentRowSize - 1;
                 isEnd = true;
             }
@@ -1140,28 +1144,15 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         return play_id;
     }
 
-    // set new id
-    private int new_id;
-    private void setNewId(int id)
-    {
-        new_id = id;
-
-        if(Pref.isAutoPlayByCategory(act)) {
-            // for auto play by category
-            if(id > getTotalLinksCount())//todo ??? change to last row and last link id
-                new_id = 1;
-        } else {
-            // for auto play by list
-            if (id > currentRowLastId)
-                new_id = currentRow1stId;
-        }
-
+    // set next id for Auto
+    private int next_id;
+    private void setNextId_auto(int id) {
+        next_id = id;
     }
 
-    // get new ID
-    private int getNewId()
-    {
-        return new_id;
+    // get next ID for Auto
+    private int getNextId_auto() {
+        return next_id;
     }
 
     // Broadcast receiver for receiving status updates from the IntentService
@@ -1252,12 +1243,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         return  pos;
     }
 
-    // get next cursor position ID by current ID
-    int getNextCursorPositionIdByCurrentId(int curId){
+    // get next cursor position ID for Auto play
+    int getNextCursorPositionId_auto(int currentPlayId){
         int focusCatNum = Utils.getPref_video_table_id(act);
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
 
-        int pos = 0;
+        int cursorPos = 0;
         DbHelper mOpenHelper = new DbHelper(act);
         mOpenHelper.setWriteAheadLoggingEnabled(false);
         SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
@@ -1274,14 +1265,73 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         int index_id = cursor.getColumnIndex("_id");
         for(int position=0;position<cursor.getCount();position++){
             cursor.moveToPosition((int) position);
-            if(curId == cursor.getInt(index_id)) {
-                pos = position;
+            if(currentPlayId == cursor.getInt(index_id)) {
+                cursorPos = position;
                 break;
             }
         }
 
-        cursor.moveToPosition((int) pos+1);
-        int nextId = cursor.getInt(index_id);
+        // check row position
+        for (int i = 0; i < mPlayLists.size(); i++) {
+            if (currentPlayId == (int) mPlayLists.get(i).get(0)) {
+                currentRowPos = i;
+                break;
+            }
+        }
+
+        // video ID starts with 1
+        currentRow1stId = (int) mPlayLists.get(currentRowPos).get(0);
+        currentRowSize = mPlayLists.get(currentRowPos).size();
+        currentRowLastId = currentRow1stId + currentRowSize - 1;
+
+//        System.out.println("??? cursorPos = " + cursorPos);
+//        System.out.println("??? currentPlayId = " + currentPlayId);
+//        System.out.println("??? currentRowPos = " + currentRowPos);
+//        System.out.println("??? currentRow1stId = " + currentRow1stId);
+//        System.out.println("??? currentRowLastId = " + currentRowLastId);
+//        System.out.println("??? currentRowSize = " + currentRowSize);
+
+        int nextId = 0;
+
+        // at last video item of category
+        try{
+            cursor.moveToPosition(cursorPos+1);
+            cursor.getInt(index_id);
+        } catch(Exception e){
+            // set next ID
+            if(Pref.isAutoPlayByList(act))
+                nextId = currentRow1stId;
+            else if (Pref.isAutoPlayByCategory(act))
+                nextId = 1;
+
+            cursor.close();
+            sqlDb.close();
+//            System.out.println("??? nextId (return / exception) = " + nextId);
+            return nextId;
+        }
+
+        // move cursor to next position
+        cursor.moveToPosition(cursorPos+1);
+//        System.out.println("??? cursor.getInt(index_id) = " + cursor.getInt(index_id));
+
+        // at row end
+        if(cursor.getInt(index_id)  > currentRowLastId  ) {
+
+            // set next ID
+            if(Pref.isAutoPlayByList(act))
+                nextId = currentRow1stId;
+            else if(Pref.isAutoPlayByCategory(act))
+                nextId = currentRowLastId + 1;
+
+//            System.out.println("??? nextId 1 = " + nextId);
+        }
+        else {
+            cursor.moveToPosition((int) cursorPos + 1);
+            nextId = cursor.getInt(index_id);
+//            System.out.println("??? nextId 2 = " + nextId);
+        }
+
+//        System.out.println("??? nextId (return)= " + nextId);
 
         cursor.close();
         sqlDb.close();
@@ -1468,11 +1518,9 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     {
                         // auto play
                         if (Pref.isAutoPlayByList(act) ||
-                                Pref.isAutoPlayByCategory(act)) {
+                            Pref.isAutoPlayByCategory(act)) {
                             setPlayId((int) ((Video) (item)).id);
-                            startYouTubeIntent(((Video) item).videoUrl);
-                            setNewId(getNextCursorPositionIdByCurrentId(getPlayId()));
-
+                            startYouTubeIntentForResult(((Video) item).videoUrl);
                         } else {
                             // manual play
                             act.runOnUiThread(new Runnable() {
