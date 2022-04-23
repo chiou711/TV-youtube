@@ -27,6 +27,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.leanback.app.BackgroundManager;
 import androidx.leanback.app.DetailsSupportFragment;
 import androidx.leanback.widget.Action;
@@ -232,22 +234,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
                 } else if(action.getId() == ACTION_DELETE){
                     // delete current item
-                    ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
-                    VideoProvider.tableId = String.valueOf(Utils.getPref_video_table_id(getActivity()));
-                    contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + mSelectedVideo.id,null);
-
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
-                    getActivity().setResult( Activity.RESULT_OK, returnIntent);
-
-                    // show toast
-                    getActivity().runOnUiThread(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                    getActivity().finish();
+                    deleteCurrentItem();
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -387,8 +374,18 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                     public void onResourceReady(
                             Bitmap resource,
                             Transition<? super Bitmap> transition) {
+                        System.out.println("onResourceReady");
                         row.setImageBitmap(getActivity(), resource);
                         startEntranceTransition();
+                    }
+
+                    @Override
+                    public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                        super.onLoadFailed(errorDrawable);
+                        System.out.println("onLoadFailed");
+
+                        // delete current item
+                        deleteCurrentItem();
                     }
                 });
 
@@ -444,5 +441,25 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                 }
             }
         }
+    }
+
+    // delete current item
+    void deleteCurrentItem(){
+        ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
+        VideoProvider.tableId = String.valueOf(Utils.getPref_video_table_id(getActivity()));
+        contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + mSelectedVideo.id,null);
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
+        getActivity().setResult( Activity.RESULT_OK, returnIntent);
+
+        // show toast
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        getActivity().finish();
     }
 }

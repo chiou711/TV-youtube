@@ -404,7 +404,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             int nextId_auto = getNextCursorPositionId_auto(getPlayId());
             setNextId_auto(nextId_auto);
 
-            nextLinkTitle =  getYouTubeTitle();
+            nextLinkTitle =  getNextYouTubeTitle();
 
             countStr = act.getString(R.string.play_countdown)+
                               " " + count + " " +
@@ -1201,12 +1201,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     // get YouTube title
-    private String getYouTubeTitle()
+    private String getNextYouTubeTitle()
     {
         int focusCatNum = Utils.getPref_video_table_id(act);
         String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(focusCatNum));
         String columnName = VideoContract.VideoEntry.COLUMN_LINK_TITLE;
-        int pos = getCursorPositionById(getPlayId());
+        int pos = getCursorPositionById(getNextId_auto());
         return getDB_link_data(table,columnName,pos);
     }
 
