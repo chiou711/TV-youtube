@@ -42,7 +42,6 @@ import com.cw.tv_yt.data.YouTubeTimeConvert;
 import com.cw.tv_yt.define.Define;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.ui.MainFragment;
-import com.cw.tv_yt.ui.MainFragment.RowLength;
 import com.cw.tv_yt.ui.VideoDetailsActivity;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpRequest;
@@ -148,9 +147,11 @@ public class CardPresenter extends Presenter {
         // set position info
         int row_number = row_id;
         String positionInfo;
-        RowLength rowLength = MainFragment.getRowLengthByVideoId(video.id);
-        String linkNumberOfRowLinks = "    (" + rowLength.start_id + "/" +
-                rowLength.row_length + ")    ";
+        int rowLength = MainFragment.getRowInfoByVideoId(video.id);
+        int linkPosInRow = MainFragment.getLinkPositionInRowByVideoId(video.id);
+
+        String linkNumberOfRowLinks = "    (" + linkPosInRow + "/" +
+                rowLength + ")    ";
         if(row_number == -1) {
             // duration + link number of row links
             positionInfo = duration +linkNumberOfRowLinks;
