@@ -104,6 +104,13 @@ public class Utils {
         return getVideoTableId_byCategoryName(context,catName);
     }
 
+    // get preference video table ID
+    public static int getPref_video_table_id(Activity context)
+    {
+        String catName = getPref_category_name(context);
+        return getVideoTableId_byCategoryName(context,catName);
+    }
+
     // set link source number
     public static void setPref_link_source_number(Context context, int linkSrcNumber ){
         SharedPreferences pref = context.getSharedPreferences("link_src", 0);
@@ -503,7 +510,7 @@ public class Utils {
                 null);
 
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
+        returnIntent.putExtra("KEY_DELETE", Pref.DB_DELETE);
         act.setResult( Activity.RESULT_OK, returnIntent);
 
         // show toast
@@ -614,6 +621,79 @@ public class Utils {
             act.startActivity(new_intent);
             act.finish();
         }
+    }
+
+    // Delete selected item confirmation
+    public static void confirmDeleteSelectedItem(FragmentActivity act, long video_id){
+
+        AlertDialog.Builder builder;
+        builder = new AlertDialog.Builder(act);
+
+        builder.setTitle(R.string.confirm_dialog_title)
+                .setMessage( act.getResources().getString(R.string.delete_item_message) + " " + video_id )
+                .setPositiveButton(act.getString(R.string.button_cancel), new DialogInterface.OnClickListener()
+                {
+                    // stop
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton(act.getString(R.string.button_ok), new DialogInterface.OnClickListener()
+                {
+                    // continue
+                    @Override
+                    public void onClick(DialogInterface dialog, int which1)
+                    {
+                        dialog.dismiss();
+                        deleteSelectedItem(act,video_id);
+                    }
+                }).
+                setOnCancelListener(new DialogInterface.OnCancelListener(){
+                    // cancel
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        dialog.dismiss();
+                    }
+                } );
+        AlertDialog alertDlg = builder.create();
+
+        // set listener for selection
+        alertDlg.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dlgInterface) {
+
+                // focus
+                Button negative = alertDlg.getButton(AlertDialog.BUTTON_NEGATIVE);
+                negative.setFocusable(true);
+                negative.setFocusableInTouchMode(true);
+                negative.requestFocus();
+            }
+        });
+        alertDlg.show();
+    }
+
+    // delete selected item
+    public static void deleteSelectedItem(FragmentActivity act, long video_id){
+
+        System.out.println("Utils / _deleteSelectedItem / id = " + video_id);
+        ContentResolver contentResolver = act.getApplicationContext().getContentResolver();
+        VideoProvider.tableId = String.valueOf(Utils.getPref_video_table_id(act));
+        contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + video_id,null);
+
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("KEY_DELETE", Pref.DB_DELETE);
+        act.setResult( Activity.RESULT_OK, returnIntent);
+
+        // show toast
+        act.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(act, act.getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        act.finish();
     }
 
 }

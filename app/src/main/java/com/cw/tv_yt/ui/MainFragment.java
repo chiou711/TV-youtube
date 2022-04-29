@@ -334,7 +334,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     int currentRow1stId;
     int currentRowSize;
     int currentRowLastId;
-    static boolean isLongClicked;
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
         @Override
         public void onItemClicked(Presenter.ViewHolder itemViewHolder, Object item,
@@ -369,14 +368,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                 // item is Category
                 } else {
-                    if(isLongClicked) {
-                        System.out.println("--- is Long clicked");
-                        isLongClicked = false;
-                        return;
-                    } else {
-                        // switch category by onItemClicked
-                        switchCategory(item);
-                    }
+                    // switch category by onItemClicked
+                    switchCategory(item);
                 }
 //                } else if (((String) item).contains(getString(R.string.guidedstep_first_title))) {
 //                    Intent intent = new Intent(act, GuidedStepActivity.class);
@@ -395,7 +388,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        System.out.println("MainFragment / _onActivityResult");
         if(requestCode == YOUTUBE_LINK_INTENT) {
             count = Define.DEFAULT_COUNT_DOWN_TIME_TO_PLAY_NEXT; // countdown time to play next
             builder = new AlertDialog.Builder(getContext());
@@ -464,20 +457,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             });
             alertDlg.show();
         }
-        else if(requestCode == VIDEO_DETAILS_INTENT) {
-            if(data != null) {
-                int action = data.getIntExtra("KEY_DELETE",0);
-                if (action == Pref.ACTION_DELETE)
-                {
-                    act.finish();
-                    // start new MainActivity
-                    Intent new_intent = new Intent(act, MainActivity.class);
-                    new_intent.addFlags(FLAG_ACTIVITY_CLEAR_TASK);
-                    new_intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
-                    act.startActivity(new_intent);
-                }
-            }
-        }
     }
 
     @Override
@@ -545,7 +524,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private List<List> mPlayLists;
 
     int row_id;
-
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {

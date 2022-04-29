@@ -54,7 +54,7 @@ public class MainActivity extends LeanbackActivity {
         if(requestCode == MainFragment.VIDEO_DETAILS_INTENT) {
             if(data != null) {
                 int action = data.getIntExtra("KEY_DELETE",0);
-                if (action == Pref.ACTION_DELETE)
+                if (action == Pref.DB_DELETE)
                 {
                     finish();
                     // start new MainActivity

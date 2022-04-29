@@ -63,27 +63,6 @@ public class ParseJsonToDB {
         isParsing = false;
     }
 
-    //
-    // parse JSON string and insert content to DB tables
-    //
-    private void parseJsonStringAndInsertDB(String content) throws JSONException
-    {
-        if(content != null) {
-            content = content.replaceAll("(?m)^[ \t]*\r?\n", "");
-        }
-
-        final String jsonString = content;//getJsonStringByFile(filePath);
-
-//        System.out.println("ParseJsonToDB / _parseJsonFileAndInsertDB / filePath = " + filePath);
-//        System.out.println("ParseJsonToDB / _parseJsonFileAndInsertDB / jsonString = " + jsonString);
-        JSONObject jsonObj = new JSONObject(jsonString);
-        Utils.parseJsonAndInsertDB(mContext,jsonObj);
-        isParsing = false;
-    }
-
-
-
-
     private String getJsonStringByFile(String filePath) {
 //        System.out.println("ParseJsonToDB / _getJsonString / filePath = " + filePath);
 

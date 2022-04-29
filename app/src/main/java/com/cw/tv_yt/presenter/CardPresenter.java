@@ -18,8 +18,11 @@ package com.cw.tv_yt.presenter;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ImageCardView;
@@ -33,7 +36,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
@@ -174,10 +181,40 @@ public class CardPresenter extends Presenter {
             int height = res.getDimensionPixelSize(R.dimen.card_height);
             cardView.setMainImageDimensions(width, height);
 
+            // original
+//            Glide.with(cardView.getContext())
+//                    .load(video.cardImageUrl)
+//                    .apply(RequestOptions.errorOf(mDefaultCardImage))
+//                    .into(cardView.getMainImageView());
+
+            // with onResourceReady / onLoadFailed
+            RequestOptions options = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.movie)
+                    .error(R.drawable.movie)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .priority(Priority.HIGH);
+
             Glide.with(cardView.getContext())
+                    .asBitmap()
                     .load(video.cardImageUrl)
-                    .apply(RequestOptions.errorOf(mDefaultCardImage))
-                    .into(cardView.getMainImageView());
+                    .apply(options)
+                    .into(new SimpleTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(
+                                Bitmap resource,
+                                Transition<? super Bitmap> transition) {
+                            Drawable mDrawable = new BitmapDrawable(act.getResources(), resource);
+                            cardView.setMainImage(mDrawable);
+                        }
+
+                        @Override
+                        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+                            super.onLoadFailed(errorDrawable);
+                            System.out.println("CardPresenter / _onLoadFailed");
+                            cardView.setMainImage(act.getResources().getDrawable(R.drawable.movie));
+                        }
+                    });
         }
 
         // card view long click listener: launch VideoDetailsActivity

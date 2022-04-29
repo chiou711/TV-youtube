@@ -10,7 +10,7 @@ import static com.cw.tv_yt.define.Define.DEFAULT_SEL_FILE_MGR_APP;
 import static com.cw.tv_yt.define.Define.DEFAULT_SHOW_YOUTUBE_DURATION;
 
 public class Pref {
-	public static int ACTION_DELETE = 99;
+	public static int DB_DELETE = 99;
 
 	public static boolean isAutoPlayByList(Context context) {
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);

@@ -22,6 +22,10 @@
             android:title="@string/set_default"
             android:defaultValue="true"
             android:key="@string/pref_key_set_default" />
+        <Preference
+            android:title="@string/remove_invalid_links"
+            android:defaultValue="true"
+            android:key="@string/pref_key_remove_invalid_links" />
 <!--        <SwitchPreference-->
 <!--            android:title="@string/pref_title_recommendations"-->
 <!--            android:defaultValue="true"-->

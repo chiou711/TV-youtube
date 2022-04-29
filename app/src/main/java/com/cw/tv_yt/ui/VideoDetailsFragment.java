@@ -16,9 +16,7 @@
 
 package com.cw.tv_yt.ui;
 
-import android.app.Activity;
 import android.app.NotificationManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -69,7 +67,6 @@ import com.bumptech.glide.request.transition.Transition;
 import com.cw.tv_yt.Pref;
 import com.cw.tv_yt.R;
 import com.cw.tv_yt.Utils;
-import com.cw.tv_yt.data.VideoProvider;
 import com.cw.tv_yt.model.Video;
 import com.cw.tv_yt.model.VideoCursorMapper;
 import com.cw.tv_yt.presenter.CardPresenter;
@@ -234,7 +231,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
 
                 } else if(action.getId() == ACTION_DELETE){
                     // delete current item
-                    deleteCurrentItem();
+                    Utils.confirmDeleteSelectedItem(getActivity(),mSelectedVideo.id);
                 } else {
                     Toast.makeText(getActivity(), action.toString(), Toast.LENGTH_SHORT).show();
                 }
@@ -385,7 +382,7 @@ public class VideoDetailsFragment extends DetailsSupportFragment
                         System.out.println("onLoadFailed");
 
                         // delete current item
-                        deleteCurrentItem();
+                        Utils.deleteSelectedItem(getActivity(),mSelectedVideo.id);
                     }
                 });
 
@@ -443,23 +440,4 @@ public class VideoDetailsFragment extends DetailsSupportFragment
         }
     }
 
-    // delete current item
-    void deleteCurrentItem(){
-        ContentResolver contentResolver = getActivity().getApplicationContext().getContentResolver();
-        VideoProvider.tableId = String.valueOf(Utils.getPref_video_table_id(getActivity()));
-        contentResolver.delete(VideoContract.VideoEntry.CONTENT_URI, "_id=" + mSelectedVideo.id,null);
-
-        Intent returnIntent = new Intent();
-        returnIntent.putExtra("KEY_DELETE", Pref.ACTION_DELETE);
-        getActivity().setResult( Activity.RESULT_OK, returnIntent);
-
-        // show toast
-        getActivity().runOnUiThread(new Runnable() {
-            public void run() {
-                Toast.makeText(getActivity(), getString(R.string.database_delete_item), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        getActivity().finish();
-    }
 }

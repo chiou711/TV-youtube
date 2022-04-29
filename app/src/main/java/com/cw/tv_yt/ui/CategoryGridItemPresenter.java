@@ -26,7 +26,6 @@ class CategoryGridItemPresenter extends GridItemPresenter {
          @Override
          public boolean onLongClick(View v) {
             System.out.println("CategoryGridItemPresenter / onLongClick / category item = " + item);
-            MainFragment.isLongClicked = true;
             Utils.confirmDeleteCategory(act,category_names,(String)item);
             return false;
          }
