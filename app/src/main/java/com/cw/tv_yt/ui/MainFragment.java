@@ -599,26 +599,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                    (mVideoCursorAdapters.get(loaderId)!= null))
                     mVideoCursorAdapters.get(loaderId).changeCursor(data);
 
-                int sizeOfRowLinks = data.getCount();
-//                System.out.println("MainFragment / _onLoadFinished / sizeOfRowLinks= " + sizeOfRowLinks);
-                int columnIndex = data.getColumnIndex(VideoContract.VideoEntry._ID);
-                int first_video_id = data.getInt(columnIndex);
-//                System.out.println("MainFragment / _onLoadFinished / 1st video_id of row = " + first_video_id);
-                data.moveToPosition(sizeOfRowLinks-1); // starts from 0
-                int last_video_id = data.getInt(columnIndex);
-//                System.out.println("MainFragment / _onLoadFinished / last_video_id = " + last_video_id);
-
-                List<Integer> playlist = new ArrayList<>();
-                for(int i=0;i<=(sizeOfRowLinks-1);i++) {
-                    data.moveToPosition(i);
-                    playlist.add(data.getInt(columnIndex));
-                }
-
-                // add new row info to row info list
-                rowInfoList.add(new RowInfo(first_video_id,last_video_id,sizeOfRowLinks,playlist));
-
-                mPlayLists.add(playlist);
-
                 // one row added
                 rowsLoadedCount++;
 //                System.out.println("MainFragment / _onLoadFinished / rowsLoadedCount = "+ rowsLoadedCount);
@@ -634,6 +614,77 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                     System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
                     System.out.println("MainFragment / _onLoadFinished / end of onLoadFinished video");
                     System.out.println("MainFragment / _onLoadFinished / -------------------------------------");
+
+                    // create row info list
+                    DbHelper mOpenHelper = new DbHelper(act);
+                    mOpenHelper.setWriteAheadLoggingEnabled(false);
+                    SQLiteDatabase sqlDb = mOpenHelper.getReadableDatabase();
+                    String table = VideoContract.VideoEntry.TABLE_NAME.concat(String.valueOf(Utils.getPref_video_table_id(act)));
+
+                    Cursor cursor = sqlDb.query(
+                            table,
+                            null,//projection,
+                            null,//selection,
+                            null,//selectionArgs,
+                            null,
+                            null,
+                            null//sortOrder
+                    );
+
+                    int columnIndex_ID = cursor.getColumnIndex(VideoContract.VideoEntry._ID);
+                    int columnIndex_row_title = cursor.getColumnIndex(VideoContract.VideoEntry.COLUMN_ROW_TITLE);
+                    int videosCount = cursor.getCount();
+                    String same_row_title = null;
+                    int size_row_links = 0;
+                    int first_videoId = 0;
+                    int last_videoId = 0;
+                    List<Integer> play_list = null;
+                    
+                    for(int pos=0;pos<videosCount;pos++) {
+
+                        cursor.moveToPosition((int) pos);
+                        int id = cursor.getInt(columnIndex_ID);
+                        int end_id = 0;
+                        String row_title = cursor.getString(columnIndex_row_title);
+
+                        if(pos == videosCount-1)
+                            end_id = id;
+
+                        // new same row_title
+                        if(!row_title.equalsIgnoreCase(same_row_title)){
+
+                            // grouping
+                            if(size_row_links>1){
+                                rowInfoList.add(new RowInfo(first_videoId,last_videoId,size_row_links,play_list));
+                            }
+
+                            // new row start
+                            size_row_links = 1;
+                            first_videoId = id;
+                            same_row_title = row_title;
+                            play_list = new ArrayList<>();
+                            play_list.add(id);
+                        } else if (row_title.equalsIgnoreCase(same_row_title)){
+                            last_videoId = id;
+                            play_list.add(id);
+                            size_row_links++;
+
+                            // end of table
+                            if(last_videoId == end_id)
+                                rowInfoList.add(new RowInfo(first_videoId,last_videoId,size_row_links,play_list));
+                        }
+                    }
+                    cursor.close();
+                    sqlDb.close();
+
+                    // check row info list
+//                    for(int i=0;i<rowInfoList.size();i++){
+//                        System.out.println("( row  = " + i);
+//                        List<Integer> list = rowInfoList.get(i).list;
+//                        System.out.println("    size  = " + list.size());
+//                        System.out.print("    from " + rowInfoList.get(i).start_id);
+//                        System.out.println(" to " + rowInfoList.get(i).end_id +")");
+//                    }
                 }
             }
         } else { // cursor data is null after App installation

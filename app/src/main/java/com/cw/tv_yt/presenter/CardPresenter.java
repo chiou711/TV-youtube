@@ -69,7 +69,7 @@ import java.util.concurrent.Executors;
 public class CardPresenter extends Presenter {
     private int mSelectedBackgroundColor = -1;
     private int mDefaultBackgroundColor = -1;
-    private Drawable mDefaultCardImage;
+//    private Drawable mDefaultCardImage;
     FragmentActivity act;
     private static YouTube youtube;
     boolean isGotDuration;
@@ -95,7 +95,7 @@ public class CardPresenter extends Presenter {
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
         mDefaultBackgroundColor = ContextCompat.getColor(parent.getContext(), R.color.default_background);
         mSelectedBackgroundColor = ContextCompat.getColor(parent.getContext(), R.color.selected_background);
-        mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie, null);
+//        mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie, null);
 
         ImageCardView cardView = new ImageCardView(parent.getContext()) {
             @Override
