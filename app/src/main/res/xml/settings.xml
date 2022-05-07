@@ -16,7 +16,7 @@
             android:key="@string/pref_key_show_duration" />
         <SwitchPreference
             android:title="@string/sel_file_mgr_app"
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="@string/pref_key_sel_file_mgr_app" />
         <Preference
             android:title="@string/set_default"

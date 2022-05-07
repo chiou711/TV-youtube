@@ -80,31 +80,11 @@ public class ImportGDriveAct extends AppCompatActivity {
 
     private EditText mFileTitleEditText;
     private TextView mJsonText;
-    final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 97;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // check Read/Write storage permission
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)//api23
-        {
-            // check permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE  },
-                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-            }
-            else
-                doCreate();
-        }
-        else
-            doCreate();
-
+        doCreate();
     }
 
     // do create
@@ -140,28 +120,6 @@ public class ImportGDriveAct extends AppCompatActivity {
             Toast.makeText(this, "Please install a File Manager.",
                     Toast.LENGTH_SHORT).show();
         }
-    }
-
-    // callback of granted permission
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        System.out.println("grantResults.length =" + grantResults.length);
-        switch (requestCode)
-        {
-            case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
-            {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    doCreate();
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    finish();
-                }
-                return;
-            }//case
-        }//switch
     }
 
     void exit() {
@@ -396,7 +354,10 @@ public class ImportGDriveAct extends AppCompatActivity {
     // open file from file chooser
     private void openFileFromFilePickerSaved(String path) {
 
-        File sdcard = Environment.getExternalStorageDirectory();
+//        File sdcard = Environment.getExternalStorageDirectory();
+
+        // data package folder
+        File sdcard = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS);
         File file = new File(path);
         Log.d("sdcard path =",sdcard.getPath());
         Log.d("file path =",file.getPath());

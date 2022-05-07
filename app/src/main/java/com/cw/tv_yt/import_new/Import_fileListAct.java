@@ -38,7 +38,6 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
     ListView listView;
     public FragmentManager fragmentManager;
     public FragmentManager.OnBackStackChangedListener onBackStackChangedListener;
-    final int PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 98;
     int linkSrcNum;
 
     @Override
@@ -46,51 +45,9 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
     {
 
         linkSrcNum = getIntent().getExtras().getInt("link_source_number");
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)//api23
-        {
-            // check permission
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED)
-            {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                                Manifest.permission.READ_EXTERNAL_STORAGE  },
-                        PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-            }
-            else
-                doCreate();
-        }
-        else
-            doCreate();
+        doCreate();
 
         super.onCreate(bundle);
-    }
-
-
-    // callback of granted permission
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
-        System.out.println("grantResults.length =" + grantResults.length);
-        switch (requestCode)
-        {
-            case PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE:
-            {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                {
-                    doCreate();
-                }
-                else
-                {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                    finish();
-                }
-                return;
-            }//case
-        }//switch
     }
 
 
@@ -116,15 +73,11 @@ public class Import_fileListAct extends FragmentActivity implements FragmentMana
         onBackStackChangedListener = this;
         fragmentManager.addOnBackStackChangedListener(onBackStackChangedListener);
 
-        String dirString = Environment.getExternalStorageDirectory().toString() +
-                "/" +
-                Utils.getStorageDirName(this);
+        // data package folder
+        // /storage/emulated/0/Android/data/com.cw.tv_yt/files/Documents
+        String dirString = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
 
         System.out.println("Import_fileListAct / _onResume / dirString = " + dirString);
-
-        File dir = new File(dirString);
-        if(!dir.isDirectory())
-            dir.mkdir();
 
         getFiles(new File(dirString).listFiles());
     }

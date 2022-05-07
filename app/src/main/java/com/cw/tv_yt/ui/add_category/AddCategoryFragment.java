@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
@@ -33,6 +34,7 @@ import com.cw.tv_yt.data.Source_links;
 import com.cw.tv_yt.import_new.Import_fileListAct;
 import com.cw.tv_yt.import_new.gdrive.ImportGDriveAct;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -136,6 +138,17 @@ public class AddCategoryFragment extends VerticalGridSupportFragment  {
                 // position number 1: is dedicated for local link source
                 // others: for link sources
                 if(clickedSrcLinkNum == 1){ // local link source
+
+                    // create data package folder
+                    // path: /storage/emulated/0/Android/data/com.cw.tv_yt/files/Documents
+                    String dirString = getActivity().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS).toString();
+
+                    System.out.println("AddCategoryFragment / _onItemClicked / dirString = " + dirString);
+
+                    File dir = new File(dirString);
+
+                    if(!dir.isDirectory())
+                        dir.mkdir();
 
                     if(Pref.isSelFileMgrApp(getActivity())){
                         // select file manager app : can access google drive

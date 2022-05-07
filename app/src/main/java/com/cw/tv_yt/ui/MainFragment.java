@@ -655,6 +655,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
                             // grouping
                             if(size_row_links>1){
+                                mPlayLists.add(play_list);
                                 rowInfoList.add(new RowInfo(first_videoId,last_videoId,size_row_links,play_list));
                             }
 
@@ -670,8 +671,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                             size_row_links++;
 
                             // end of table
-                            if(last_videoId == end_id)
-                                rowInfoList.add(new RowInfo(first_videoId,last_videoId,size_row_links,play_list));
+                            if(last_videoId == end_id) {
+                                mPlayLists.add(play_list);
+                                rowInfoList.add(new RowInfo(first_videoId, last_videoId, size_row_links, play_list));
+                            }
                         }
                     }
                     cursor.close();

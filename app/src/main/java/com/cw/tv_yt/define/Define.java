@@ -33,8 +33,8 @@ public class Define {
     // show duration (default: disabled, show duration could cause card view display lag)
     public final static boolean DEFAULT_SHOW_YOUTUBE_DURATION = false;
 
-    // select file manager app (default: disabled, user enabled this will need advanced operation)
-    public final static boolean DEFAULT_SEL_FILE_MGR_APP = false;
+    // select file manager app (default: enabled, data package folder is empty at first)
+    public final static boolean DEFAULT_SEL_FILE_MGR_APP = true;
 
     // initial number of default URL: db_source_id_x
     public final static int INIT_SOURCE_LINK_NUMBER = 1;
