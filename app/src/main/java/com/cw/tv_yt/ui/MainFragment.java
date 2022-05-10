@@ -191,8 +191,14 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         if(alertDlg != null)
             alertDlg.dismiss();
+    }
 
-        cancelYouTubeHandler(); //todo ??? Why not stop when power off
+    @Override
+    public void onStop() {
+        System.out.println("MainFragment / _onStop");
+        mBackgroundManager.release();
+        cancelYouTubeHandler();
+        super.onStop();
     }
 
     @Override
@@ -206,12 +212,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         localBroadcastMgr.unregisterReceiver(responseReceiver);
         responseReceiver = null;
         super.onDestroy();
-    }
-
-    @Override
-    public void onStop() {
-        mBackgroundManager.release();
-        super.onStop();
     }
 
     private void prepareBackgroundManager() {
@@ -422,9 +422,6 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
                         @Override
                         public void onClick(DialogInterface dialog1, int which1)
                         {
-                            alertDlg.dismiss();
-                            cancelYouTubeHandler();
-
                             // launch next intent
                             alertDlg.dismiss();
                             cancelYouTubeHandler();
@@ -982,6 +979,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
     private void cancelYouTubeHandler()
     {
+        System.out.println("MainFragment / _cancelYouTubeHandler");
         if(handler != null) {
             handler.removeCallbacks(runCountDown);
             handler = null;
@@ -1723,4 +1721,5 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
         }
         return itemRowNumber;
     }
+
 }
